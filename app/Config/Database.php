@@ -30,12 +30,12 @@ class Database extends Config
         'username'     => 'postgres',
         'password'     => '123456',
         'database'     => 'cns27112025',
-        'DBDriver'     => 'postgre',
+        'DBDriver'     => 'Postgre',
         'DBPrefix'     => '',
         'pConnect'     => false,
         'DBDebug'      => true,
-        'charset'      => 'utf8mb4',
-        'DBCollat'     => 'utf8mb4_general_ci',
+        'charset'      => 'utf8',
+        'DBCollat'     => 'utf8_general_ci',
         'swapPre'      => '',
         'encrypt'      => false,
         'compress'     => false,
@@ -162,6 +162,7 @@ class Database extends Config
      *
      * @var array<string, mixed>
      */
+    
     public array $tests = [
         'DSN'         => '',
         'hostname'    => '127.0.0.1',

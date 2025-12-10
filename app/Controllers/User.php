@@ -9,17 +9,51 @@ class User extends BaseController{
     /// index
     public function index(){
         // Si el usuario ya está logueado, redirigir al dashboard (o donde corresponda)
+        $captcha= $this->generar_captcha(array(0,1,2,3,4,5,6,7,8,9,'A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R'),4);
+        
+        $data['base']='<input name="base" type="hidden" value="'.base_url().'">';
+        $data['cod_captcha']=$captcha;
+        $data['captcha']=md5($captcha);
+
         if (session()->get('isLoggedIn')) {
             return redirect()->to(base_url('dashboard'));
         }
         
         helper(['form']);
-        return view('dashboard/login');
+        return view('dashboard/login', $data);
     }
 
 
+    /// Valida login
     public function loginAction(){
-        $session = session();
+        $rules = [
+            'user_name' => 'required|min_length[3]|max_length[20]', // Ajusta longitudes
+            'password' => 'required|min_length[5]|max_length[30]', // Ajusta longitudes
+        ];
+        
+        // 2. Ejecutar la validación básica
+        if (!$this->validate($rules)) {
+            return redirect()->back()->withInput()->with('errors', $this->validator->getErrors());
+        }
+
+        $usuario = $this->request->getPost('user_name');
+        $password = $this->request->getPost('password');
+
+        echo $usuario.'---'.$password;
+
+
+/*        if(isset($_POST['user_name']) && isset($_POST['password']) && isset($_POST['dat_captcha'])){
+
+            $user_name = $this->input->post('user_name');
+            $password = $this->input->post('password'); 
+            $captcha = $this->input->post('captcha'); 
+
+            echo $user_name.'--'.$password.''.$captcha;
+        }
+        else{
+            echo "No puede";
+        }*/
+        /*$session = session();
         $model = new IndexModel();
 
         $rules = [
@@ -27,12 +61,6 @@ class User extends BaseController{
             'password' => 'required|min_length[8]|max_length[255]', // Ajusta longitudes
         ];
         
-        /*$errors = [
-            'password' => [
-                'validateUser' => 'Usuario o Contraseña incorrectos.'
-            ]
-        ];
-*/
         // 2. Ejecutar la validación básica
         if (!$this->validate($rules)) {
             return redirect()->back()->withInput()->with('errors', $this->validator->getErrors());
@@ -41,19 +69,55 @@ class User extends BaseController{
         // 3. Realizar la verificación manual de usuario y contraseña
         $usuario = $this->request->getPost('usuario');
         $password = $this->request->getPost('password');
-        echo $usuario.'---'.$usuario;
-        /*$user = $model->where('usuario', $usuario)->first();
+        $is_valid = $this->model_funcionario->verificar_loggin($this->security->xss_clean($usuario), $this->security->xss_clean($password));
+        if($is_valid['bool']){
+            $userData = [
+            'user_id'    => 1, // Asegúrate de que tu modelo devuelve 'id'
+            'username'   => 'juan',
+            'isLoggedIn' => TRUE, // Bandera clave para tus filtros de acceso
+        ];
+        
+        $session->set($userData); // Guarda la sesión
 
-        if ($user && password_verify($password, $user['password'])) {
-            // Éxito: crear sesión y redirigir
-            // ...
-        } else {
-            // Error: credenciales incorrectas
-            $session->setFlashdata('error', 'Usuario o Contraseña incorrectos.');
-            return redirect()->to('/login')->withInput();
+        // 2. Redirigir al usuario a una página protegida (ej. dashboard)
+        return redirect()->to(base_url('dashboard')); 
+        }
+        else{
+            echo "Error!!";
         }*/
+
     }
 
+    /// GET CAPTCHA
+    public function get_captcha(){
+      if($this->input->is_ajax_request()){
+          $post = $this->input->post();
+          $captcha= $this->generar_captcha(array(0,1,2,3,4,5,6,7,8,9,'A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R'),4);
+         
+          $result = array(
+          'respuesta' => 'correcto',
+          'cod_captcha' => $captcha,
+          'captcha' => md5($captcha),
+        );
+          
+        echo json_encode($result);
+ 
+      }else{
+        show_404();
+      }
+    }
+
+
+    //// GENERAR CAPTCHA
+    function generar_captcha($chars,$length){
+        $captcha=null;
+        for ($i=0; $i <$length ; $i++) { 
+            $rand= rand(0,count($chars)-1);
+            $captcha .=$chars[$rand];
+        }
+
+        return $captcha;
+    }
 
 
 

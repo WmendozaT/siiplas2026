@@ -26,6 +26,9 @@ class User extends BaseController{
 
     /// Valida login
     public function loginAction(){
+        $session = session();
+        $model_index = new IndexModel();
+
         $rules = [
             'user_name' => 'required|min_length[3]|max_length[20]', // Ajusta longitudes
             'password' => 'required|min_length[5]|max_length[30]', // Ajusta longitudes
@@ -38,8 +41,32 @@ class User extends BaseController{
 
         $usuario = $this->request->getPost('user_name');
         $password = $this->request->getPost('password');
+        $dat_captcha = $this->request->getPost('dat_captcha');
 
-        echo $usuario.'---'.$password;
+        $is_valid = $model_index->verificar_loggin($usuario, $password);
+        
+        if($is_valid['bool']==true){
+            echo "hola undo";
+            /*$userData = [
+            'user_id'    => 1, // Asegúrate de que tu modelo devuelve 'id'
+            'username'   => 'juan',
+            'isLoggedIn' => TRUE, // Bandera clave para tus filtros de acceso
+        ];*/
+        
+        //$session->set($userData); // Guarda la sesión
+
+        // 2. Redirigir al usuario a una página protegida (ej. dashboard)
+        //return redirect()->to(base_url('dashboard')); 
+        }
+        else{
+            echo "Error!!";
+        }
+
+        echo $is_valid['message'];
+
+
+
+       // echo $usuario.'---'.$password;
 
 
 /*        if(isset($_POST['user_name']) && isset($_POST['password']) && isset($_POST['dat_captcha'])){

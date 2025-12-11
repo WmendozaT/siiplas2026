@@ -24,7 +24,7 @@
             <input name="base" type="hidden" value="<?= base_url() ?>">
             <div class="form-group">
                 <label for="usu">Usuario:</label>
-                <input type="usuario" name="user_name" id="user_name" value="<?= old('usuario') ?>" required>
+                <input type="usuario" name="user_name" id="user_name" value="<?= old('user_name') ?>" required>
                 <!-- Mostrar errores de validación específicos -->
                 <?php if (isset($errors['user_name'])): ?>
                     <p class="error-text"><?= $errors['user_name'] ?></p>
@@ -45,7 +45,7 @@
             </div>
 
             <div class="form-group">
-                <input tabindex="4" id="dat_captcha" name="dat_captcha" type="text" class="form-control form-input-bg text-center" placeholder="Ingrese el texto de la imagen" autofocus minlength="4" maxlength="4" >
+                <input tabindex="4" id="dat_captcha" name="dat_captcha" type="text" class="form-control form-input-bg text-center" placeholder="Ingrese el texto de la imagen" autofocus minlength="4" maxlength="4" required>
                 <div id="cat" class="text-danger text-start" style="font-size:9px; visibility: hidden;" style="font-size:8px;">
                     <b>  Este campo es requerido</b>
                 </div>

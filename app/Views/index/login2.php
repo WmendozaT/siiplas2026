@@ -9,14 +9,14 @@
     <div class="login-container">
         <h2>Iniciar Sesión SIIPLAS 2026</h2>
 
-        <!-- Mostrar mensajes de éxito/error flashdata -->
-        <?php if (session()->getFlashdata('error')): ?>
-            <div class="alert error"><?= session()->getFlashdata('error') ?></div>
+        <!-- AQUÍ VA EL MENSAJE DE ERROR ESPECÍFICO DEL LOGIN -->
+        <?php if (session()->getFlashdata('error_message')): ?>
+            <div class="alert error">
+                <?= session()->getFlashdata('error_message') ?>
+            </div>
         <?php endif; ?>
 
-        <?php if (session()->getFlashdata('success')): ?>
-            <div class="alert success"><?= session()->getFlashdata('success') ?></div>
-        <?php endif; ?>
+        <?= $formulario; ?>
 
         <!-- Formulario de Login -->
         <form action="<?= base_url('login/auth') ?>" method="post">
@@ -24,6 +24,7 @@
             <input name="base" type="hidden" value="<?= base_url() ?>">
             <div class="form-group">
                 <label for="usu">Usuario:</label>
+                <!-- Mantén 'old()' para preservar el usuario escrito si hay error -->
                 <input type="usuario" name="user_name" id="user_name" value="<?= old('user_name') ?>" required>
                 <!-- Mostrar errores de validación específicos -->
                 <?php if (isset($errors['user_name'])): ?>
@@ -39,6 +40,7 @@
                 <?php endif; ?>
             </div>
 
+            <!-- ... el resto de tu código para el captcha ... -->
             <div class="text-center py-3">
                 <p class="caja" id="refreshs" style="text-align:center"><b><?= $cod_captcha ?></b></p>
                 <input type="hidden" name="captcha" id="captcha"  value="<?= $captcha ?>" style="text-transform:uppercase;" oninput="this.value = this.value.toUpperCase();">

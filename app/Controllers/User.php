@@ -14,14 +14,35 @@ class User extends BaseController{
         $data['base']='<input name="base" type="hidden" value="'.base_url().'">';
         $data['cod_captcha']=$captcha;
         $data['captcha']=md5($captcha);
+        $data['formulario']=$this->form_login();
+
+
 
         if (session()->get('isLoggedIn')) {
             return redirect()->to(base_url('dashboard'));
         }
         
+
+
         helper(['form']);
-        return view('dashboard/login', $data);
+        return view('index/login', $data);
     }
+
+
+    //// formulario Login
+    public function form_login(){
+        $tabla='HOLA MUNDO';
+        $tabla.='';
+
+
+        return $tabla;
+    }
+
+
+
+
+
+
 
 
     /// Valida login
@@ -31,7 +52,7 @@ class User extends BaseController{
 
         $rules = [
             'user_name' => 'required|min_length[3]|max_length[20]', // Ajusta longitudes
-            'password' => 'required|min_length[5]|max_length[30]', // Ajusta longitudes
+            'password' => 'required|min_length[5]|max_length[20]', // Ajusta longitudes
         ];
         
         // 2. Ejecutar la validación básica
@@ -44,76 +65,61 @@ class User extends BaseController{
         $dat_captcha = $this->request->getPost('dat_captcha');
 
         $is_valid = $model_index->verificar_loggin($usuario, $password);
-        
         if($is_valid['bool']==true){
-            echo "hola undo";
-            /*$userData = [
-            'user_id'    => 1, // Asegúrate de que tu modelo devuelve 'id'
-            'username'   => 'juan',
+            $conf = $model_index->get_gestion_activo(); /// configuracion gestion activo
+            $modulos = $model_index->modulos($conf['ide']); /// modulos
+
+             $userData = [
+            'fun_id'    => $is_valid['data']['fun_id'], // Asegúrate de que tu modelo devuelve 'id'
+            'user_name'   => $is_valid['data']['fun_nombre'].' '.$is_valid['data']['fun_paterno'].' '.$is_valid['data']['fun_materno'],
+            'usuario'   => $is_valid['data']['fun_usuario'],
+            'cargo'   => $is_valid['data']['fun_cargo'],
+            'credencial_funcionario'   => $is_valid['data']['sw_pass'],
+            'fun_estado'   => $is_valid['data']['fun_estado'],
+            'com_id'   => $is_valid['data']['cm_id'],
+            'dist_id'   => $is_valid['data']['fun_dist'],
+            'regional'   => $model_index->datos_regional($is_valid['data']['fun_dist']),
+            
+            'mes' => $conf['conf_mes'],
+            'conf_ajuste_poa' => $conf['conf_ajuste_poa'],
+            'estado_notificaciones' => $conf['conf_poa'], /// Estado para las Notificaciones 0:no activo, 1: Habilitado
+            'entidad' => $conf['conf_nombre_entidad'],
+            'trimestre' => $conf['conf_mes_otro'], /// Trimestre 1,2,3,4
+            'verif_ppto' => $conf['ppto_poa'], /// Ppto poa : 0 (Ante proyecto), 1: (Aprobado)
+            'conf_poa_estado' => $conf['conf_poa_estado'], /// Estado Poa Estado : 1 (Inicial), 2: (Ajuste), 3: (Aprobado)
+            'conf_form4' => $conf['conf_form4'], /// Estado de Registro del formulario N4, 0 (Inactivo), 1 (Activo)
+            'conf_form5' => $conf['conf_form5'], /// Estado de Registro del formulario N5, 0 (Inactivo), 1 (Activo)
+            'conf_mod_ope' => $conf['conf_mod_ope'], /// Estado de modificacion del formulario N4, 0 (Inactivo), 1 (Activo)
+            'conf_mod_req' => $conf['conf_mod_req'], /// Estado de modificacion del formulario N5, 0 (Inactivo), 1 (Activo)
+            'conf_certificacion' => $conf['conf_certificacion'], /// Estado de modificacion del formulario N5, 0 (Inactivo), 1 (Activo)
+            'conf_psw'=>$conf['conf_psw'],
+            'm_id'=>$conf['conf_mes'],
+            'g_id'=>$conf['conf_gestion'],
+            //'desc_mes' => $this->mes_texto($//[0]['conf_mes']),
+            'abrev_sistema' => 'SIIPLAS V3.0',
+            'direccion' => 'DEPARTAMENTO NACIONAL DE PLANIFICACI&Oacute;N',
+            'sistema' => 'SISTEMA DE PLANIFICACI&Oacute;N Y SEGUIMIENTO POA - SIIPLAS V3.0',
+            'sistema_pie' => 'SIIPLAS - Sistema de Planificaci&oacute;n y Seguimiento POA',
+
             'isLoggedIn' => TRUE, // Bandera clave para tus filtros de acceso
-        ];*/
+            ];
         
-        //$session->set($userData); // Guarda la sesión
+            $session->set($userData); // Guarda la sesión
 
-        // 2. Redirigir al usuario a una página protegida (ej. dashboard)
-        //return redirect()->to(base_url('dashboard')); 
+            // 2. Redirigir al usuario a una página protegida (ej. dashboard)
+            return redirect()->to(base_url('dashboard')); 
         }
         else{
-            echo "Error!!";
+            return redirect()->to(base_url('login'))->with('error_message', $is_valid['message']); 
         }
-
-        echo $is_valid['message'];
-
-
-
-       // echo $usuario.'---'.$password;
-
-
-/*        if(isset($_POST['user_name']) && isset($_POST['password']) && isset($_POST['dat_captcha'])){
-
-            $user_name = $this->input->post('user_name');
-            $password = $this->input->post('password'); 
-            $captcha = $this->input->post('captcha'); 
-
-            echo $user_name.'--'.$password.''.$captcha;
-        }
-        else{
-            echo "No puede";
-        }*/
-        /*$session = session();
-        $model = new IndexModel();
-
-        $rules = [
-            'usuario' => 'required|min_length[3]|max_length[30]', // Ajusta longitudes
-            'password' => 'required|min_length[8]|max_length[255]', // Ajusta longitudes
-        ];
-        
-        // 2. Ejecutar la validación básica
-        if (!$this->validate($rules)) {
-            return redirect()->back()->withInput()->with('errors', $this->validator->getErrors());
-        }
-
-        // 3. Realizar la verificación manual de usuario y contraseña
-        $usuario = $this->request->getPost('usuario');
-        $password = $this->request->getPost('password');
-        $is_valid = $this->model_funcionario->verificar_loggin($this->security->xss_clean($usuario), $this->security->xss_clean($password));
-        if($is_valid['bool']){
-            $userData = [
-            'user_id'    => 1, // Asegúrate de que tu modelo devuelve 'id'
-            'username'   => 'juan',
-            'isLoggedIn' => TRUE, // Bandera clave para tus filtros de acceso
-        ];
-        
-        $session->set($userData); // Guarda la sesión
-
-        // 2. Redirigir al usuario a una página protegida (ej. dashboard)
-        return redirect()->to(base_url('dashboard')); 
-        }
-        else{
-            echo "Error!!";
-        }*/
-
+      
     }
+
+
+
+
+
+
 
     /// GET CAPTCHA
     public function get_captcha(){
@@ -147,60 +153,7 @@ class User extends BaseController{
     }
 
 
-
-    /// Autentica Login
-    public function loginAction2(){
-        $session = session();
-        $model = new IndexModel();
-
-        // 1. Validar la entrada del formulario
-        $rules = [
-            'usuario' => 'required|min_length[3]|max_length[10]',
-            'password' => 'required|min_length[6]|max_length[20]|validateUser[usuario,password]',
-        ];
-
-       /* $errors = [
-            'password' => [
-                'validateUser' => 'Usuario o Contraseña incorrectos.'
-            ]
-        ];*/
-
-        // 2. Ejecutar la validación básica
-        if (!$this->validate($rules)) {
-            return redirect()->back()->withInput()->with('errors', $this->validator->getErrors());
-        }
-
-        // 2. Obtener datos validados
-        $usuario = $this->request->getVar('usuario');
-        $password = $this->request->getVar('password');
-        echo "Hola mundo";
-        //return redirect()->to('/dashboard');
-        /*// 3. Buscar usuario en la base de datos
-        $user = $model->getUserByUsuario($usuario);
-
-        if ($user && password_verify($password, $user['password'])) {
-            // 4. Verificar contraseña y crear sesión segura
-            $ses_data = [
-                'id'        => $user['id'],
-                'usuario'   => $user['usuario'],
-                'nombre'    => $user['nombre'],
-                'rol'       => $user['rol'],
-                'isLoggedIn' => TRUE
-            ];
-            $session->set($ses_data);
-
-            // Redirige al dashboard o página principal
-            return redirect()->to('/dashboard');
-
-        } else {
-            // Si falla la verificación (esto rara vez se ejecuta si validateUser funciona bien)
-            $session->setFlashdata('error', 'Usuario o Contraseña incorrectos.');
-            return redirect()->to('/login')->withInput();
-        }*/
-    }
-
-    public function logout()
-    {
+    public function logout(){
         $session = session();
         $session->destroy();
         return redirect()->to('/login');
@@ -210,67 +163,5 @@ class User extends BaseController{
 
 
 
-
-
-    /////////////
-
-
-    public function index3(){
-
-        // 1. Instanciar el modelo
-        $model = new IndexModel();
-
-        // 2. Llamar al método específico definido en el modelo: 
-        //    Debe ser 'obtenerFuncionariosActivosRaw'
-        $funcionarios = $model->obtenerFuncionariosActivosRaw(); 
-        
-        // 3. Mostrar el conteo para verificar que funciona
-        echo count($funcionarios);
-        
-        // Opcional: Pasar los datos a una vista para mostrarlos formateados
-        // return view('nombre_de_tu_vista', ['funcionarios' => $funcionarios]);
-    }
-
-
-    public function index2(){
-        //echo route_to('admin_proy_listado');
-        //echo route_to('admin/proy/list_proy');
-        //echo base_url().'assets/img/registro1.png';
-        // 1. Opcional: Preparar datos para pasar a la vista
-
-        $model = new IndexModel();
-
-        // Llama al método que creamos en el modelo (Método A)
-        $funcionarios = $model->obtenerFuncionariosActivos();
-        echo count($funcionarios);
-
-       /* $data = [
-            'titulo' => 'Página Principal del Dashboard',
-            'mensaje' => '¡Bienvenido al sistema siiplas2026!',
-            'url_boton' => base_url('admin/proy/list_proy'),
-            'texto_boton' => 'Listado de Proyectos'
-        ];
-
-        // 2. Cargar la vista 'dashboard_view.php' y pasarle los datos
-        return view('dashboard/index', $data);*/
-    }
-    /// libreria calculadora
-    public function calculadora(){
-        //echo route_to('admin_proy_listado');
-        //echo route_to('admin/proy/list_proy');
-        //echo base_url().'assets/img/registro1.png';
-        // 1. Opcional: Preparar datos para pasar a la vista
-
-        $calc = new Calculadora();
-        $resultado = $calc->sumar(5, 10);
-
-        echo "El resultado es: " . $resultado;
-
-        
-    }
-
-    public function listProy(){
-        echo "Hola mundo nuevo nuevo";
-    }
    
 }

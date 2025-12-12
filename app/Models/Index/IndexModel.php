@@ -5,6 +5,7 @@ use CodeIgniter\Model;
 
 class IndexModel extends Model{
     protected $table = 'funcionario'; 
+    //protected $table = 'configuracion'; 
     
     /// lista de funcionario
     public function obtenerFuncionariosActivosRaw(){
@@ -14,8 +15,37 @@ class IndexModel extends Model{
         return $query->getResult(); 
     }
 
-    /// Verifica Usuario Administr
-public function verificar_loggin($user_name, $password_plano){
+
+    /// Gestion Activo
+    public function get_gestion_activo(){
+        $sql = "SELECT * FROM configuracion WHERE conf_estado = 1";
+        $query = $this->query($sql);
+        
+        return $query->getRowArray();
+    }
+
+    /// Modulos Activos
+    public function modulos($ide){
+        $builder = $this->db->table('confi_modulo');
+        $builder->where('ide', $ide); // El segundo parámetro se escapa automáticamente
+        $query = $builder->get();
+        
+        return $query->getRowArray();
+    }
+
+    /// Datos Regional Distrital
+    public function datos_regional($dist_id){
+        $sql = 'select *
+                from _distritales ds
+                Inner Join _departamentos as d On d.dep_id=ds.dep_id
+                where ds.dist_id='.$dist_id.'';
+
+        $query = $this->db->query($sql);
+        return $query->getRowArray();
+    }
+
+    /// Verifica Usuario activo
+    public function verificar_loggin($user_name, $password_plano){
     $data = array(
         'bool'   => false,
         'fun_id' => null,
@@ -26,112 +56,47 @@ public function verificar_loggin($user_name, $password_plano){
     $builder = $this->db->table('funcionario');
     $user = $builder->where('fun_usuario', $user_name)->get()->getRowArray();
 
-    if ($user) {
         // 3. Verificar si el usuario existe
         if (!$user) {
             return $data;
         }
-
 
         if ($user['fun_estado'] == 3) {
             $data['message'] = 'Usuario inactivo.';
             return $data; // Sale de la función, el bool sigue siendo false
         }
 
+        if($user['sw_pass']==0){
+            // ---  MIGRAR A UN HASH SEGURO INMEDIATAMENTE (password_hash) ---
+            $new_secure_hash = password_hash($password_plano, PASSWORD_DEFAULT); // Usa bcrypt/argon2
+            // Actualizar la base de datos con el nuevo hash seguro y marcar como migrado
+            $builder->where('fun_id', $user['fun_id'])
+                    ->update([
+                        'fun_password' => $new_secure_hash,
+                        'sw_pass'      => 1
+                    ]);
+        }
 
+        $builder = $this->db->table('funcionario');
+        $user = $builder->where('fun_usuario', $user_name)->get()->getRowArray();
 
-            if($user['sw_pass']==0){ // haseando el password
-                
-                // --- 2. MIGRAR A UN HASH SEGURO INMEDIATAMENTE (password_hash) ---
-                $new_secure_hash = password_hash($password_plano, PASSWORD_DEFAULT); // Usa bcrypt/argon2
-                
-                // Actualizar la base de datos con el nuevo hash seguro
-                $builder->where('fun_id', $user['fun_id'])
-                        ->update([
-                            'fun_password' => $new_secure_hash,
-                            'sw_pass' => 1
-                        ]);
-            }
+     //   5. Verificar la contraseña usando password_verify()
+        if (password_verify($password_plano, $user['fun_password'])) {
+            // --- Contraseña correcta: Preparar respuesta de éxito ---
+            $data['bool']   = true;
+            $data['fun_id'] = $user['fun_id'];
+            $data['data']   = $user;
+            $data['message'] = 'Login exitoso.';
 
-
-            if (password_verify($password_plano, $user['fun_password'])) {
-             $data['bool'] = true;
-             $data['fun_id'] = $user['fun_id'];
-             $data['data'] = $user;
-             $data['message'] = 'Login exitoso.';
-             return $data;
-            } 
-
-    }
-    else{
-        return $data; // Si no hay usuario o las contraseñas no coinciden en ningún caso    
-    }
-    
-    
+            return $data;
+        }
+        else{
+            return $data;
+        }
 }
 
 
-    public function verificar_loggin3($user_name, $password_plano){
-    
-        // 1. Usar Query Builder para prevenir SQL Injection
-        $this->db->select('*');
-        $this->db->from('funcionario');
-        $this->db->where('fun_usuario', $user_name); // CI3 sanitiza automáticamente aquí
-
-        $query = $this->db->get();
-        $user = $query->row_array(); // Obtiene UNA sola fila como array
-
-        $data = array(
-            'bool' => false,
-            'fun_id' => null,
-            'data' => null // Es útil devolver todos los datos
-        );
-
-        // 2. Verificar si se encontró un usuario
-        if ($user) {
-            // 3. Verificar la contraseña usando password_verify()
-            // Asume que fun_password está hasheado correctamente con password_hash()
-            if (password_verify($password_plano, $user['fun_password'])) {
-                // ¡Éxito!
-                $data['bool'] = true;
-                $data['fun_id'] = $user['fun_id'];
-                $data['data'] = $user;
-            }
-        }
-        
-        // Devuelve el array con el resultado
-        return $data;
-    }
 
 
 
-
-
-/*    public function verificar_loggin($user_name, $password){
-        $query = "SELECT *
-        FROM funcionario
-        WHERE fun_usuario = '".$user_name."' ";
-        $query = $this->db->query($query);
-        $query = $query->result_array();
-        $data = array(
-            'bool' => false,
-            'fun_id' => null  
-        );
-        foreach ($query as $fila) {
-            $var = $this->password_decod($fila['fun_password']);
-            if($var == $password){
-                $data['bool'] = true;
-                $data['fun_id'] = $fila['fun_id'];
-            }
-        }
-        return $data;
-    }
-    */
-    // Si usas el método Query Builder recomendado:
-   /* public function obtenerFuncionariosActivos()
-    {
-        // Con la línea protected $table = 'funcionario'; añadida arriba, 
-        // este método ya sabe qué tabla usar.
-        return $this->where('fun_estado !=', 3)->findAll();
-    }*/
 }

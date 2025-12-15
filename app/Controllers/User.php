@@ -9,11 +9,11 @@ class User extends BaseController{
     /// index
     public function index(){
         // Si el usuario ya está logueado, redirigir al dashboard (o donde corresponda)
-        $captcha= $this->generar_captcha(array(0,1,2,3,4,5,6,7,8,9,'A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R'),4);
+       /* $captcha= $this->generar_captcha(array(0,1,2,3,4,5,6,7,8,9,'A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R'),4);
         
         $data['base']='<input name="base" type="hidden" value="'.base_url().'">';
         $data['cod_captcha']=$captcha;
-        $data['captcha']=md5($captcha);
+        $data['captcha']=md5($captcha);*/
         $data['formulario']=$this->form_login();
 
 
@@ -31,8 +31,211 @@ class User extends BaseController{
 
     //// formulario Login
     public function form_login(){
-        $tabla='HOLA MUNDO';
-        $tabla.='';
+       // $tabla='HOLA MUNDO';
+        $captcha= $this->generar_captcha(array(0,1,2,3,4,5,6,7,8,9,'A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R'),4);
+        
+        $data['cod_captcha']=$captcha;
+        $data['captcha']=md5($captcha);
+
+         $tabla='
+            <style>
+                .caja {
+                font-family: sans-serif;
+                font-size: 28px;
+                font-weight: 100;
+                color: #000000;
+                background: #d1d9dc;
+                margin: 0 0 15px;
+                overflow: hidden;
+                padding: 3px;
+                }
+
+                #loading {
+                    display: none;
+                    position: fixed;
+                    left: 50%;
+                    top: 50%;
+                    transform: translate(-50%, -50%);
+                    font-size: 24px;
+                    z-index: 1000;
+                }
+
+                #loadingpws {
+                    display: none;
+                    position: fixed;
+                    left: 50%;
+                    top: 50%;
+                    transform: translate(-50%, -50%);
+                    font-size: 24px;
+                    z-index: 1000;
+                }
+
+                .modal {
+                    display: none;
+                    position: fixed;
+                    top: 0;
+                    left: 0;
+                    width: 100%;
+                    height: 100%;
+                    background: rgba(0,0,0,0.6);
+                }
+
+                .modal2 {
+                    display: none;
+                    position: fixed;
+                    top: 0;
+                    left: 0;
+                    width: 250%;
+                    height: 150%;
+                }
+
+                .modal-content {
+                    background: white;
+                    width: 400px;
+                    margin: 50px auto;
+                    padding: 30px;
+                    text-align: center;
+                    border-radius: 8px;
+                }
+
+                .modal-content2 {
+                    background: white;
+                    width: 600px;
+                    margin: 50px auto;
+                    padding: 30px;
+                    border-radius: 18px;
+                }
+
+                .open-btn {
+                    background: #4CAF50;
+                    color: white;
+                    font-size: 16px;
+                }
+
+                .close-btn {
+                    background: #f44336;
+                    color: white;
+                }
+            </style>';
+        
+        $tabla.='
+        <div id="kc-content-wrapper">
+        <input name="base" type="hidden" value="'.base_url().'">
+        <div class="background-siat-login overflow-hidden d-flex justify-content-center align-items-center" style="height: 100vh;">
+            <div class="container px-md-5 text-center text-lg-start my-5 ">
+            <div>
+              <a href="#" style="font-size:11px;color: hsl(150, 80%, 90%)" onclick="show2()"><b>ARCHIVOS ADJUNTOS</b></a>
+            </div>
+                <div class="row gx-lg-5 align-items-center mb-sm-0">
+                    <div class="col-lg-6 mb-sm-0 mb-lg-0 text-center mt-lg-0" style="z-index: 10">
+                        <div class="imgSiat">
+                            <picture>
+                                <source srcset="'.base_url().'Img/login/logo_CNS_header.png" media="(min-width: 992px)" width="200px" height="auto">
+                                <source srcset="'.base_url().'Img/login/logo_CNS_header.png" media="(min-width: 768px)" width="200px" height="auto">
+                                <img class="img-fluid animateBolivia" src="'.base_url().'Img/login/logo_CNS_header.png"alt="logoSiatBolivia" width="200px" height="auto">
+                            </picture>
+                            
+                            <h1 class="my-5 display-5 fw-bold ls-tight text-center titleSiat" style="color: hsl(218, 81%, 95%)">
+                                Sistema de Planificaci&oacute;n y Seguimiento al POA
+                                <br/>
+                                <span style="color: #FFFF">SIIPLAS v3.0</span>
+                            </h1>
+                            
+                            <div class="redesSocialesHeader">
+                                <a href="https://www.facebook.com/CNS.Bolivia/" target="_blank"><img class="rrss mx-2" src="'.base_url().'Img/login/facebook.svg"/ alt="rrssFacebook"></a>
+                                <a href="https://www.instagram.com/cnsbolivia/" target="_blank"><img class="rrss mx-2" src="'.base_url().'Img/login/instagram.svg"/ alt="rrssinstagram"></a>
+                                <a href="https://www.youtube.com/channel/UCH8i2IHse60iSiyeYAihomg" target="_blank"><img class="rrss mx-2" src="'.base_url().'Img/login/youtube.svg"/ alt="rrssYoutube"></a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-6 mb-lg-0 position-relative">
+                    <br/>
+                        <div class="card bg-card">
+                            <div class="card-body px-4 py-4 px-md-5">
+
+                                <div id="loading"><i class="fas fa-spinner fa-spin"></i> Cargando...</div>
+                                <form role="form" action="'.base_url('login/auth').'" method="post" id="form" class="login-form">
+                                    <input type="hidden" name="tp" id="tp" value="0">
+                                    <div align=center>
+                                        <b style="color:black;">DEPARTAMENTO NACIONAL DE PLANIFICACIÓN - C.N.S.</b>
+                                    </div>
+
+                                    <h5 class="text-center fw-bold my-4 titleBienvenido">Bienvenido/a!</h5>';
+                                    if (session()->getFlashdata('error_message')): 
+                                        $tabla.='<div class="alert error">'.session()->getFlashdata('error_message').'</div>';
+                                    endif; 
+
+                                    $tabla.='
+                                    <div class="row align-items-center">
+                                        <div class="col">
+                                        <div id="form-login-username" class="form-group">      
+                                            <input type="radio" name="radio-inline" id="radio0" checked="checked">
+                                            <i></i><b>Unidad Administrativa</b></label> &nbsp;&nbsp; 
+                                            <input type="radio" name="radio-inline" id="radio1">
+                                            <i></i><font color="#146f64"><b>Establecimiento de Salud</b></font></label>
+                                        </div>
+                                        </div>
+                                    </div>
+
+                                    <input id="deviceId" class="dOt" name="deviceId">
+
+                                    <div class="row align-items-center">
+                                        <div class="col">
+                                            <div class="form-floating mb-2">
+                                                <input tabindex="1" type="text" class="form-control form-input-bg" name="user_name" id="user_name" value="'.old('user_name').'" placeholder="USUARIO" minlength="5" maxlength="20" autocomplete="off" style="text-transform:uppercase;" oninput="this.value = this.value.toUpperCase();">
+                                                <label for="user_name">USUARIO SIIPLAS</label>
+                                                <div id="usu" class="text-danger text-start" style="font-size:9px;visibility: hidden;">
+                                                   <b> Este campo es requerido</b>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-auto pf-0">
+                                            <img src="'.base_url().'Img/login/help.svg" class="tootip" title="USUARIO: Acceso asignado por el Departamento Nacional de Planificación"/>
+                                        </div>
+                                    </div>
+
+                                    <input id="deviceId" class="dOt" name="deviceId">
+
+                                    <div class="row align-items-center">
+                                        <div class="col">
+                                            <div class="form-floating mb-2">
+                                                <input tabindex="3" id="password" class="form-control form-input-bg" name="password" id="password" type="password" autocomplete="off" placeholder="CONTRASEÑA" minlength="6" maxlength="50"/>
+                                                <label for="password">PASSWORD</label>
+                                                <div id="pass" class="text-danger text-start" style="font-size:9px; visibility: hidden;" style="font-size:8px;">
+                                                  <b>  Este campo es requerido</b>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-auto pf-0">
+                                            <img src="'.base_url().'Img/login/help.svg" onclick="togglePassword(\'password\')" class="tootip" id="toggleIcon" title="CLAVE DE ACCESO: Acceso asignado por el Departamento Nacional de Planificación"/>
+                                        </div>
+                                    </div>
+
+                                    <div class="text-center py-3">
+                                        <p class="caja" id="refreshs" style="text-align:center"><b>'.$data['cod_captcha'].'</b></p>
+                                        <input type="hidden" name="captcha" id="captcha"  value="'.$data['captcha'].'" style="text-transform:uppercase;" oninput="this.value = this.value.toUpperCase();">
+                                    </div>
+
+                                    <div class="mb-4">
+                                        <input tabindex="4" id="dat_captcha" name="dat_captcha" type="text" class="form-control form-input-bg text-center" placeholder="Ingrese el texto de la imagen" autofocus minlength="4" maxlength="4" >
+                                        <div id="cat" class="text-danger text-start" style="font-size:9px; visibility: hidden;" style="font-size:8px;">
+                                            <b>  Este campo es requerido</b>
+                                        </div>
+                                    </div>
+
+                                    <div class="d-grid gap-2 mt-2">
+                                        <input tabindex="4" class="btn btn-lg mdl-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent" style="width: 100%;" name="login" id="kc-login" type="submit" value="INGRESAR"/>
+                                    </div>
+                                </form>
+                                <br>
+                                <a href="#" style="color:blue; font-size:11px;" onclick="show()">Olvidaste tu Contraseña?</a>
+                            </div>
+                        </div>
+                    </div>
+                
+                </div>
+            </div>
+        </div>';
 
 
         return $tabla;
@@ -123,8 +326,9 @@ class User extends BaseController{
 
     /// GET CAPTCHA
     public function get_captcha(){
-      if($this->input->is_ajax_request()){
-          $post = $this->input->post();
+     // if($this->request->isAJAX()){
+       //   $post = $this->input->post();
+
           $captcha= $this->generar_captcha(array(0,1,2,3,4,5,6,7,8,9,'A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R'),4);
          
           $result = array(
@@ -132,15 +336,39 @@ class User extends BaseController{
           'cod_captcha' => $captcha,
           'captcha' => md5($captcha),
         );
-          
-        echo json_encode($result);
- 
-      }else{
-        show_404();
-      }
+          echo json_encode($result);
+
+      //}else{
+        //show_404();
+      //}
     }
 
+    public function get_captcha2()
+    {
+        // En CI4, accedes a la solicitud mediante $this->request
+        if ($this->request->isAJAX()) {
+            // $post = $this->request->getPost(); // Puedes usar esto si necesitas datos POST específicos
 
+            // Asegúrate de que la función generar_captcha() esté definida en alguna parte
+            $captcha_word = $this->generar_captcha(
+                array(0,1,2,3,4,5,6,7,8,9,'A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R'),
+                4
+            );
+            
+            $result = array(
+                'respuesta' => 'correcto',
+                'cod_captcha' => $captcha_word,   // El texto plano para mostrar visualmente
+                'captcha' => md5($captcha_word), // El texto cifrado para validación
+            );
+            
+            // Usa el método respond() del ResponseTrait para enviar la respuesta JSON
+            return $this->respond($result);
+
+        } else {
+            // Usa show_404() o throw new \CodeIgniter\Exceptions\PageNotFoundException();
+            throw new \CodeIgniter\Exceptions\PageNotFoundException();
+        }
+    }
     //// GENERAR CAPTCHA
     function generar_captcha($chars,$length){
         $captcha=null;

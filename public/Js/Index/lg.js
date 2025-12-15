@@ -106,10 +106,11 @@
     // });
 
         $(document).ready(function(e) {
+            var request;
           $('#refreshs').click(function(){
-              var url = base+"index.php/user/get_captcha";
+              var url = base + "User/get_captcha"; 
+             // alert(url)
  
-              var request;
               if (request) {
                   request.abort();
               }
@@ -121,12 +122,14 @@
 
               request.done(function (response, textStatus, jqXHR) {
                 if (response.respuesta == 'correcto') {
+                    alert('hola mundo')
                   $("#refreshs").html(response.cod_captcha);
                   document.getElementById("captcha").value = response.captcha;
                 }
               }); 
           });
         });
+
 
         $("#sub").on("click", function (e) {
           document.getElementById("but").style.display = 'none';

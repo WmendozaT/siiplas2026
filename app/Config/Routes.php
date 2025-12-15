@@ -12,6 +12,8 @@ $routes->get('/', 'User::index');
 $routes->get('login', 'User::index');
 $routes->post('login/auth', 'User::loginAction');
 $routes->get('logout', 'User::logout');
+$routes->post('User/get_captcha', 'User::get_captcha');
+//$routes->post('User/get_captcha', 'User::get_captcha');
 
 $routes->get('dashboard', 'CDashboard\Dashboard::dashboard_admin');
 

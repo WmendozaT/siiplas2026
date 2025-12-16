@@ -8,22 +8,11 @@ class User extends BaseController{
 
     /// index
     public function index(){
-        // Si el usuario ya está logueado, redirigir al dashboard (o donde corresponda)
-       /* $captcha= $this->generar_captcha(array(0,1,2,3,4,5,6,7,8,9,'A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R'),4);
-        
-        $data['base']='<input name="base" type="hidden" value="'.base_url().'">';
-        $data['cod_captcha']=$captcha;
-        $data['captcha']=md5($captcha);*/
         $data['formulario']=$this->form_login();
-
-
-
         if (session()->get('isLoggedIn')) {
             return redirect()->to(base_url('dashboard'));
         }
         
-
-
         helper(['form']);
         return view('index/login', $data);
     }
@@ -69,53 +58,6 @@ class User extends BaseController{
                     font-size: 24px;
                     z-index: 1000;
                 }
-
-                .modal {
-                    display: none;
-                    position: fixed;
-                    top: 0;
-                    left: 0;
-                    width: 100%;
-                    height: 100%;
-                    background: rgba(0,0,0,0.6);
-                }
-
-                .modal2 {
-                    display: none;
-                    position: fixed;
-                    top: 0;
-                    left: 0;
-                    width: 250%;
-                    height: 150%;
-                }
-
-                .modal-content {
-                    background: white;
-                    width: 400px;
-                    margin: 50px auto;
-                    padding: 30px;
-                    text-align: center;
-                    border-radius: 8px;
-                }
-
-                .modal-content2 {
-                    background: white;
-                    width: 600px;
-                    margin: 50px auto;
-                    padding: 30px;
-                    border-radius: 18px;
-                }
-
-                .open-btn {
-                    background: #4CAF50;
-                    color: white;
-                    font-size: 16px;
-                }
-
-                .close-btn {
-                    background: #f44336;
-                    color: white;
-                }
             </style>';
         
         $tabla.='
@@ -123,9 +65,6 @@ class User extends BaseController{
         <input name="base" type="hidden" value="'.base_url().'">
         <div class="background-siat-login overflow-hidden d-flex justify-content-center align-items-center" style="height: 100vh;">
             <div class="container px-md-5 text-center text-lg-start my-5 ">
-            <div>
-              <a href="#" style="font-size:11px;color: hsl(150, 80%, 90%)" onclick="show2()"><b>ARCHIVOS ADJUNTOS</b></a>
-            </div>
                 <div class="row gx-lg-5 align-items-center mb-sm-0">
                     <div class="col-lg-6 mb-sm-0 mb-lg-0 text-center mt-lg-0" style="z-index: 10">
                         <div class="imgSiat">
@@ -177,8 +116,6 @@ class User extends BaseController{
                                         </div>
                                     </div>
 
-                                    <input id="deviceId" class="dOt" name="deviceId">
-
                                     <div class="row align-items-center">
                                         <div class="col">
                                             <div class="form-floating mb-2">
@@ -193,8 +130,6 @@ class User extends BaseController{
                                             <img src="'.base_url().'Img/login/help.svg" class="tootip" title="USUARIO: Acceso asignado por el Departamento Nacional de Planificación"/>
                                         </div>
                                     </div>
-
-                                    <input id="deviceId" class="dOt" name="deviceId">
 
                                     <div class="row align-items-center">
                                         <div class="col">
@@ -227,8 +162,17 @@ class User extends BaseController{
                                         <input tabindex="4" class="btn btn-lg mdl-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent" style="width: 100%;" name="login" id="kc-login" type="submit" value="INGRESAR"/>
                                     </div>
                                 </form>
-                                <br>
-                                <a href="#" style="color:blue; font-size:11px;" onclick="show()">Olvidaste tu Contraseña?</a>
+                                    <div class="d-flex justify-content-between fs-5 mt-4">
+                                        <div class="">
+                                            <span><a tabindex="5" href="'.base_url().'password">Olvide mi contraseña</a></span>
+                                        </div>
+                                        <a id="auth-link">Autenticarse SIAT En Línea v1</a>
+                                    </div> 
+                                    <div class="d-flex justify-content-center fs-5 mt-2">
+                                        <div class="">
+                                            <span><a tabindex="5" href="/realms/login2/login-actions/registration?client_id=app-frontend&amp;tab_id=O9uOG0GX238">Registrarme como Ciudadano</a></span>
+                                        </div>
+                                    </div>
                             </div>
                         </div>
                     </div>
@@ -237,16 +181,8 @@ class User extends BaseController{
             </div>
         </div>';
 
-
         return $tabla;
     }
-
-
-
-
-
-
-
 
     /// Valida login
     public function loginAction(){
@@ -323,52 +259,231 @@ class User extends BaseController{
 
 
 
+    /// password
+    public function user_password(){
+        $data['formulario']='
+            <style>
+                #loadingpws {
+                    display: none;
+                    position: fixed;
+                    left: 50%;
+                    top: 50%;
+                    transform: translate(-50%, -50%);
+                    font-size: 24px;
+                    z-index: 1000;
+                }
+
+                .modal-backdrop {
+                    position: fixed;
+                    top: 0;
+                    left: 0;
+                    width: 100%;
+                    height: 100%;
+                    background-color: rgba(0, 0, 0, 0.6);
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    z-index: 1000; /* Asegura que esté por encima de todo */
+                }
+
+                /* El cuadro del mensaje */
+                .modal-content {
+                    background-color: #fff;
+                    padding: 20px;
+                    border-radius: 8px;
+                    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+                    width: 90%;
+                    max-width: 400px;
+                    text-align: center;
+                }
+
+                .modal-header h4 {
+                    margin-top: 0;
+                    color: #333;
+                }
+
+                .modal-body p {
+                    color: #555;
+                    margin-bottom: 20px;
+                }
+
+                .modal-footer {
+                    display: flex;
+                    justify-content: center;
+                    gap: 10px; /* Espacio entre botones */
+                }
+
+                /* Estilos básicos para los botones (usa tus propias clases si usas Bootstrap) */
+                .btn-primary {
+                    background-color: #125d55;
+                    color: white;
+                    border: none;
+                    padding: 10px 20px;
+                    border-radius: 5px;
+                    cursor: pointer;
+                }
+
+                .btn-secondary {
+                    background-color: #6c757d;
+                    color: white;
+                    border: none;
+                    padding: 10px 20px;
+                    border-radius: 5px;
+                    cursor: pointer;
+                }
+            </style>
+
+            <div class="d-flex justify-content-center align-items-center cardCenter">
+                <div class="card rounded-3 blue-border cardSize">
+                    <div class="card-body">
+                        <h5 class="text-center fw-bold font-24">Olvidé mi contraseña</h5>
+                        <h6 class="card-subitle text-center mb-2 text-muted">Ingrese su Usuario y Correo Electronico</h6>
+
+                        <div class="d-flex align-items-center my-3">
+                            <svg class="iconEmailReset" style=" width: 55px; height: 55px; margin-right: 20px;" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+                                <path fill="#67757c" d="M215.4 96H144 107.8 96v8.8V144v40.4 89L.2 202.5c1.6-18.1 10.9-34.9 25.7-45.8L48 140.3V96c0-26.5 21.5-48 48-48h76.6l49.9-36.9C232.2 3.9 243.9 0 256 0s23.8 3.9 33.5 11L339.4 48H416c26.5 0 48 21.5 48 48v44.3l22.1 16.4c14.8 10.9 24.1 27.7 25.7 45.8L416 273.4v-89V144 104.8 96H404.2 368 296.6 215.4zM0 448V242.1L217.6 403.3c11.1 8.2 24.6 12.7 38.4 12.7s27.3-4.4 38.4-12.7L512 242.1V448v0c0 35.3-28.7 64-64 64H64c-35.3 0-64-28.7-64-64v0zM176 160H336c8.8 0 16 7.2 16 16s-7.2 16-16 16H176c-8.8 0-16-7.2-16-16s7.2-16 16-16zm0 64H336c8.8 0 16 7.2 16 16s-7.2 16-16 16H176c-8.8 0-16-7.2-16-16s7.2-16 16-16z"/>
+                            </svg>
+                            <h6 class="mb-2 text-muted" style="padding-top : 15px">"Ingrese su Usuario asignado y la dirección de correo electrónico y le enviaremos un enlace para restablecer su contraseña."</h6>
+                        </div>';
+
+                            if(session()->getFlashdata('errors')):
+                                $data['formulario'].='<div class="alert alert-danger">'.session()->getFlashdata('errors').'</div>';
+                            endif;
+
+                             if(session()->getFlashdata('success')):
+                                $data['formulario'].='<div class="alert alert-success">'.session()->getFlashdata('success').'</div>';
+                            endif;
+
+                        $data['formulario'].='
+                            <div id="loadingpws" ><i class="fas fa-spinner fa-spin"></i> Cargando...</div>
+                            <form id="formpws" novalidate class="form-horizontal" action="'.base_url('valida_psw').'" method="post">
+    
+                            <!-- Campo de Usuario -->
+                            <div class="row align-items-center">
+                                <div class="col">
+                                    <div class="form-floating mb-2">
+                                        <input tabindex="1" id="user_namepws" class="form-control form-input-bg" name="user_namepws" value="" type="text" autocomplete="off" spellcheck="false" placeholder="Usuario" minlength="5" maxlength="20" style="text-transform:uppercase;" oninput="this.value = this.value.toUpperCase();"/>
+                                        <label for="user_namepws">Usuario</label>
+                                        <!-- Contenedor para el icono (puedes ajustar el estilo CSS para posicionarlo correctamente) -->
+                                        <div style="position: absolute; right: 10px; top: 15px;">
+                                            <svg width="24px" height="24px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                <g id="SVGRepo_iconCarrier">
+                                                    <path d="M12 4C9.79086 4 8 5.79086 8 8C8 10.2091 9.79086 12 12 12C14.2091 12 16 10.2091 16 8C16 5.79086 14.2091 4 12 4ZM12 14C8.13401 14 5 17.134 5 21H19C19 17.134 15.866 14 12 14Z" fill="#67757C"></path>
+                                                </g>
+                                            </svg>
+                                        </div>
+                                        <!-- Div para mostrar el error de usuario -->
+                                        <div id="usupsw" class="text-danger text-start mt-1" style="font-size: 0.8rem;"></div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Campo de Correo Electrónico -->
+                            <div class="row align-items-center">
+                                <div class="col">
+                                    <div class="form-floating mb-2">
+                                        <input tabindex="2" id="emailpws" class="form-control form-input-bg" name="emailpws" value="" type="email" autocomplete="off" spellcheck="false" placeholder="Email" />
+                                        <label for="emailpws">Correo</label>
+                                        <!-- Contenedor para el icono -->
+                                        <div style="position: absolute; right: 10px; top: 15px;">
+                                            <svg width="24px" height="24px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                <g id="SVGRepo_iconCarrier"> 
+                                                    <path d="M4 7.00005L10.2 11.65C11.2667 12.45 12.7333 12.45 13.8 11.65L20 7" stroke="#67757C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> 
+                                                    <rect x="3" y="5" width="18" height="14" rx="2" stroke="#67757C" stroke-width="2" stroke-linecap="round"></rect> 
+                                                </g>
+                                            </svg>
+                                        </div>
+                                        <!-- Div para mostrar el error de email -->
+                                        <div id="email" class="text-danger text-start mt-1" style="font-size: 0.8rem;"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="d-grid gap-2 col-10 mx-auto mt-4">
+                                <button class="btn btnColor borderRadius" name="login" id="kc-login" type="submit">ENVIAR</button>
+                                <a href="'.base_url().'logout" class="btn btn-outline-secondary borderRadius">VOLVER</a>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <div id="customConfirmModal" class="modal-backdrop" style="display: none;">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h4>Confirmación de Envío</h4>
+                    </div>
+                    <div class="modal-body">
+                        <p>¿Está seguro de que desea enviar el formulario de restablecimiento de contraseña?</p>
+                    </div>
+                    <div class="modal-footer">
+                        <button id="confirmYes" class="btn btn-primary">Sí, enviar</button>
+                        <button id="confirmNo" class="btn btn-secondary">Cancelar</button>
+                    </div>
+                </div>
+            </div>';
+
+        return view('index/password', $data);
+    }
+
+
+
+    /// Valida password
+    public function ValidaPws(){
+        $postData = $this->request->getPost();
+        if ($postData) {
+            $model_index = new IndexModel();
+            $usuario_ingresado = $this->request->getPost('user_namepws');
+            $email_ingresado = $this->request->getPost('emailpws');
+            $datos_funcionario = $model_index->fun_usuario($usuario_ingresado);
+            
+            if (count($datos_funcionario)!=0) {
+                $data_to_store = array( 
+                    'fun_id' => $datos_funcionario['fun_id'],
+                    'email' => $email_ingresado,
+                    'sol_fecha' => date("d/m/Y H:i:s"),
+                    'num_ip' => $this->request->getIPAddress(),  
+                    'nom_ip' => gethostbyaddr($this->request->getIPAddress()),
+                  );
+                  $sol_id = $model_index->insert($data_to_store);
+                
+                    if(count($model_index->solicitud_contraseñas($sol_id))!=0){
+                        return redirect()->to(base_url('password'))->with('success', 'Instrucciones enviadas a su correo.');
+                    }
+                    else{
+                        return redirect()->back()->with('errors', 'Error al registrar la solicitud.');
+                    }
+                
+            } else {
+                // La fila NO fue encontrada (el usuario no existe o el estado es 3)
+                 return redirect()->back()->with('errors', 'Usuario no válido o inactivo.');
+            }
+
+        } else {
+            
+            return redirect()->to(base_url('password'))->with('errors', 'Error!');
+        }
+    }
+
+
+
+
+
 
     /// GET CAPTCHA
     public function get_captcha(){
-     // if($this->request->isAJAX()){
-       //   $post = $this->input->post();
-
-          $captcha= $this->generar_captcha(array(0,1,2,3,4,5,6,7,8,9,'A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R'),4);
+        $captcha= $this->generar_captcha(array(0,1,2,3,4,5,6,7,8,9,'A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R'),4);
          
           $result = array(
           'respuesta' => 'correcto',
           'cod_captcha' => $captcha,
           'captcha' => md5($captcha),
         );
-          echo json_encode($result);
 
-      //}else{
-        //show_404();
-      //}
+        return $this->response->setJSON($result);
     }
 
-    public function get_captcha2()
-    {
-        // En CI4, accedes a la solicitud mediante $this->request
-        if ($this->request->isAJAX()) {
-            // $post = $this->request->getPost(); // Puedes usar esto si necesitas datos POST específicos
 
-            // Asegúrate de que la función generar_captcha() esté definida en alguna parte
-            $captcha_word = $this->generar_captcha(
-                array(0,1,2,3,4,5,6,7,8,9,'A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R'),
-                4
-            );
-            
-            $result = array(
-                'respuesta' => 'correcto',
-                'cod_captcha' => $captcha_word,   // El texto plano para mostrar visualmente
-                'captcha' => md5($captcha_word), // El texto cifrado para validación
-            );
-            
-            // Usa el método respond() del ResponseTrait para enviar la respuesta JSON
-            return $this->respond($result);
-
-        } else {
-            // Usa show_404() o throw new \CodeIgniter\Exceptions\PageNotFoundException();
-            throw new \CodeIgniter\Exceptions\PageNotFoundException();
-        }
-    }
     //// GENERAR CAPTCHA
     function generar_captcha($chars,$length){
         $captcha=null;

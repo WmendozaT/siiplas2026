@@ -4,7 +4,11 @@ namespace App\Models\Index;
 use CodeIgniter\Model;
 
 class IndexModel extends Model{
-    protected $table = 'funcionario'; 
+    protected $table = 'funcionario';
+    protected $table = 'solicitudes_psw';
+    protected $primaryKey = 'sol_id';
+    // Campos permitidos para inserción masiva
+    protected $allowedFields = ['fun_id', 'email', 'sol_fecha', 'num_ip', 'nom_ip'];
     //protected $table = 'configuracion'; 
     
     /// lista de funcionario
@@ -32,6 +36,30 @@ class IndexModel extends Model{
         
         return $query->getRowArray();
     }
+
+    /// Get Buscando funcionario por su Usuario
+    public function fun_usuario($usuario){
+        // Usando el Query Builder de CI4 para una consulta segura
+            $sql = 'select *
+                from funcionario
+                where fun_usuario=\''.$usuario.'\' and fun_estado!=3';
+
+        $query = $this->db->query($sql);
+        return $query->getRowArray();
+    }
+
+
+    /// solicitudes para Contraseñas
+    public function solicitud_contraseñas($sol_id){
+        $sql = 'select *
+                from solicitudes_psw
+                where sol_id='.$sol_id.'';
+        $query = $this->db->query($sql);
+        return $query->getRowArray();
+    }
+
+
+
 
     /// Datos Regional Distrital
     public function datos_regional($dist_id){
@@ -93,7 +121,7 @@ class IndexModel extends Model{
         else{
             return $data;
         }
-}
+    }
 
 
 

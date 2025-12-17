@@ -15,9 +15,15 @@ $routes->get('logout', 'User::logout');
 
 $routes->post('User/get_captcha', 'User::get_captcha');
 
-
+//// recuperar contraseñas
 $routes->get('password', 'User::user_password');
 $routes->post('valida_psw', 'User::ValidaPws');
+
+//// archivos adjuntos
+$routes->get('documents', 'User::list_documentos');
+
+
+
 
 $routes->get('dashboard', 'CDashboard\Dashboard::dashboard_admin');
 

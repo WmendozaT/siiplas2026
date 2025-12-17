@@ -5,12 +5,7 @@ use CodeIgniter\Model;
 
 class IndexModel extends Model{
     protected $table = 'funcionario';
-    protected $table = 'solicitudes_psw';
-    protected $primaryKey = 'sol_id';
-    // Campos permitidos para inserción masiva
-    protected $allowedFields = ['fun_id', 'email', 'sol_fecha', 'num_ip', 'nom_ip'];
-    //protected $table = 'configuracion'; 
-    
+
     /// lista de funcionario
     public function obtenerFuncionariosActivosRaw(){
         $sql = "SELECT * FROM funcionario WHERE fun_estado != 3";

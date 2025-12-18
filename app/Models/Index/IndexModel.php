@@ -68,7 +68,7 @@ class IndexModel extends Model{
     }
 
     /// Verifica Usuario activo
-    public function verificar_loggin($user_name, $password_plano){
+    public function verificar_loggin($user_name, $password_plano, $captcha,$dat_captcha){
     $data = array(
         'bool'   => false,
         'fun_id' => null,
@@ -82,6 +82,11 @@ class IndexModel extends Model{
         // 3. Verificar si el usuario existe
         if (!$user) {
             return $data;
+        }
+
+        if(md5($dat_captcha)!=$captcha){
+            $data['message'] = 'Error en el código.';
+            return $data; // Sale de la función, el bool sigue siendo false
         }
 
         if ($user['fun_estado'] == 3) {

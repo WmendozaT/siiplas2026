@@ -24,7 +24,7 @@
         </header>
         <div id="kc-content">
         
-            <?= $formulario;?>
+        <?= $formulario;?>
             
         </div>
     </div>

@@ -20,7 +20,14 @@ class SolicitudesPswModel  extends Model{
         return $this->getInsertID();
     }
 
-
+    /// solicitudes para Contraseñas
+    public function solicitud_contraseñas($sol_id){
+        $sql = 'select *
+                from solicitudes_psw
+                where sol_id='.$sol_id.'';
+        $query = $this->db->query($sql);
+        return $query->getRowArray();
+    }
 
 
 }

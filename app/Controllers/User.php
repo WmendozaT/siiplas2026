@@ -105,7 +105,7 @@ class User extends BaseController{
 
                                 <div id="loading"><i class="fas fa-spinner fa-spin"></i> Cargando...</div>
                                 <form role="form" action="'.base_url('login/auth').'" method="post" id="form" class="login-form">
-                                    <input type="hidden" name="tp" id="tp" value="0">
+                                    <input type="text" name="tp" id="tp" value="0">
                                     <div align=center>
                                         <b style="color:black;">DEPARTAMENTO NACIONAL DE PLANIFICACIÓN - C.N.S.</b>
                                     </div>
@@ -193,38 +193,6 @@ class User extends BaseController{
         return $tabla;
     }
 
-    /// Valida login
-        
-    public function loginAction2(){
-        $session = session();
-        $model_index = new IndexModel();
-
-        $rules = [
-            'user_name' => 'required|min_length[3]|max_length[20]', // Ajusta longitudes
-            'password' => 'required|min_length[5]|max_length[20]', // Ajusta longitudes
-        ];
-        
-        // 2. Ejecutar la validación básica
-        if (!$this->validate($rules)) {
-            return redirect()->back()->withInput()->with('errors', $this->validator->getErrors());
-        }
-
-        $usuario = $this->request->getPost('user_name');
-        $password = $this->request->getPost('password');
-        $captcha = $this->request->getPost('captcha');
-        $dat_captcha = $this->request->getPost('dat_captcha');
-
-        $is_valid = $model_index->verificar_loggin($usuario, $password, $captcha,$dat_captcha);
-        if($is_valid['bool']==true){
-            echo "Todo Bien";
-        }
-        else{
-            return redirect()->to(base_url('login'))->with('errors', $is_valid['message']);
-        }
-      
-    }
-
-
 
     /// Valida login
     public function loginAction(){
@@ -243,14 +211,21 @@ class User extends BaseController{
 
         $usuario = $this->request->getPost('user_name');
         $password = $this->request->getPost('password');
+        $tp = $this->request->getPost('tp');
         $captcha = $this->request->getPost('captcha');
         $dat_captcha = $this->request->getPost('dat_captcha');
+
+        if($tp==0){ /// Administracion
+
+        }
+        else{ /// Establecimiento de salud
+
+        }
 
         $is_valid = $model_index->verificar_loggin($usuario, $password, $captcha,$dat_captcha);
         if($is_valid['bool']==true){
             $conf = $model_index->get_gestion_activo(); /// configuracion gestion activo
             $modulos = $model_index->modulos($conf['ide']); /// modulos
-
              $userData = [
             'fun_id'    => $is_valid['data']['fun_id'], // Asegúrate de que tu modelo devuelve 'id'
             'user_name'   => $is_valid['data']['fun_nombre'].' '.$is_valid['data']['fun_paterno'].' '.$is_valid['data']['fun_materno'],
@@ -260,32 +235,12 @@ class User extends BaseController{
             'fun_estado'   => $is_valid['data']['fun_estado'],
             'com_id'   => $is_valid['data']['cm_id'],
             'dist_id'   => $is_valid['data']['fun_dist'],
+            'rol'   => $model_index->get_rol_usuario($is_valid['data']['fun_id']),
+            'modulos'   => $modulos,
             'regional'   => $model_index->datos_regional($is_valid['data']['fun_dist']),
-            
-            'mes' => $conf['conf_mes'],
-            'conf_ajuste_poa' => $conf['conf_ajuste_poa'],
-            'estado_notificaciones' => $conf['conf_poa'], /// Estado para las Notificaciones 0:no activo, 1: Habilitado
-            'entidad' => $conf['conf_nombre_entidad'],
-            'trimestre' => $conf['conf_mes_otro'], /// Trimestre 1,2,3,4
-            'verif_ppto' => $conf['ppto_poa'], /// Ppto poa : 0 (Ante proyecto), 1: (Aprobado)
-            'conf_poa_estado' => $conf['conf_poa_estado'], /// Estado Poa Estado : 1 (Inicial), 2: (Ajuste), 3: (Aprobado)
-            'conf_form4' => $conf['conf_form4'], /// Estado de Registro del formulario N4, 0 (Inactivo), 1 (Activo)
-            'conf_form5' => $conf['conf_form5'], /// Estado de Registro del formulario N5, 0 (Inactivo), 1 (Activo)
-            'conf_mod_ope' => $conf['conf_mod_ope'], /// Estado de modificacion del formulario N4, 0 (Inactivo), 1 (Activo)
-            'conf_mod_req' => $conf['conf_mod_req'], /// Estado de modificacion del formulario N5, 0 (Inactivo), 1 (Activo)
-            'conf_certificacion' => $conf['conf_certificacion'], /// Estado de modificacion del formulario N5, 0 (Inactivo), 1 (Activo)
-            'conf_psw'=>$conf['conf_psw'],
-            'm_id'=>$conf['conf_mes'],
-            'g_id'=>$conf['conf_gestion'],
-            //'desc_mes' => $this->mes_texto($//[0]['conf_mes']),
-            'abrev_sistema' => 'SIIPLAS V3.0',
-            'direccion' => 'DEPARTAMENTO NACIONAL DE PLANIFICACI&Oacute;N',
-            'sistema' => 'SISTEMA DE PLANIFICACI&Oacute;N Y SEGUIMIENTO POA - SIIPLAS V3.0',
-            'sistema_pie' => 'SIIPLAS - Sistema de Planificaci&oacute;n y Seguimiento POA',
-
+            'configuracion'   => $conf,
             'isLoggedIn' => TRUE, // Bandera clave para tus filtros de acceso
             ];
-        
             $session->set($userData); // Guarda la sesión
 
             // 2. Redirigir al usuario a una página protegida (ej. dashboard)
@@ -490,7 +445,7 @@ class User extends BaseController{
                 ];
                  $sol_id = $this->SolicitudesPswModel->createPswSolicitud($data_to_store);
 
-                    if(count($this->IndexModel->solicitud_contraseñas($sol_id))!=0){
+                    if(count($this->SolicitudesPswModel->solicitud_contraseñas($sol_id))!=0){
                         return redirect()->to(base_url('password'))->with('success', 'Instrucciones enviadas a su correo.');
                     }
                     else{

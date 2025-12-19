@@ -17,7 +17,11 @@ class IndexModel extends Model{
 
     /// Gestion Activo
     public function get_gestion_activo(){
-        $sql = "SELECT * FROM configuracion WHERE conf_estado = 1";
+        $sql = "SELECT * 
+                FROM configuracion conf
+                Inner Join mes as m On m.m_id=conf.conf_mes
+                Inner Join trimestre_mes as trm On trm.trm_id=conf.conf_mes_otro
+                WHERE conf.conf_estado = 1";
         $query = $this->query($sql);
         
         return $query->getRowArray();
@@ -44,16 +48,6 @@ class IndexModel extends Model{
     }
 
 
-    /// solicitudes para Contraseñas
-    public function solicitud_contraseñas($sol_id){
-        $sql = 'select *
-                from solicitudes_psw
-                where sol_id='.$sol_id.'';
-        $query = $this->db->query($sql);
-        return $query->getRowArray();
-    }
-
-
 
 
     /// Datos Regional Distrital
@@ -66,6 +60,20 @@ class IndexModel extends Model{
         $query = $this->db->query($sql);
         return $query->getRowArray();
     }
+
+    /// Datos Rol del funcionario
+    public function get_rol_usuario($fun_id){
+        $sql = '
+        select f.fun_id,f.r_id,f.r_estado,r.r_estado,r.r_nombre
+        from fun_rol f
+        Inner Join rol as r On r.r_id=f.r_id
+        where f.fun_id='.$fun_id.'
+        group by f.fun_id,f.r_id,f.r_estado,r.r_estado,r.r_nombre';
+
+        $query = $this->db->query($sql);
+        return $query->getRowArray();
+    }
+
 
     /// Verifica Usuario activo
     public function verificar_loggin($user_name, $password_plano, $captcha,$dat_captcha){

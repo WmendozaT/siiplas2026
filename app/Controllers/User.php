@@ -215,12 +215,12 @@ class User extends BaseController{
         $captcha = $this->request->getPost('captcha');
         $dat_captcha = $this->request->getPost('dat_captcha');
 
-        if($tp==0){ /// Administracion
+/*        if($tp==0){ /// Administracion
 
         }
         else{ /// Establecimiento de salud
 
-        }
+        }*/
 
         $is_valid = $model_index->verificar_loggin($usuario, $password, $captcha,$dat_captcha);
         if($is_valid['bool']==true){

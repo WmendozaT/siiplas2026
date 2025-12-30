@@ -28,13 +28,34 @@ class IndexModel extends Model{
     }
 
     /// Modulos Activos
-    public function modulos($ide){
-        $builder = $this->db->table('confi_modulo');
-        $builder->where('ide', $ide); // El segundo parámetro se escapa automáticamente
-        $query = $builder->get();
-        
-        return $query->getRowArray();
+    public function modulos($ide,$tp_adm){
+        if($tp_adm==1){ /// Nacional
+            $sql = "select *
+                from modulo
+                order by mod_id asc";
+        }
+        else{ /// regional / distrital
+            $sql = "select * 
+                from confi_modulo conf
+                Inner Join modulo as mod On mod.mod_id=conf.mod_id
+                WHERE conf.ide = ".$ide."
+                order by conf.mod_id asc";
+        }
+        $query = $this->query($sql);
+        return $query->getResultArray();
     }
+
+
+    /// Sub Modulos Activos
+    public function sub_modulos($id){
+        $sql = "select *
+                from modulo_menu
+                where mod_id=".$id."
+                order by sub_id asc";
+        $query = $this->query($sql);
+        return $query->getResultArray();
+    }
+
 
     /// Get Buscando funcionario por su Usuario
     public function fun_usuario($usuario){

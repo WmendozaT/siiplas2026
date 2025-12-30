@@ -226,7 +226,8 @@ class User extends BaseController{
         if($is_valid['bool']==true){
             $conf = $model_index->get_gestion_activo(); /// configuracion gestion activo
             $modulos = $model_index->modulos($conf['ide']); /// modulos
-             $userData = [
+
+            $userData = [
             'fun_id'    => $is_valid['data']['fun_id'], // Asegúrate de que tu modelo devuelve 'id'
             'user_name'   => $is_valid['data']['fun_nombre'].' '.$is_valid['data']['fun_paterno'].' '.$is_valid['data']['fun_materno'],
             'usuario'   => $is_valid['data']['fun_usuario'],

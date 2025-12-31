@@ -1,72 +1,48 @@
 <!DOCTYPE html>
 <html lang="en" dir="ltr" data-bs-theme="light" data-color-theme="Blue_Theme" data-layout="horizontal">
-
 <head>
   <!-- Required meta tags -->
   <meta charset="UTF-8" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <!-- Favicon icon-->
   <link rel="shortcut icon" type="image/png" href="<?= base_url('Img/plantillaImg/logo_CNS_header.png') ?>" />
-  <!-- Core Css -->
   <link rel="stylesheet" href="<?= base_url('Css/plantillaCss/styles.css') ?>"/>
   <title><?= session()->get("configuracion")['conf_abrev_sistema'] ?? 'No encontrado' ?></title>
-  <!-- jvectormap  -->
-  <link rel="stylesheet" href="<?= base_url('Css/plantillaCss/jquery-jvectormap.css') ?>">
 </head>
-
 <body>
-  <!-- Toast -->
-  <?= session()->get("view_bienvenida") ?? 'No encontrado' ?>
-  <!-- Preloader -->
+  <?= session()->get("view_bienvenida") ?? 'No encontrado'?>
   <div class="preloader">
     <img src="<?= base_url('Img/plantillaImg/logo_CNS_header.png') ?>" style="width: 5%;" alt="loader" class="lds-ripple img-fluid" />
   </div>
+  
   <div id="main-wrapper">
-    <?= session()->get("view_modulos") ?? 'No encontrado' ?>
-    <!--==== SIDEBAR Start MENU BOOTSTRAP ====-->
-    <?= session()->get("view_modulos_sidebar") ?? 'No encontrado' ?>
-    <!--==== END MENU BOOTSTRAP SIDEBAR ====-->
-
     <div class="page-wrapper">
-
-      <!--=====  SEGUNDO MENU =====-->
-      <?= session()->get("view_modulos") ?? 'No encontrado' ?>
-      <!--===== FIN SEGUNDO MENU =====-->
-
+      <?= session()->get("view_modulos") ?? 'No encontrado' ?> <!--====  Start MENU BOOTSTRAP ====-->
+      <?= session()->get("view_modulos_sidebar") ?? 'No encontrado' ?> <!--====  MENU BOOTSTRAP SIDEBAR ====-->
       <div class="body-wrapper">
         <div class="container-fluid">
           <!--  Header Start -->
           <header class="topbar sticky-top">
-            <!-- ==== MENU LAYOUT CABECERA ==== -->
-            <?= session()->get("view_cabecera_layout") ?? 'No encontrado' ?>
-            <!-- ==== FIN MENU LAYOUT CABECERA === -->
-            <!-- ===== CABECERA SUPERIOR ===== -->
-            <?= session()->get("view_cabecera") ?? 'No encontrado' ?>
-            <!-- ===== FIN CABECERA SUPERIOR ==== -->
+            <?= session()->get("view_cabecera_layout") ?? 'No encontrado' ?> <!-- ==== MENU LAYOUT CABECERA ==== -->
+            <?= session()->get("view_cabecera") ?? 'No encontrado' ?> <!-- ===== CABECERA SUPERIOR ===== -->
           </header>
-
 
           <!--  Header End -->
           <div class="row">
-              <?= session()->get("configuracion")['conf_abrev_sistema'] ?? 'No encontrado' ?><br>
+              HOLA MUNDO
               
               <br>
               <?= $boton ?>
           </div>
-
-
+        </div>
       </div>
-    </div>
 
     <!--  Menu izquierdo -->
     <?= session()->get("view_menu_izquierdo") ?? 'No encontrado' ?>
     <!--  Fin Menu izquierdo -->
-
+    </div>
+    <div class="dark-transparent sidebartoggler"></div>
   </div>
-  <div class="dark-transparent sidebartoggler"></div>
-  </div>
-
   <script src="<?= base_url('Js/PlantillaJs/vendor.min.js') ?>"></script>
   <!-- Import Js Files -->
   <script src="<?= base_url('Js/PlantillaJs/bootstrap.bundle.min.js') ?>"></script>
@@ -76,20 +52,10 @@
   <script src="<?= base_url('Js/PlantillaJs/app.min.js') ?>"></script>
   <script src="<?= base_url('Js/PlantillaJs/sidebarmenu.js') ?>"></script>
   <script src="<?= base_url('Js/PlantillaJs/feather.min.js') ?>"></script>
-
   <!-- solar icons -->
   <script src="<?= base_url('Js/PlantillaJs/iconify-icon.min.js') ?>"></script>
   <!-- highlight.js (code view) -->
   <script src="<?= base_url('Js/PlantillaJs/highlight.min.js') ?>"></script>
-<!--   <script>
-  hljs.initHighlightingOnLoad();
-
-
-  document.querySelectorAll("pre.code-view > code").forEach((codeBlock) => {
-    codeBlock.textContent = codeBlock.innerHTML;
-  });
-</script> -->
-
   <script src="<?= base_url('Js/PlantillaJs/apexcharts.min.js') ?>"></script>
   <script src="<?= base_url('Js/PlantillaJs/dashboard.js') ?>"></script>
 </body>

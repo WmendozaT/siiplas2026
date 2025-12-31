@@ -418,7 +418,7 @@ class User extends BaseController{
               <!-- Dashboard -->
               <!-- =================== -->
               <li class="sidebar-item">
-                <a class="sidebar-link sidebar-link primary-hover-bg" href="index.html" aria-expanded="false">
+                <a class="sidebar-link sidebar-link primary-hover-bg" href="'.base_url().'dashboard" aria-expanded="false">
                   <iconify-icon icon="solar:atom-line-duotone" class="fs-6 aside-icon"></iconify-icon>
                   <span class="hide-menu ps-1"><b>Dashboard</b></span>
                 </a>
@@ -467,7 +467,7 @@ class User extends BaseController{
               <nav class="navbar navbar-expand-xl container-fluid p-0">
                 <ul class="navbar-nav">
                   <li class="nav-item d-none d-xl-block">
-                    <a href="index.html" class="text-nowrap nav-link" style="color:#ffffff; font-size: 25px;">
+                    <a href="#" class="text-nowrap nav-link" style="color:#ffffff; font-size: 25px;">
                       <img src="'.base_url($img).'" class="dark-logo" width="35" alt="spike-img"/>&nbsp;&nbsp;<b>'.$sistema.'</b>
                     </a>
                   </li>

@@ -23,7 +23,10 @@ $routes->post('valida_psw', 'User::ValidaPws');
 $routes->get('documents', 'User::list_documentos');
 
 
-
-
+/// Dashboard
 $routes->get('dashboard', 'CDashboard\Dashboard::dashboard_admin');
+
+
+/// Mantenimiento
+$routes->get('mnt/responsables', 'CMantenimiento\Responsables::lista_responsables');
 

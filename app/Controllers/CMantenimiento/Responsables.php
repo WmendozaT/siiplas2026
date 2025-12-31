@@ -1,12 +1,13 @@
 <?php
-namespace App\Controllers\CDashboard;
+namespace App\Controllers\CMantenimiento;
 use App\Controllers\BaseController; 
 // Importa las clases necesarias para initController
 use CodeIgniter\HTTP\RequestInterface;
 use CodeIgniter\HTTP\ResponseInterface;
 use Psr\Log\LoggerInterface;
+use App\Models\Index\Model_funcionarios;
 
-class Dashboard extends BaseController{
+class Responsables extends BaseController{
     public function initController(RequestInterface $request, ResponseInterface $response, LoggerInterface $logger){
         // LLAMADA OBLIGATORIA al initController del padre (DESCOMENTADA)
         parent::initController($request, $response, $logger); 
@@ -29,15 +30,15 @@ class Dashboard extends BaseController{
     }
 
 
-    /// Dasboard Administrador
-    public function dashboard_admin(){
-
+    /// Reponsables POA
+    public function lista_responsables(){
+        
 
         $data['boton']='<a href="'.base_url().'logout" class="boton-login">
                     Ir a Inicio de Sesión
                 </a>';
 
-        return view('View_dashboard/viewdashboard_poa',$data);
+        return view('View_mantenimiento/View_responsables/view_funcionarios',$data);
     }
 }
 

@@ -6,19 +6,30 @@ use CodeIgniter\Model;
 class Model_funcionarios extends Model{
     protected $table = 'funcionario';
 
-    /// lista de funcionarios POA
+    /// lista de funcionarios POA Activos
     public function obtenerFuncionariosActivos(){
-        $sql = "SELECT * 
+        $sql = 'SELECT * 
                 from vlist_funcionario
-                where cm_id=0";
+                where cm_id=0';
         $query = $this->query($sql);
         
         return $query->getResultArray();
     }
 
-    /// lista de funcionarios POA
+    /// Get Responsable POA
+    public function get_responsablePoa($id){
+        $sql = 'SELECT * 
+                from vlist_funcionario
+                where id='.$id.'';
+        $query = $this->query($sql);
+        
+        return $query->getResultArray();
+    }
+
+    /// lista de funcionarios para Seguimiento POA activos
     public function obtenerFuncionariosActivos_seguimientoPOA(){
-        $sql = "SELECT * 
+        $gestion = session()->get('configuracion')['conf_gestion'] ?? null;
+        $sql = 'SELECT * 
                         from vlist_funcionario vf
                         Inner Join _distritales as dist On dist.dist_id=vf.fun_dist
                         Inner Join _componentes as c On c.com_id=vf.cm_id
@@ -26,7 +37,7 @@ class Model_funcionarios extends Model{
                         Inner Join servicios_actividad as sa On sa.serv_id=c.serv_id
                         Inner Join _proyectofaseetapacomponente as pfe On pfe.pfec_id=c.pfec_id
                         Inner Join aperturaprogramatica as apg On apg.aper_id=pfe.aper_id
-                        where vf.cm_id!=0 and apg.aper_gestion=2025";
+                        where vf.cm_id!=0 and apg.aper_gestion='.$gestion.'';
         $query = $this->query($sql);
         
         return $query->getResultArray();

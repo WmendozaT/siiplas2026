@@ -28,5 +28,6 @@ $routes->get('dashboard', 'CDashboard\Dashboard::dashboard_admin');
 
 
 /// Mantenimiento
-$routes->get('mnt/responsables', 'CMantenimiento\Responsables::lista_responsables');
+$routes->get('mnt/responsables', 'CMantenimiento\CResponsables::lista_responsables');
+$routes->get('mnt/update_responsable/(:num)', 'CMantenimiento\CResponsables::update_responsable/$1');
 

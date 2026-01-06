@@ -9,15 +9,15 @@
   <link rel="stylesheet" href="<?= base_url('Css/plantillaCss/styles.css') ?>"/>
   <link rel="stylesheet" href="<?= base_url('Css/plantillaCss/dataTables.bootstrap5.min.css') ?>">
   <!-- <link rel="stylesheet" href="<?= base_url('Css/plantillaCss/tabler-icons.min.css') ?>"> -->
-  <link rel="stylesheet" href="cdn.jsdelivr.net">
+<!--   <link rel="stylesheet" href="cdn.jsdelivr.net"> -->
   <title><?= session()->get("configuracion")['conf_abrev_sistema'] ?? 'No encontrado' ?></title>
   
 </head>
 <body>
   <?= session()->get("view_bienvenida") ?? 'No encontrado'?>
-  <div class="preloader">
+<!--   <div class="preloader">
     <img src="<?= base_url('Img/plantillaImg/logo_CNS_header.png') ?>" style="width: 5%;" alt="loader" class="lds-ripple img-fluid" />
-  </div>
+  </div> -->
   
   <div id="main-wrapper">
     <div class="page-wrapper">
@@ -44,7 +44,9 @@
     </div>
     <div class="dark-transparent sidebartoggler"></div>
   </div>
+  <script src=<?= base_url('Js/Index/jquery.min.js') ?>></script>
   <script src="<?= base_url('Js/PlantillaJs/vendor.min.js') ?>"></script>
+  <script src=<?= base_url('Js/Mantenimiento/JsResponsable.js') ?>></script>
   <!-- Import Js Files -->
   <script src="<?= base_url('Js/PlantillaJs/bootstrap.bundle.min.js') ?>"></script>
   <script src="<?= base_url('Js/PlantillaJs/simplebar.min.js') ?>"></script>
@@ -65,6 +67,8 @@
 </script>
   <script src="<?= base_url('Js/PlantillaJs/jquery.dataTables.min.js') ?>"></script>
   <script src="<?= base_url('Js/PlantillaJs/datatable.init.js') ?>"></script>
+
+
 </body>
 
 </html>

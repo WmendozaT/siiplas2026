@@ -6,9 +6,11 @@ use CodeIgniter\HTTP\RequestInterface;
 use CodeIgniter\HTTP\ResponseInterface;
 use Psr\Log\LoggerInterface;
 use App\Models\Model_Mantenimiento\Model_funcionarios;
+use App\Models\Model_Mantenimiento\Model_regional;
 
 class CResponsables extends BaseController{
     protected $Model_funcionarios;
+    protected $Model_regional;
 
     public function initController(RequestInterface $request, ResponseInterface $response, LoggerInterface $logger){
         // LLAMADA OBLIGATORIA al initController del padre (DESCOMENTADA)
@@ -56,8 +58,35 @@ class CResponsables extends BaseController{
 
     /// Formulario 
     public function get_responsables_poa($get_rep){
+      $model_funcionario = new Model_funcionarios();
+      $model_reg = new Model_regional();
+
+      ////
+      $get_pss=$model_funcionario->get_pwd($get_rep[0]['id']);
+      if (empty($get_pss)) {
+        $pss='Sin Password - Reasignar Password';
+      }
+      else{
+        $pss=$get_pss[0]['fun_apassword'];
+      }
+      ////
+
+      ////
+      $regionales=$model_reg->obtenerRegionales();
+      $distritales=$model_reg->obtenerDistritales($get_rep[0]['dep_id']);
+      ////
+
+      ////
+      $info = password_get_info($get_rep[0]['fun_password']);
+      $has_title='<div style="color:green"><b> Hasheado</b></div>';
+      if($info['algoName']=='unknown'){
+        $has_title='<div style="color:red"><b>No Hasheado</b></div>';
+      }
+      ////
         $tabla='';
         $tabla.='
+        <input name="base" type="text" value="'.base_url().'">
+        <input name="id" type="text" value="'.$get_rep[0]['id'].'">
         <div class="col-12">
                       <div class="card w-100 border position-relative overflow-hidden mb-0">
                         <div class="card-body p-4">
@@ -87,29 +116,78 @@ class CResponsables extends BaseController{
                                   <input type="number" class="form-control" id="fn_fono" name="fn_fono" placeholder="'.$get_rep[0]['fun_telefono'].'" value="'.$get_rep[0]['fun_telefono'].'">
                                 </div>
                                 <div class="mb-3">
-                                  <label class="form-label">Location</label>
-                                  <select class="form-select" aria-label="Default select example">
-                                    <option selected>United Kingdom</option>
-                                    <option value="1">United States</option>
-                                    <option value="2">United Kingdom</option>
-                                    <option value="3">India</option>
-                                    <option value="3">Russia</option>
-                                  </select>
+                                  <label for="exampleInputtext" class="form-label">CARGO ADMINISTRATIVO</label>
+                                  <input type="text" class="form-control" id="fn_fono" name="fn_fono" placeholder="'.$get_rep[0]['fun_cargo'].'" value="'.$get_rep[0]['fun_telefono'].'">
                                 </div>
                               </div>
+
+
+
                               <div class="col-lg-6">
                                 <div class="mb-3">
                                   <label for="exampleInputtext2" class="form-label">USUARIO</label>
-                                  <input type="text" class="form-control" id="exampleInputtext2" placeholder="Maxima Studio">
+                                  <input type="text" class="form-control" id="fn_usu" name="fn_usu" placeholder="'.$get_rep[0]['fun_usuario'].'" value="'.$get_rep[0]['fun_usuario'].'">
                                 </div>
                                 <div class="mb-3">
-                                  <label class="form-label">Currency</label>
-                                  <select class="form-select" aria-label="Default select example">
-                                    <option selected>India (INR)</option>
-                                    <option value="1">US Dollar ($)</option>
-                                    <option value="2">United Kingdom (Pound)</option>
-                                    <option value="3">India (INR)</option>
-                                    <option value="3">Russia (Ruble)</option>
+                                  <label for="exampleInputtext2" class="form-label">PASSWORD '.$has_title.'</label>
+                                  <input type="text" class="form-control" id="fn_usu" name="fn_usu" placeholder="Contraseña" value="'.$pss.'">
+                                </div>
+                                <div class="mb-3">
+                                  <label class="form-label">ADMINISTRACIÓN</label>
+                                  <select class="form-select" name="tp_adm" id="tp_adm"aria-label="Default select example">
+                                    <option value="0">Seleccione ..</option>';
+                                    if ($get_rep[0]['fun_adm']==1) {
+                                      $tabla.=' <option value="1" selected="true">NACIONAL</option>
+                                                <option value="2">REGIONAL</option>';
+                                    }
+                                    else{
+                                      $tabla.='<option value="1">NACIONAL</option>
+                                                <option value="2" selected="true">REGIONAL</option>';
+                                    }
+                                    $tabla.='
+                                  </select>
+                                </div>
+                                <div class="mb-3">
+                                  <label class="form-label">REGIONAL</label>
+                                  <select class="form-select" name="reg_id" id="reg_id" aria-label="Default select example">
+                                    <div id="select_reg">';
+                                    if($get_rep[0]['fun_adm']==1){
+                                      $tabla.='<option value="10" selected>Administración Central</option>';    
+                                    }
+                                    else{
+                                      foreach($regionales as $row){
+                                      if($row['dep_id']==$get_rep[0]['dep_id']){
+                                          $tabla.='<option value="'.$row['dep_id'].'" selected>'.strtoupper($row['dep_departamento']).'</option>';    
+                                        }
+                                        else{
+                                          $tabla.='<option value="'.$row['dep_id'].'">'.strtoupper($row['dep_departamento']).'</option>';
+                                        }
+                                      }
+                                    }
+                                    $tabla.='
+                                    </div>
+                                  </select>
+                                  
+                                </div>
+                                <div class="mb-3">
+                                  <label class="form-label">DISTRITAL</label>
+                                  <select class="form-select" name="dist_id" id="dist_id" aria-label="Default select example">
+                                    <div id="select_dist">';
+                                    if($get_rep[0]['fun_adm']==1){
+                                      $tabla.='<option value="22" selected>Oficina Nacional</option>';    
+                                    }
+                                    else{
+                                      foreach($distritales as $row){
+                                      if($row['dist_id']==$get_rep[0]['dist_id']){
+                                          $tabla.='<option value="'.$row['dist_id'].'" selected>'.strtoupper($row['dist_distrital']).'</option>';    
+                                        }
+                                        else{
+                                          $tabla.='<option value="'.$row['dist_id'].'">'.strtoupper($row['dist_distrital']).'</option>';
+                                        }
+                                      }
+                                    }
+                                    $tabla.='
+                                    </div>
                                   </select>
                                 </div>
                                 <div class="mb-3">
@@ -136,6 +214,57 @@ class CResponsables extends BaseController{
                     </div>';
         return $tabla;
     }
+
+
+
+    /// GET CAPTCHA
+
+  public function get_reg_nal() {
+    $model_funcionario = new Model_funcionarios();
+    $model_reg = new Model_regional();
+    $regionales=$model_reg->obtenerRegionales();
+    $tp_adm = $this->request->getPost('tipo_adm'); /// tipo adm
+    $fun_id = $this->request->getPost('id'); /// id
+    $get_rep=$model_funcionario->get_responsablePoa($fun_id);
+    $distritales=$model_reg->obtenerDistritales($get_rep[0]['dep_id']);
+    $select_reg='';
+    $select_dist='';
+
+    if($tp_adm==1){ /// Nacional
+      $select_reg.='<option value="10">Administración Central</option>';
+      $select_dist.='<option value="22">Oficina Nacional</option>';
+    }
+    else{ /// Regional
+      $select_reg.='<option value="0" selected>Seleccione ..</option>';
+                    foreach($regionales as $row){
+                      if($row['dep_id']==$get_rep[0]['dep_id']){
+                        $select_reg.='<option value="'.$row['dep_id'].'" selected >'.strtoupper($row['dep_departamento']).'</option>';    
+                      }
+                      else{
+                        $select_reg.='<option value="'.$row['dep_id'].'" >'.strtoupper($row['dep_departamento']).'</option>';    
+                      }
+                    }
+
+      $select_dist.='<option value="0">Seleccione ...</option>';
+                    foreach($distritales as $row){
+                      if($row['dist_id']==$get_rep[0]['dist_id']){
+                        $select_dist.='<option value="'.$row['dist_id'].'" selected >'.strtoupper($row['dist_distrital']).'</option>';    
+                      }
+                      else{
+                        $select_dist.='<option value="'.$row['dist_id'].'" >'.strtoupper($row['dist_distrital']).'</option>';    
+                      }
+                    }
+    }
+
+
+    $result = [
+        'respuesta'      => 'correcto',
+        'select_reg' => $select_reg, // Regional
+        'select_dist' => $select_dist // Distrital
+    ];
+
+    return $this->response->setJSON($result);
+}
 
 
 

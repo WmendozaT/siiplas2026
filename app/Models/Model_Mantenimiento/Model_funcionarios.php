@@ -26,6 +26,18 @@ class Model_funcionarios extends Model{
         return $query->getResultArray();
     }
 
+    /// Get Password 2026
+    public function get_pwd($id){
+        $sql = 'SELECT *
+                from historial_psw
+                where fun_id='.$id.'
+                order by psw_id desc
+                LIMIT 1;';
+        $query = $this->query($sql);
+        
+        return $query->getResultArray();
+    }
+
     /// lista de funcionarios para Seguimiento POA activos
     public function obtenerFuncionariosActivos_seguimientoPOA(){
         $gestion = session()->get('configuracion')['conf_gestion'] ?? null;

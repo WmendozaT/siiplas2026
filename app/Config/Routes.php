@@ -31,4 +31,5 @@ $routes->get('dashboard', 'CDashboard\Dashboard::dashboard_admin');
 $routes->get('mnt/responsables', 'CMantenimiento\CResponsables::lista_responsables');
 $routes->get('mnt/update_responsable/(:num)', 'CMantenimiento\CResponsables::update_responsable/$1');
 $routes->post('mnt/get_reg_nal', 'CMantenimiento\CResponsables::get_reg_nal');
-
+$routes->post('mnt/get_dist', 'CMantenimiento\CResponsables::get_distritales'); /// get Distritales segun la regional
+$routes->post('mnt/update_resp', 'CMantenimiento\CResponsables::Update_resp');

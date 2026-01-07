@@ -64,7 +64,7 @@ class CResponsables extends BaseController{
       ////
       $get_pss=$model_funcionario->get_pwd($get_rep[0]['id']);
       if (empty($get_pss)) {
-        $pss='Sin Password - Reasignar Password';
+        $pss='';
       }
       else{
         $pss=$get_pss[0]['fun_apassword'];
@@ -74,6 +74,7 @@ class CResponsables extends BaseController{
       ////
       $regionales=$model_reg->obtenerRegionales();
       $distritales=$model_reg->obtenerDistritales($get_rep[0]['dep_id']);
+      $unidadOrganizacional=$model_reg->obtenerUnidadesOrganizacionales();
       ////
 
       ////
@@ -85,16 +86,16 @@ class CResponsables extends BaseController{
       ////
         $tabla='';
         $tabla.='
-        <input name="base" type="text" value="'.base_url().'">
-        <input name="id" type="text" value="'.$get_rep[0]['id'].'">
+        <input name="base" type="hidden" value="'.base_url().'">
+        <input name="id" type="hidden" value="'.$get_rep[0]['id'].'">
         <div class="col-12">
                       <div class="card w-100 border position-relative overflow-hidden mb-0">
                         <div class="card-body p-4">
                           <h4 class="card-title">Datos del Responsable POA</h4>
                           <p class="card-subtitle mb-4">Formulario para cambiar editar Información del Reponsable POA</p>
-                          <form>
+                          <form role="form" action="'.base_url('mnt/update_resp').'" method="post" id="form" class="login-form">
                             <div class="row">
-                              <div class="col-lg-6">
+                              <div class="col-lg-4">
                                 <div class="mb-3">
                                   <label for="exampleInputtext" class="form-label">NOMBRE</label>
                                   <input type="text" class="form-control" id="fn_nom" name="fn_nom" placeholder="'.$get_rep[0]['fun_nombre'].'" value="'.$get_rep[0]['fun_nombre'].'">
@@ -115,22 +116,12 @@ class CResponsables extends BaseController{
                                   <label for="exampleInputtext" class="form-label">NRO DE CELULAR</label>
                                   <input type="number" class="form-control" id="fn_fono" name="fn_fono" placeholder="'.$get_rep[0]['fun_telefono'].'" value="'.$get_rep[0]['fun_telefono'].'">
                                 </div>
-                                <div class="mb-3">
-                                  <label for="exampleInputtext" class="form-label">CARGO ADMINISTRATIVO</label>
-                                  <input type="text" class="form-control" id="fn_fono" name="fn_fono" placeholder="'.$get_rep[0]['fun_cargo'].'" value="'.$get_rep[0]['fun_telefono'].'">
-                                </div>
                               </div>
 
-
-
-                              <div class="col-lg-6">
+                              <div class="col-lg-4">
                                 <div class="mb-3">
-                                  <label for="exampleInputtext2" class="form-label">USUARIO</label>
-                                  <input type="text" class="form-control" id="fn_usu" name="fn_usu" placeholder="'.$get_rep[0]['fun_usuario'].'" value="'.$get_rep[0]['fun_usuario'].'">
-                                </div>
-                                <div class="mb-3">
-                                  <label for="exampleInputtext2" class="form-label">PASSWORD '.$has_title.'</label>
-                                  <input type="text" class="form-control" id="fn_usu" name="fn_usu" placeholder="Contraseña" value="'.$pss.'">
+                                  <label for="exampleInputtext" class="form-label">CARGO ADMINISTRATIVO</label>
+                                  <input type="text" class="form-control" id="fn_cargo" name="fn_cargo" placeholder="'.$get_rep[0]['fun_cargo'].'" value="'.$get_rep[0]['fun_cargo'].'">
                                 </div>
                                 <div class="mb-3">
                                   <label class="form-label">ADMINISTRACIÓN</label>
@@ -190,21 +181,40 @@ class CResponsables extends BaseController{
                                     </div>
                                   </select>
                                 </div>
-                                <div class="mb-3">
-                                  <label for="exampleInputtext3" class="form-label">Phone</label>
-                                  <input type="text" class="form-control" id="exampleInputtext3" placeholder="+91 12345 65478">
-                                </div>
                               </div>
-                              <div class="col-12">
-                                <div>
-                                  <label for="exampleInputtext4" class="form-label">Address</label>
-                                  <input type="text" class="form-control" id="exampleInputtext4" placeholder="814 Howard Street, 120065, India">
+
+                              <div class="col-lg-4">
+                                <div class="mb-3">
+                                  <label class="form-label">UNIDAD ORGANIZACIONAL</label>
+                                  <select class="form-select" name="uni_id" id="uni_id" aria-label="Default select example">';
+                                      foreach($unidadOrganizacional as $row){
+                                      if($row['uni_id']==$get_rep[0]['uni_id']){
+                                          $tabla.='<option value="'.$row['uni_id'].'" selected>'.strtoupper($row['uni_unidad']).'</option>';    
+                                        }
+                                        else{
+                                          $tabla.='<option value="'.$row['uni_id'].'">'.strtoupper($row['uni_unidad']).'</option>';
+                                        }
+                                      }
+                                    $tabla.='
+                                  </select>
+                                </div>
+                                <div class="mb-3">
+                                  <label for="exampleInputtext2" class="form-label">USUARIO</label>
+                                  <input type="text" class="form-control" id="fn_usu" name="fn_usu" placeholder="'.$get_rep[0]['fun_usuario'].'" value="'.$get_rep[0]['fun_usuario'].'">
+                                </div>
+                                <div class="mb-3">
+                                  <label for="exampleInputtext2" class="form-label">PASSWORD'.$has_title.'</label>
+                                  <input type="text" class="form-control" id="fn_usu" name="fn_usu" placeholder="Contraseña" value="'.$pss.'">
+                                </div>
+                                <div class="mb-3">
+                                  <label for="exampleInputtext2" class="form-label">CORREO</label>
+                                  <input type="text" class="form-control" id="fn_email" name="fn_email" placeholder="ejemplo@gmail.com">
                                 </div>
                               </div>
                               <div class="col-12">
                                 <div class="d-flex align-items-center justify-content-end mt-4 gap-6">
-                                  <button class="btn btn-primary">Save</button>
-                                  <button class="btn bg-danger-subtle text-danger">Cancel</button>
+                                  <button class="btn btn-primary">Guardar</button>
+                                  <button class="btn bg-danger-subtle text-danger">Cancelar</button>
                                 </div>
                               </div>
                             </div>
@@ -217,8 +227,7 @@ class CResponsables extends BaseController{
 
 
 
-    /// GET CAPTCHA
-
+  /// GET REGIONAL
   public function get_reg_nal() {
     $model_funcionario = new Model_funcionarios();
     $model_reg = new Model_regional();
@@ -256,7 +265,6 @@ class CResponsables extends BaseController{
                     }
     }
 
-
     $result = [
         'respuesta'      => 'correcto',
         'select_reg' => $select_reg, // Regional
@@ -267,7 +275,37 @@ class CResponsables extends BaseController{
 }
 
 
+ /// GET DISTRITAL
+  public function get_distritales() {
+    $model_funcionario = new Model_funcionarios();
+    $model_reg = new Model_regional();
 
+   // $regionales=$model_reg->obtenerRegionales();
+    $dep_id = $this->request->getPost('dep_id'); /// tipo adm
+    $fun_id = $this->request->getPost('id'); /// id
+    
+    $get_rep=$model_funcionario->get_responsablePoa($fun_id);
+    $distritales=$model_reg->obtenerDistritales($dep_id);
+    
+    $select_dist='';
+
+    $select_dist.='<option value="0">Seleccione ...</option>';
+                    foreach($distritales as $row){
+                      if($row['dist_id']==$get_rep[0]['dist_id']){
+                        $select_dist.='<option value="'.$row['dist_id'].'" selected >'.strtoupper($row['dist_distrital']).'</option>';    
+                      }
+                      else{
+                        $select_dist.='<option value="'.$row['dist_id'].'" >'.strtoupper($row['dist_distrital']).'</option>';    
+                      }
+                    }
+
+    $result = [
+        'respuesta'      => 'correcto',
+        'select_dist' => $select_dist // Distrital
+    ];
+
+    return $this->response->setJSON($result);
+}
 
 
     ///Lista Reponsables POA

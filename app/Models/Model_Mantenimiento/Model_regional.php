@@ -28,6 +28,17 @@ class Model_regional extends Model{
     }
 
 
+    /// lista Unidades Organizacionales
+    public function obtenerUnidadesOrganizacionales(){
+        $sql = '
+            SELECT *
+            from unidadorganizacional
+            order by uni_id asc';
+        $query = $this->query($sql);
+        return $query->getResultArray();
+    }
+
+
 
 
 }

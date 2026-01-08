@@ -4,7 +4,43 @@ namespace App\Models\Model_mantenimiento;
 use CodeIgniter\Model;
 
 class Model_funcionarios extends Model{
-    protected $table = 'funcionario';
+    protected $table      = 'funcionario';
+    protected $primaryKey = 'fun_id';
+
+    protected $allowedFields = [
+        'fun_nombre', 
+        'fun_paterno', 
+        'fun_materno', 
+        'fun_ci', 
+        'fun_telefono', 
+        'fun_cargo', 
+        'fun_adm',  
+        'fun_dist', 
+        'uni_id', 
+        'fun_usuario', 
+        'fun_password' // Asegúrate de que este nombre sea exacto al de tu columna
+    ];
+
+    // --- AGREGAR ESTO PARA EL HASHEO AUTOMÁTICO ---
+    // Estos eventos se disparan al usar $model->insert() o $model->update()
+    protected $beforeInsert = ['hashPassword'];
+    protected $beforeUpdate = ['hashPassword'];
+
+    // Función interna que realiza el hasheo
+    protected function hashPassword(array $data) {
+        // Solo hashea si el campo 'fun_password' existe en los datos que se envían
+        if (!isset($data['data']['fun_password'])) {
+            return $data;
+        }
+
+        // Usa el estándar de PHP para cifrar la clave
+        $data['data']['fun_password'] = password_hash($data['data']['fun_password'], PASSWORD_DEFAULT);
+
+        return $data;
+    }
+
+
+
 
     /// lista de funcionarios POA Activos
     public function obtenerFuncionariosActivos(){

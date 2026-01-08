@@ -69,19 +69,19 @@ $(document).ready(function() {
 $(document).ready(function() {
     $("#form").on("submit", function(e) {
         let esValido = true;
-        let mensaje = "";
 
-        // 1. Validar campos de texto y número (que no estén vacíos)
-        $("#fn_nom, #fn_pt, #fn_mt, #fn_ci, #fn_fono, #fn_cargo, #fn_usu").each(function() {
+        // 1. Validar campos de texto y número
+        // Nota: eliminé el duplicado de fn_usu que tenías en tu HTML
+        $("#fn_nom, #fn_pt, #fn_mt, #fn_ci, #fn_fono, #fn_cargo, #fn_usu, #fun_password").each(function() {
             if ($(this).val().trim() === "") {
-                $(this).addClass("is-invalid"); // Clase de borde rojo de Bootstrap
+                $(this).addClass("is-invalid");
                 esValido = false;
             } else {
                 $(this).removeClass("is-invalid").addClass("is-valid");
             }
         });
 
-        // 2. Validar Selects (que no sea el valor "0" o vacío)
+        // 2. Validar Select de Administración
         if ($("#tp_adm").val() === "0" || $("#tp_adm").val() === "") {
             $("#tp_adm").addClass("is-invalid");
             esValido = false;
@@ -89,14 +89,25 @@ $(document).ready(function() {
             $("#tp_adm").removeClass("is-invalid").addClass("is-valid");
         }
 
-        // 3. Si algo falla, detenemos el envío
+        // 3. Lógica de Envío
         if (!esValido) {
-            e.preventDefault(); // Evita que se recargue la página
+            e.preventDefault(); // Detiene el envío si hay error
             alert("Por favor, complete todos los campos obligatorios.");
+        } else {
+            e.preventDefault(); // Detenemos el envío inmediato
+    
+            $("#btnGuardar").prop("disabled", true);
+            $("#textGuardar").text("Procesando...");
+            $("#spinnerGuardar").removeClass("d-none");
+
+            // Esperar 3 segundos antes de enviar realmente el formulario
+            setTimeout(function() {
+                $("#form").off("submit").submit(); // Quita el evento actual y envía el form
+            }, 1000);
         }
     });
 
-    // Limpiar el estado de error cuando el usuario escribe
+    // Limpiar errores mientras el usuario escribe
     $("input, select").on("change keyup", function() {
         if ($(this).val().trim() !== "" && $(this).val() !== "0") {
             $(this).removeClass("is-invalid");

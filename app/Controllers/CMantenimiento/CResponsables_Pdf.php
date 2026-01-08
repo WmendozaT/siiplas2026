@@ -44,6 +44,7 @@ class CResponsables_Pdf extends BaseController{
     $dompdf = new Dompdf($options);
 
     /// instalar DOMPF composer require dompdf/dompdf
+    ///
     // Usamos comillas DOBLES al principio para que las simples de CSS no rompan el código
     // Y concatenamos $fecha para que se muestre el valor real
         $html = "

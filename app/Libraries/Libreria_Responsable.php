@@ -37,12 +37,25 @@ class Libreria_Responsable{
 
         $tabla.='
         <div class="card">
-            <a href="'.base_url().'mnt/Pdf_responsables" class="boton-login" target=_black>
-                    Generar Reporte
-                </a>
             <div class="card-body">
-                <h4 class="card-title mb-4 pb-2">RESPONSABLES POA</h4>
+
+                <!-- Contenedor flexible para Título y Botones -->
+                  <div class="d-flex justify-content-between align-items-center mb-4 pb-2">
+                      <h4 class="card-title mb-0">RESPONSABLES POA</h4>
+                      <div>
+                          <!-- Botón Nuevo Registro -->
+                          <a href="'.base_url('mnt/nuevo_responsable').'" class="btn btn-success btn-sm">
+                              <i class="ti ti-plus"></i> Nuevo Registro
+                          </a>
+                          <!-- Botón Reporte (Impresión) -->
+                          <button type="button" id="btnGenerarReporte" onclick="generarReporteBase64()" class="btn btn-outline-primary btn-sm ms-2">
+                              <i class="ti ti-printer"></i> Generar Reporte
+                          </button>
+                      </div>
+                  </div>
+
                 <div class="table-responsive pb-4">
+                    <input name="base" type="hidden" value="'.base_url().'">
                     <table id="all-student" class="table table-striped table-bordered border text-nowrap align-middle" style="font-size:10.5px;">
                       <thead>
                         <tr>
@@ -74,8 +87,8 @@ class Libreria_Responsable{
                             </a>
                           </td>
                           <td>
-                            <a href="teacher-details.html" class="link-primary" data-bs-toggle="tooltip" data-bs-placement="top" title="Eliminar">
-                              <i class="ti ti-eye fs-3">Eliminar</i>
+                            <a href="javascript:void(0)" onclick="eliminarResponsable('.$row['id'].', this)" class="text-danger" title="Eliminar">
+                                <i class="ti ti-trash fs-3">Eliminar</i>
                             </a>
                           </td>
                         </tr>';

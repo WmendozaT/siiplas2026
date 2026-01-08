@@ -114,3 +114,70 @@ $(document).ready(function() {
         }
     });
 });
+
+
+function generarReporteBase64() {
+    // 1. Referencia al botón y su contenido original
+    var $btn = $("#btnGenerarReporte");
+    var originalHtml = $btn.html();
+
+    // 2. Mostrar Loading: Desactivar botón y cambiar icono
+    $btn.prop("disabled", true);
+    $btn.html('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Generando...');
+
+    $.ajax({
+        url: base + "mnt/Pdf_responsables",
+        type: 'GET',
+        dataType: 'json',
+        success: function(response) {
+            if (response.status === 'success') {
+                // Abrir en pestaña nueva
+                var win = window.open();
+                if (win) {
+                    win.document.write('<title>Reporte de Responsables</title>');
+                    win.document.write('<iframe src="' + response.pdf + '" frameborder="0" style="border:0; top:0px; left:0px; bottom:0px; right:0px; width:100%; height:100%;" allowfullscreen></iframe>');
+                    win.document.body.style.margin = '0';
+                } else {
+                    alert("Por favor, permita las ventanas emergentes.");
+                }
+            } else {
+                alert("Error: " + response.message);
+            }
+        },
+        error: function() {
+            alert("Error de servidor");
+        },
+        complete: function() {
+            // 3. RESTAURAR BOTÓN: Se ejecuta siempre (al terminar éxito o error)
+            $btn.prop("disabled", false);
+            $btn.html(originalHtml);
+        }
+    });
+}
+
+
+function eliminarResponsable(id, elemento) {
+    // Confirmación nativa del navegador
+    if (confirm("¿Está seguro de que desea eliminar este registro?")) {
+        $.ajax({
+            url: 'mnt/delete_responsable', // Asegúrate de que la ruta sea correcta
+            type: 'POST',
+            data: { id: id },
+            dataType: 'json',
+            success: function(response) {
+                if (response.status === 'success') {
+                    alert("Eliminado correctamente");
+                    // Elimina la fila de la tabla visualmente
+                    $(elemento).closest('tr').fadeOut(500, function() {
+                        $(this).remove();
+                    });
+                } else {
+                    alert("Error: " + response.message);
+                }
+            },
+            error: function() {
+                alert("Error de conexión con el servidor");
+            }
+        });
+    }
+}

@@ -51,6 +51,10 @@ class Libreria_Responsable{
                           <button type="button" id="btnGenerarReporte" onclick="generarReporteBase64()" class="btn btn-outline-primary btn-sm ms-2">
                               <i class="ti ti-printer"></i> Generar Reporte
                           </button>
+
+                          <button type="button" onclick="firmarYAbrirReporte()" class="btn btn-info btn-sm ms-2 text-white">
+                              <i class="ti ti-certificate"></i> Firmar Digitalmente
+                          </button>
                       </div>
                   </div>
 

@@ -11,7 +11,7 @@
   <!-- <link rel="stylesheet" href="<?= base_url('Css/plantillaCss/tabler-icons.min.css') ?>"> -->
 <!--   <link rel="stylesheet" href="cdn.jsdelivr.net"> -->
   <title><?= session()->get("configuracion")['conf_abrev_sistema'] ?? 'No encontrado' ?></title>
-  
+
 </head>
 <body>
   <?= session()->get("view_bienvenida") ?? 'No encontrado'?>

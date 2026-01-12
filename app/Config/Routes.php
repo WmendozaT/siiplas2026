@@ -34,4 +34,5 @@ $routes->post('mnt/get_reg_nal', 'CMantenimiento\CResponsables::get_reg_nal');
 $routes->post('mnt/get_dist', 'CMantenimiento\CResponsables::get_distritales'); /// get Distritales segun la regional
 $routes->post('mnt/update_resp', 'CMantenimiento\CResponsables::Update_resp'); /// Valida Update Responsable
 
-$routes->get('mnt/Pdf_responsables', 'CMantenimiento\CResponsables_Pdf::Pdf_lista_responsables');
+$routes->get('mnt/Pdf_responsables', 'CMantenimiento\CResponsables_Pdf::Pdf_lista_responsables'); /// Pdf Responsables en base64
+$routes->get('mnt/Pdf_responsables_sfirma', 'CMantenimiento\CResponsables_Pdf::Pdf_lista_responsables_para_firmar'); /// Pdf Responsables en base64

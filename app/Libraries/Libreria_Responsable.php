@@ -108,8 +108,131 @@ class Libreria_Responsable{
     }
 
 
+     ////Formulario Datos del Responsable para su edicion
+    public function form_add_responsables_poa(){
+    //  $model_funcionario = new Model_funcionarios();
+      $model_reg = new Model_regional();
 
-    //// Datos del Responsable para su edicion
+      ////
+     /// $regionales=$model_reg->obtenerRegionales();
+      $unidadOrganizacional=$model_reg->obtenerUnidadesOrganizacionales();
+      ////
+
+        $tabla='';
+        $tabla.='
+        <style>
+          .is-loading {
+              cursor: wait;
+              opacity: 0.7;
+              pointer-events: none; /* Bloquea clics en toda la página */
+          }
+        </style>
+        <input name="base" type="hidden" value="'.base_url().'">
+        
+        <div class="col-12">
+                      <div class="card w-100 border position-relative overflow-hidden mb-0">
+                        <div class="card-body p-4">
+                          <h4 class="card-title">Adicionar Responsable POA</h4>
+                          <p class="card-subtitle mb-4">Formulario para Adicionar Nuevo Reponsable POA</p>
+                          <form role="form" action="'.base_url('mnt/add_resp').'" method="post" id="form_add" class="login-form">
+                        
+                            <div class="row">
+                              <div class="col-lg-4">
+                                <div class="mb-3">
+                                  <label for="exampleInputtext" class="form-label">NOMBRE</label>
+                                  <input type="text" class="form-control" id="fn_nom" name="fn_nom" placeholder="Nombre ..">
+                                </div>
+                                <div class="mb-3">
+                                  <label for="exampleInputtext" class="form-label">APELLIDO PATERNO</label>
+                                  <input type="text" class="form-control" id="fn_pt" name="fn_pt" placeholder="Paterno ..">
+                                </div>
+                                <div class="mb-3">
+                                  <label for="exampleInputtext" class="form-label">APELLIDO PATERNO</label>
+                                  <input type="text" class="form-control" id="fn_mt" name="fn_mt" placeholder="Materno ..">
+                                </div>
+                                <div class="mb-3">
+                                  <label for="exampleInputtext" class="form-label">CI</label>
+                                  <input type="number" class="form-control" id="fn_ci" name="fn_ci" placeholder="Nro Ci ..">
+                                </div>
+                                <div class="mb-3">
+                                  <label for="exampleInputtext" class="form-label">NRO DE CELULAR</label>
+                                  <input type="number" class="form-control" id="fn_fono" name="fn_fono" placeholder="">
+                                </div>
+                              </div>
+
+                              <div class="col-lg-4">
+                                <div class="mb-3">
+                                  <label for="exampleInputtext" class="form-label">CARGO ADMINISTRATIVO</label>
+                                  <input type="text" class="form-control" id="fn_cargo" name="fn_cargo" placeholder="Cargo ..">
+                                </div>
+                                <div class="mb-3">
+                                  <label class="form-label">ADMINISTRACIÓN</label>
+                                  <select class="form-select" name="tp_adm1" id="tp_adm1"aria-label="Default select example">
+                                    <option value="0">Seleccione ..</option>
+                                    <option value="1">NACIONAL</option>
+                                    <option value="2">REGIONAL</option>
+                                  </select>
+                                </div>
+                                <div class="mb-3">
+                                  <label class="form-label">REGIONAL</label>
+                                  <select class="form-select" name="reg_id1" id="reg_id1" aria-label="Default select example">
+                                  
+                                    <div id="select_reg"><option value="0">Seleccione ..</option></div>
+                                  </select>
+                                  
+                                </div>
+                                <div class="mb-3">
+                                  <label class="form-label">DISTRITAL</label>
+                                  <select class="form-select" name="dist_id" id="dist_id" aria-label="Default select example">
+                                  
+                                    <div id="select_dist"><option value="0">Seleccione ..</option></div>
+                                  </select>
+                                </div>
+                              </div>
+
+                              <div class="col-lg-4">
+                                <div class="mb-3">
+                                  <label class="form-label">UNIDAD ORGANIZACIONAL</label>
+                                  <select class="form-select" name="uni_id" id="uni_id" aria-label="Default select example">';
+                                      foreach($unidadOrganizacional as $row){
+                                        $tabla.='<option value="'.$row['uni_id'].'">'.strtoupper($row['uni_unidad']).'</option>';
+                                      }
+                                    $tabla.='
+                                  </select>
+                                </div>
+                                <div class="mb-3">
+                                  <label for="exampleInputtext2" class="form-label">USUARIO</label>
+                                  <input type="text" class="form-control" id="fn_usu" name="fn_usu" placeholder="Asignar Usuario ..">
+                                </div>
+                                <div class="mb-3">
+                                  <label for="exampleInputtext2" class="form-label">PASSWORD</label>
+                                  <input type="text" class="form-control" id="fun_password" name="fun_password" placeholder="Asignar Contraseña ..">
+                                </div>
+                                <div class="mb-3">
+                                  <label for="exampleInputtext2" class="form-label">CORREO</label>
+                                  <input type="text" class="form-control" id="fn_email" name="fn_email" placeholder="ejemplo@gmail.com">
+                                </div>
+                              </div>
+                              <div class="col-12">
+                                <div class="d-flex align-items-center justify-content-end mt-4 gap-6">
+                                  <button type="submit" id="btnGuardar" class="btn btn-primary">
+                                    <span id="textGuardar">Guardar Información</span>
+                                    <span id="spinnerGuardar" class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
+                                  </button>
+                                  <a href="'.base_url('mnt/responsables').'" class="btn bg-danger-subtle text-danger">Cancelar</a>
+                                </div>
+
+                              </div>
+                            </div>
+                          </form>
+                        </div>
+                      </div>
+                    </div>';
+        return $tabla;
+    }
+
+
+    ////Formulario Datos del Responsable para su edicion
     public function get_responsables_poa($get_rep){
       $model_funcionario = new Model_funcionarios();
       $model_reg = new Model_regional();

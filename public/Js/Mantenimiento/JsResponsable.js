@@ -65,7 +65,8 @@ $(document).ready(function() {
 
 
 
-/////
+
+///// Js Update Informacion
 $(document).ready(function() {
     $("#form").on("submit", function(e) {
         let esValido = true;
@@ -117,6 +118,176 @@ $(document).ready(function() {
 
 
 
+//////// FORM ADD tp Administracion
+$(document).ready(function() {
+    $("#tp_adm1").change(function () {
+        // Obtener el valor seleccionado directamente
+        var tp_adm = $(this).val(); 
+       // id = $('[name="id"]').val();
+      
+        // Validar que el valor no esté vacío (opcional, si tienes un "Seleccione...")
+        if (tp_adm === "") return;
+        var url = base + "mnt/get_reg_nal_add";
+        var request = $.ajax({
+            url: url,
+            type: "POST",
+            dataType: 'json',
+            data: { 
+                tipo_adm: tp_adm
+            }
+        });
+
+        request.done(function (response) {
+            if (response.respuesta == 'correcto') {
+                $("#select_reg").html(response.select_reg);
+                $("#select_dist").html(response.select_dist);
+            }
+        });
+
+        request.fail(function (jqXHR, textStatus, errorThrown) {
+            console.error("Error en la petición: " + textStatus, errorThrown);
+        });
+    }); 
+  })
+
+
+$(document).ready(function() {
+    $("#reg_id1").change(function () {
+        // Obtener el valor seleccionado directamente
+        var reg_id = $(this).val(); 
+        // Validar que el valor no esté vacío (opcional, si tienes un "Seleccione...")
+       // if (tp_adm === "") return;
+        var url = base + "mnt/get_dist_add";
+        var request = $.ajax({
+            url: url,
+            type: "POST",
+            dataType: 'json',
+            data: { 
+                dep_id: reg_id
+            }
+        });
+
+        request.done(function (response) {
+            if (response.respuesta == 'correcto') {
+                $("#select_dist").html(response.select_dist);
+            }
+        });
+
+        request.fail(function (jqXHR, textStatus, errorThrown) {
+            console.error("Error en la petición: " + textStatus, errorThrown);
+        });
+    }); 
+  })
+
+
+///// Js Valida Add Informacion
+$(document).ready(function() {
+    $("#form_add").on("submit", function(e) {
+        // 1. SIEMPRE detener el envío automático
+        e.preventDefault();
+        
+        let formulario = this; // Guardamos la referencia al formulario
+        let esValido = true;
+
+        // 2. Validar campos de texto y número
+        $("#fn_nom, #fn_pt, #fn_mt, #fn_ci, #fn_fono, #fn_cargo, #fn_usu, #fun_password").each(function() {
+            if ($(this).val().trim() === "") {
+                $(this).addClass("is-invalid").removeClass("is-valid");
+                esValido = false;
+            } else {
+                $(this).removeClass("is-invalid").addClass("is-valid");
+            }
+        });
+
+        // 3. Validar Selects (Administración, Regional, Distrital)
+        $("#tp_adm1, #reg_id1, #dist_id").each(function() {
+            let valor = $(this).val();
+            if (valor === "0" || valor === "" || valor === null) {
+                $(this).addClass("is-invalid").removeClass("is-valid");
+                esValido = false;
+            } else {
+                $(this).removeClass("is-invalid").addClass("is-valid");
+            }
+        });
+
+        // 4. Si la validación visual falla, no continuar
+        if (!esValido) {
+            alert("Por favor, complete todos los campos obligatorios correctamente.");
+            return false;
+        }
+
+        // 5. Validación AJAX (¿Existe el usuario?)
+        let usuarioDigitado = $("#fn_usu").val().trim();
+        let urlVerificacion = base + "mnt/verif_usuario";
+
+        // Deshabilitar botón para evitar múltiples clics
+        $("#btnGuardar").prop("disabled", true);
+        $("#textGuardar").text("Verificando...");
+
+        $.ajax({
+            url: urlVerificacion,
+            type: "POST",
+            dataType: 'json',
+            data: { usuario: usuarioDigitado },
+            success: function(response) {
+                if (response.respuesta === 'correcto') {
+                    // EL USUARIO NO EXISTE: Proceder con el guardado
+                    $("#textGuardar").text("Guardando...");
+                    $("#spinnerGuardar").removeClass("d-none");
+
+                    // Esperar un breve momento para efecto visual y enviar
+                    setTimeout(function() {
+                        // Importante: usamos formulario.submit() (nativo) 
+                        // para que no vuelva a entrar en este bucle de jQuery
+                        formulario.submit();
+                    }, 800);
+
+                } else {
+                    // EL USUARIO YA EXISTE
+                    alert("El nombre de usuario '" + usuarioDigitado + "' ya se encuentra registrado. Intente con otro.");
+                    $("#fn_usu").addClass("is-invalid").focus();
+                    $("#btnGuardar").prop("disabled", false);
+                    $("#textGuardar").text("Guardar");
+                }
+            },
+            error: function() {
+                alert("Error de conexión con el servidor.");
+                $("#btnGuardar").prop("disabled", false);
+                $("#textGuardar").text("Guardar");
+            }
+        });
+    });
+
+    // Limpiar clases de error dinámicamente cuando el usuario corrige el campo
+    $("input, select").on("input change", function() {
+        if ($(this).val().trim() !== "" && $(this).val() !== "0") {
+            $(this).removeClass("is-invalid");
+        }
+    });
+});
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//// Para Firmar Digitalmente
 function firmarYAbrirReporte() {
     // 1. Mostrar un loader/mensaje inicial con console.log (alert detiene el script)
     console.log('Generando documento... Espere mientras preparamos el reporte para la firma.');

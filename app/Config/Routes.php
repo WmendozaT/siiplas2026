@@ -28,11 +28,16 @@ $routes->get('dashboard', 'CDashboard\Dashboard::dashboard_admin');
 
 
 /// Mantenimiento
-$routes->get('mnt/responsables', 'CMantenimiento\CResponsables::lista_responsables');
-$routes->get('mnt/update_responsable/(:num)', 'CMantenimiento\CResponsables::update_responsable/$1');
-$routes->post('mnt/get_reg_nal', 'CMantenimiento\CResponsables::get_reg_nal');
-$routes->post('mnt/get_dist', 'CMantenimiento\CResponsables::get_distritales'); /// get Distritales segun la regional
+$routes->get('mnt/responsables', 'CMantenimiento\CResponsables::lista_responsables'); /// lista de Responsables POA
+$routes->get('mnt/nuevo_responsable', 'CMantenimiento\CResponsables::new_responsables'); /// Add Responsable POA
+$routes->get('mnt/update_responsable/(:num)', 'CMantenimiento\CResponsables::update_responsable/$1'); /// Update Responsable POA
+$routes->post('mnt/get_reg_nal_add', 'CMantenimiento\CResponsables::get_reg_nal_add'); /// add
+$routes->post('mnt/get_reg_nal', 'CMantenimiento\CResponsables::get_reg_nal'); /// update
+$routes->post('mnt/get_dist_add', 'CMantenimiento\CResponsables::get_distritales_add'); /// get Add Distritales segun la regional
+$routes->post('mnt/get_dist', 'CMantenimiento\CResponsables::get_distritales'); /// get Update Distritales segun la regional
+$routes->post('mnt/add_resp', 'CMantenimiento\CResponsables::Add_resp'); /// Valida Add Responsable
 $routes->post('mnt/update_resp', 'CMantenimiento\CResponsables::Update_resp'); /// Valida Update Responsable
+$routes->post('mnt/verif_usuario', 'CMantenimiento\CResponsables::verif_usuario'); /// Verifica La duplicidad de Usuario
 
 $routes->get('mnt/Pdf_responsables', 'CMantenimiento\CResponsables_Pdf::Pdf_lista_responsables'); /// Pdf Responsables en base64
 $routes->get('mnt/Pdf_responsables_sfirma', 'CMantenimiento\CResponsables_Pdf::Pdf_lista_responsables_para_firmar'); /// Pdf Responsables en base64

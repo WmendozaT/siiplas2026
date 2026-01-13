@@ -52,6 +52,17 @@ class Model_funcionarios extends Model{
         return $query->getResultArray();
     }
 
+
+    /// Get Usuario POA
+public function get_usuario_responsablePoa($usuario) {
+    // El método where() escapa automáticamente el valor de $usuario
+    return $this->db->table('vlist_funcionario')
+                    ->where('fun_usuario', $usuario)
+                    ->get()
+                    ->getResultArray();
+}
+
+
     /// Get Responsable POA
     public function get_responsablePoa($id){
         $sql = 'SELECT * 

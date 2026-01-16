@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Firma Digital - Jacobitus Total</title>
+    <link rel="icon" type="image/x-icon" href="./favicon.ico">
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <link href="./assets/vendor/FreezeUI/freeze-ui.min.css" rel="stylesheet">
+    <link href="./assets/vendor/prism/prism.min.css" rel="stylesheet" />
+    <script src="//unpkg.com/alpinejs" defer></script>
+</head>
+
+<body class="bg-dark">
+    <div class="container">
+        <div class="card mt-5 mb-5">
+            <div class="card-body">
+                <div class="col-md-12">
+                    <div class="float-start">
+                        <img class="img-fluid" src="assets/images/logo-adsib.png" alt="ADSIB">
+                    </div>
+                    <div class="float-end">
+                        <img class="img-fluid" src="assets/images/logo-firma-digital.png" alt="FIRMA DIGITAL">
+                    </div>
+                </div>
+            </div>
+            <div class="card-body" x-data="{ jacobitus: {}, dispositivo: true, versionMinima: '1.3.0' }"
+                x-init="jacobitus = await jacobitusEnEjecucion(versionMinima); dispositivo = await dispositivoConectado()">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-body">
+                                <h1 class="card-title">
+                                    Documento PDF
+                                </h1>
+                                <h5 class="card-subtitle mb-2 text-body-secondary">
+                                    Firma de documentos con el Jacobitus Total
+                                </h5>
+                                <template x-if="!jacobitus.versionCompatible">
+                                    <div class="col-md-12">
+                                        <div class="d-flex alert alert-warning">
+                                            <div class="flex-shrink-0"> <img width="100"
+                                                    class="img-fluid mx-auto rounded-circle"
+                                                    src="assets/images/tokencito.png" alt="..."> </div>
+                                            <div class="flex-grow-1 ms-3">
+                                                <h3>Atención</h3>
+                                                <p class="lead">
+                                                    Usted esta utlizando <strong>Jacobitus <span
+                                                            x-text="jacobitus.versionActual"></span></strong>, ésta
+                                                    versión no es compatible con esta aplicación, por favor actualice su
+                                                    versión mínimamente a la versión <strong><span
+                                                            x-text="versionMinima"></span></strong>.
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </template>
+                            </div>
+                            <div class="card-body">
+                                <div class="mb-3">
+                                    <label for="archivo" class="form-label">Seleccione el documento PDF que desea
+                                        firmar</label>
+                                    <input class="form-control" type="file" id="archivo" accept=".pdf"
+                                        onchange="javascript:cargarArchivoBase64('archivo', 'archivoPdf', 'firmas');">
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-12" style="height: 500px;">
+                                        <embed class="form-control" id="archivoPdf" style="height: 100%; width: 100%">
+                                    </div>
+                                </div>
+                                <div class="row mt-2">
+                                    <template x-if="!jacobitus">
+                                        <div class="col-md-12">
+                                            <div class="d-flex alert alert-danger">
+                                                <div class="flex-shrink-0"> <img width="100"
+                                                        class="img-fluid mx-auto rounded-circle"
+                                                        src="assets/images/tokencito.png" alt="..."> </div>
+                                                <div class="flex-grow-1 ms-3">
+                                                    <h3>Atención</h3>
+                                                    <p class="lead">
+                                                        Ejecute la aplicación <strong>Jacobitus de Escritorio</strong> y
+                                                        actualice la página.
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </template>
+                                    <template x-if="!dispositivo">
+                                        <div class="col-md-12">
+                                            <div class="d-flex alert alert-warning">
+                                                <div class="flex-shrink-0"> <img width="100"
+                                                        class="img-fluid mx-auto rounded-circle"
+                                                        src="assets/images/tokencito.png" alt="..."> </div>
+                                                <div class="flex-grow-1 ms-3">
+                                                    <h3>Atención</h3>
+                                                    <p class="lead">
+                                                        Conecte su <strong>dispositivo criptográfico (token)</strong> y
+                                                        actualice la página.
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </template>
+                                    <template
+                                        x-if="jacobitus.enEjecucion && dispositivo && jacobitus.versionCompatible">
+                                        <div class="col-md-12">
+                                            <input onclick="javascript:firmarPdf('archivoPdf', 'archivoPdf', 'firmas');"
+                                                type="button" class="btn btn-dark float-end" value="Firmar">
+                                            <input
+                                                onclick="javascript:firmarPdfModoSeguro('archivoPdf', 'archivoPdf', 'firmas');"
+                                                type="button" class="btn btn-dark float-end me-1"
+                                                value="Firmar (Modo seguro)">
+                                        </div>
+                                    </template>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-body">
+                                <h1 class="card-title">
+                                    Firmas
+                                </h1>
+                                <h5 class="card-subtitle mb-2 text-body-secondary">Validación de firmas en el documento
+                                </h5>
+                                <pre class="p-3 language-json"
+                                    style="height: 650px; overflow: scroll;"><code id="firmas"></code></pre>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <hr class="p-0 m-0">
+            <div class="card-body bg-light">
+                <div class="row mb-3">
+                    <div class="col-md-12 mb-3">
+                        <div class="card">
+                            <div class="card-body">
+                                <div class="d-flex align-items-center">
+                                    <div class="flex-shrink-0">
+                                        <img width="70" src="assets/images/resl.png" alt="...">
+                                    </div>
+                                    <div class="flex-grow-1 ms-3">
+                                        <h6 class="text-muted">CÓDIGO FUENTE</h6>
+                                        <h5>
+                                            Repositorio Estatal de Software Libre
+                                        </h5>
+                                        <a class="text-decoration-none text-black text-opacity-75"
+                                            href="https://gitlab.softwarelibre.gob.bo/adsib/jacobitus-total/envolturas/javascript/-/tree/master/ejemplos/vanillajs"
+                                            target="_blank">https://gitlab.softwarelibre.gob.bo/adsib/jacobitus-total/envolturas/javascript/-/tree/master/ejemplos/vanillajs</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-12 mb-3">
+                        <div class="card">
+                            <div class="card-body">
+                                <div class="d-flex align-items-top">
+                                    <div class="flex-shrink-0">
+                                        <img src="assets/images/jacobitus-escritorio.png" alt="...">
+                                    </div>
+                                    <div class="flex-grow-1 ms-3">
+                                        <h5 class="text-muted1">JACOBITUS DE ESCRITORIO</h5>
+                                        <span class="lead">Solución a todo requerimiento de firma digital</span>
+                                        <h4 class="text-muted mt-3">
+                                            Instalador
+                                        </h4>
+                                        <a class="text-decoration-none text-black text-opacity-75"
+                                            href="https://firmadigital.bo/herramientas/jacobitus-escritorio/"
+                                            target="_blank">https://firmadigital.bo/herramientas/jacobitus-escritorio/</a>
+                                        <h4 class="text-muted mt-3">
+                                            Documentación de interoperación
+                                        </h4>
+                                        <a class="text-decoration-none text-black text-opacity-75"
+                                            href="https://localhost:9000/apidoc/"
+                                            target="_blank">https://localhost:9000/apidoc/</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="offset-md-9 col-md-3">
+                        <img class="img-fluid float-end" src="assets/images/potenciado-por-ADSIB-1.png"
+                            alt="POTENCIADO POR ADSIB">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script type="text/javascript" src="./assets/vendor/prism/prism.min.js"></script>
+    <script type="text/javascript" src="./assets/vendor/FreezeUI/freeze-ui.min.js"></script>
+    <script type="text/javascript" src="./assets/vendor/adsib/jacobitus-total.browser.js"></script>
+    <script type="text/javascript" src="./assets/js/script.js"></script>
+</body>
+
+</html>

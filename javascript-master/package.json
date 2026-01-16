@@ -1,0 +1,13 @@
+{
+  "name": "@jacobitus-total/envolturas-javascript",
+  "version": "1.1.0",
+  "description": "Módulo envoltura para interoperación del Jacobitus Total",
+  "author": "ADSIB",
+  "contributors": [
+    {
+      "name": "Juan Carlos Paredes",
+      "email": "jparedes@adsib.gob.bo"
+    }
+  ],
+  "license": "LPG-Bolivia"
+}

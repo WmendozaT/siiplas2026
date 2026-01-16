@@ -1,0 +1,55 @@
+{
+  "name": "vuejs-jacobitus-total",
+  "version": "1.1.0",
+  "description": "VueJS 2 - Jacobitus TOTAL",
+  "author": "ADSIB",
+  "contributors": [
+    {
+      "name": "Juan Carlos Paredes",
+      "email": "jparedes@adsib.gob.bo"
+    }
+  ],
+  "private": true,
+  "license": "LPG-Bolivia",
+  "scripts": {
+    "serve": "vue-cli-service serve",
+    "build": "vue-cli-service build",
+    "lint": "vue-cli-service lint",
+    "desarrollo": "VUE_APP_PUBLIC_PATH=/utilidades/jacobitus-vuejs/ npm run build"
+  },
+  "dependencies": {
+    "bootstrap": "^5.1.3",
+    "core-js": "^3.8.3",
+    "sweetalert2": "^11.10.1",
+    "vue": "^2.6.14"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.12.16",
+    "@babel/eslint-parser": "^7.12.16",
+    "@vue/cli-plugin-babel": "~5.0.0",
+    "@vue/cli-plugin-eslint": "~5.0.0",
+    "@vue/cli-service": "~5.0.0",
+    "eslint": "^7.32.0",
+    "eslint-plugin-vue": "^8.0.3",
+    "vue-template-compiler": "^2.6.14"
+  },
+  "eslintConfig": {
+    "root": true,
+    "env": {
+      "node": true
+    },
+    "extends": [
+      "plugin:vue/essential",
+      "eslint:recommended"
+    ],
+    "parserOptions": {
+      "parser": "@babel/eslint-parser"
+    },
+    "rules": {}
+  },
+  "browserslist": [
+    "> 1%",
+    "last 2 versions",
+    "not dead"
+  ]
+}

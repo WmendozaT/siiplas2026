@@ -1,0 +1,16 @@
+{
+  "name": "javascript-jacobitus-total",
+  "version": "1.1.0",
+  "description": "",
+  "author": "ADSIB",
+  "contributors": [
+    {
+      "name": "Juan Carlos Paredes",
+      "email": "jparedes@adsib.gob.bo"
+    }
+  ],
+  "license": "LPG-Bolivia",
+  "scripts": {
+    "start": "npx live-server ."
+  }
+}

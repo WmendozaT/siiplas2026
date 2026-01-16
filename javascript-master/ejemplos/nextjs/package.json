@@ -1,0 +1,36 @@
+{
+  "name": "nextjs-jacobitus-total",
+  "version": "1.1.0",
+  "author": "ADSIB",
+  "contributors": [
+    {
+      "name": "Juan Carlos Paredes",
+      "email": "jparedes@adsib.gob.bo"
+    }
+  ],
+  "private": true,
+  "license": "LPG-Bolivia",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "desarrollo": "NEXT_PUBLIC_BASE_PATH=/utilidades/jacobitus-nextjs npm run build"
+  },
+  "dependencies": {
+    "bootstrap": "^5.3.2",
+    "next": "14.0.3",
+    "react": "^18",
+    "react-dom": "^18",
+    "sweetalert2": "^11.10.1"
+  },
+  "devDependencies": {
+    "@types/node": "^20",
+    "@types/prismjs": "^1.26.3",
+    "@types/react": "^18",
+    "@types/react-dom": "^18",
+    "eslint": "^8",
+    "eslint-config-next": "14.0.3",
+    "typescript": "^5"
+  }
+}

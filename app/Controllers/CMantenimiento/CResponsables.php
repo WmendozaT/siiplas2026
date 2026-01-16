@@ -80,39 +80,43 @@ class CResponsables extends BaseController{
   public function Add_resp() {
     $db = \Config\Database::connect(); 
     try {
-      $model_funcionario = new Model_funcionarios();
-      echo "string";
+        $model_funcionario = new Model_funcionarios();
 
-     /* $data = [
+        $data = [
             'fun_nombre'   => $this->request->getPost('fn_nom'),
+            'car_id'  => 0,
             'fun_paterno'  => $this->request->getPost('fn_pt'),
             'fun_materno'  => $this->request->getPost('fn_mt'),
             'fun_ci'       => $this->request->getPost('fn_ci'),
             'fun_telefono' => $this->request->getPost('fn_fono'),
             'fun_cargo'    => $this->request->getPost('fn_cargo'),
-            'fun_adm'      => $this->request->getPost('tp_adm'),
-            'fun_dist'      => $this->request->getPost('dist_id'),
+            'fun_adm'      => $this->request->getPost('tp_adm1'),
+            'fun_dist'     => $this->request->getPost('dist_id'),
             'uni_id'       => $this->request->getPost('uni_id'),
             'fun_usuario'  => $this->request->getPost('fn_usu'),
         ];
 
-      $pass = $this->request->getPost('fun_password');
-      if (!empty($pass)) {
-          $data['fun_password'] = $pass;
+        $pass = $this->request->getPost('fun_password');
 
-          $db->table('historial_psw')->insert([
-                'fun_id'        => $id,
+        if (!empty($pass)) {
+          // 1. Hashear la contraseña
+          $data['fun_password'] = password_hash($pass, PASSWORD_BCRYPT);
+
+          // 2. PRIMERO insertar el funcionario para generar el ID
+            $db->table('funcionario')->insert($data);
+            $id_generado = $db->insertID(); // Ahora sí tenemos el ID
+
+            // 3. SEGUNDO insertar en el historial usando el ID generado
+            $db->table('historial_psw')->insert([
+                'fun_id'        => $id_generado, // Usamos la variable correcta
                 'fun_apassword' => $pass
             ]);
-      }
 
-      // Actualización del funcionario (Operación independiente)
-        if (!$model_funcionario->update($id, $data)) {
-            throw new \Exception("No se pudo actualizar los datos del funcionario.");
+            return redirect()->to(base_url('mnt/responsables'))
+                             ->with('success', 'Datos guardados correctamente.');
+        } else {
+            return redirect()->back()->withInput()->with('error', 'La contraseña es obligatoria.');
         }
-
-        return redirect()->to(base_url('mnt/responsables'))
-                         ->with('success', 'Datos actualizados correctamente.');*/
 
     } catch (Exception $e) {
         // 5. Manejo de la excepción: Loguear el error y avisar al usuario
@@ -120,6 +124,13 @@ class CResponsables extends BaseController{
         
         return redirect()->back()->withInput()->with('error', 'Ocurrió un error inesperado: ' . $e->getMessage());
     }
+
+/*    } catch (\Throwable $e) {  /// para mostrar
+    // Usamos \Throwable para capturar tanto errores de PHP como de Base de Datos
+    
+    // OPCIÓN A: Para depurar rápido (Detiene todo y muestra el error en pantalla)
+    die("Error detectado: " . $e->getMessage()); 
+    }*/
   }
 
   /// Valida Form Update Responsable

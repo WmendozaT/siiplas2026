@@ -150,7 +150,7 @@ $(document).ready(function() {
     }); 
   })
 
-
+//// select reg add
 $(document).ready(function() {
     $("#reg_id1").change(function () {
         // Obtener el valor seleccionado directamente
@@ -475,7 +475,7 @@ function generarReporteBase64() {
     });
 }
 
-
+//// Eliminar Responsable
 function eliminarResponsable(id, elemento) {
     // Confirmación nativa del navegador
     if (confirm("¿Está seguro de que desea eliminar este registro?")) {

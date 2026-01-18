@@ -477,27 +477,32 @@ function generarReporteBase64() {
 
 //// Eliminar Responsable
 function eliminarResponsable(id, elemento) {
-    // Confirmación nativa del navegador
     if (confirm("¿Está seguro de que desea eliminar este registro?")) {
         $.ajax({
-            url: 'mnt/delete_responsable', // Asegúrate de que la ruta sea correcta
+            url: base + "mnt/delete_responsable",
             type: 'POST',
-            data: { id: id },
             dataType: 'json',
+            data: { 
+                fun_id: id
+            },
             success: function(response) {
-                if (response.status === 'success') {
-                    alert("Eliminado correctamente");
-                    // Elimina la fila de la tabla visualmente
-                    $(elemento).closest('tr').fadeOut(500, function() {
+                if (response.respuesta === 'correcto') {
+                    // Animación para eliminar la fila de la tabla
+                    $(elemento).closest('tr').fadeOut(400, function() {
                         $(this).remove();
+                        // Opcional: Recargar contador de filas si es necesario
                     });
+                    alert("Registro dado de baja con éxito");
                 } else {
-                    alert("Error: " + response.message);
+                    alert("Error: " + (response.mensaje || "No se pudo eliminar"));
                 }
             },
-            error: function() {
-                alert("Error de conexión con el servidor");
+            error: function(xhr) {
+                console.error(xhr.responseText);
+                alert("Error de comunicación con el servidor");
             }
         });
     }
 }
+
+

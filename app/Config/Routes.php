@@ -38,7 +38,7 @@ $routes->post('mnt/get_dist', 'CMantenimiento\CResponsables::get_distritales'); 
 $routes->post('mnt/add_resp', 'CMantenimiento\CResponsables::Add_resp'); /// Valida Add Responsable
 $routes->post('mnt/update_resp', 'CMantenimiento\CResponsables::Update_resp'); /// Valida Update Responsable
 $routes->post('mnt/verif_usuario', 'CMantenimiento\CResponsables::verif_usuario'); /// Verifica La duplicidad de Usuario
-$routes->post('mnt/delete_responsable', 'CMantenimiento\CResponsables::verif_usuario'); /// Elimina Usuario
+$routes->post('mnt/delete_responsable', 'CMantenimiento\CResponsables::delete_responsable'); /// Elimina Usuario
 
 $routes->get('mnt/Pdf_responsables', 'CMantenimiento\CResponsables_Pdf::Pdf_lista_responsables'); /// Pdf Responsables en base64
 $routes->get('mnt/Pdf_responsables_sfirma', 'CMantenimiento\CResponsables_Pdf::Pdf_lista_responsables_para_firmar'); /// Pdf Responsables en base64

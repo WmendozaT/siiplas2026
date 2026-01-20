@@ -84,17 +84,17 @@ class CResponsables extends BaseController{
         $model_funcionario = new Model_funcionarios();
 
         $data = [
-            'fun_nombre'   => $this->request->getPost('fn_nom'),
+            'fun_nombre'   => strtoupper($this->request->getPost('fn_nom')),
             'car_id'  => 0,
-            'fun_paterno'  => $this->request->getPost('fn_pt'),
-            'fun_materno'  => $this->request->getPost('fn_mt'),
+            'fun_paterno'  => strtoupper($this->request->getPost('fn_pt')),
+            'fun_materno'  => strtoupper($this->request->getPost('fn_mt')),
             'fun_ci'       => $this->request->getPost('fn_ci'),
             'fun_telefono' => $this->request->getPost('fn_fono'),
-            'fun_cargo'    => $this->request->getPost('fn_cargo'),
+            'fun_cargo'    => strtoupper($this->request->getPost('fn_cargo')),
             'fun_adm'      => $this->request->getPost('tp_adm1'),
             'fun_dist'     => $this->request->getPost('dist_id'),
             'uni_id'       => $this->request->getPost('uni_id'),
-            'fun_usuario'  => $this->request->getPost('fn_usu'),
+            'fun_usuario'  => strtoupper($this->request->getPost('fn_usu')),
         ];
 
         $email_destino = 'mendozatrujillowilmer@gmail.com'; // Asegúrate de capturar el correo del formulari
@@ -232,26 +232,33 @@ private function enviarCredenciales2($para, $usuario, $password) {
       }
 
       $data = [
-            'fun_nombre'   => $this->request->getPost('fn_nom'),
-            'fun_paterno'  => $this->request->getPost('fn_pt'),
-            'fun_materno'  => $this->request->getPost('fn_mt'),
+            'fun_nombre'   => strtoupper($this->request->getPost('fn_nom')),
+            'fun_paterno'  => strtoupper($this->request->getPost('fn_pt')),
+            'fun_materno'  => strtoupper($this->request->getPost('fn_mt')),
             'fun_ci'       => $this->request->getPost('fn_ci'),
             'fun_telefono' => $this->request->getPost('fn_fono'),
-            'fun_cargo'    => $this->request->getPost('fn_cargo'),
+            'fun_cargo'    => strtoupper($this->request->getPost('fn_cargo')),
             'fun_adm'      => $this->request->getPost('tp_adm'),
             'fun_dist'      => $this->request->getPost('dist_id'),
             'uni_id'       => $this->request->getPost('uni_id'),
-            'fun_usuario'  => $this->request->getPost('fn_usu'),
+            'fun_usuario'  => strtoupper($this->request->getPost('fn_usu')),
         ];
 
       $pass = $this->request->getPost('fun_password');
       if (!empty($pass)) {
           $data['fun_password'] = $pass;
 
-          $db->table('historial_psw')->insert([
+          $pass_ini=$model_funcionario->get_pwd($id);
+          if(!empty($pass_ini)){
+            if($pass_ini[0]['fun_apassword']!=$pass){
+                $db->table('historial_psw')->insert([
                 'fun_id'        => $id,
                 'fun_apassword' => $pass
-            ]);
+                ]);
+            }
+          }
+
+          
       }
 
       // Actualización del funcionario (Operación independiente)

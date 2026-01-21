@@ -118,6 +118,27 @@ public function get_usuario_responsablePoa($usuario) {
         return $query->getRowArray();
     }
 
+
+    /// Lista de Unidades Responsables segun el proyecto
+    public function get_list_unidadresponsables($proy_id){
+        $sql = 'SELECT *
+                from vista_subactividades
+                where proy_id='.$proy_id.'';
+        $query = $this->query($sql);
+        
+        return $query->getResultArray();
+    }
+
+    /// Verif si existe ya unidad registrado para el Seguimiento POA
+    public function verif_uresponsable_existente_seguimiento($com_id){
+        $sql = 'SELECT *
+                from vlist_funcionario
+                where cm_id='.$com_id.'';
+        $query = $this->query($sql);
+        
+        return $query->getResultArray();
+    }
+
     /// Modulos Activos
     public function modulos($ide,$tp_adm){
         if($tp_adm==1){ /// Nacional

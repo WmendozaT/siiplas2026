@@ -271,170 +271,6 @@ $(document).ready(function() {
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-//// Para Firmar Digitalmente
-function firmarYAbrirReporte() {
-    // 1. Mostrar un loader/mensaje inicial con console.log (alert detiene el script)
-    console.log('Generando documento... Espere mientras preparamos el reporte para la firma.');
-
-    // 2. Obtener el PDF sin firmar del servidor CI4
-    $.ajax({
-        url: base + "mnt/Pdf_responsables_sfirma", 
-        type: 'GET', 
-        dataType: 'json',
-        success: function(respuestaCI4) {
-
-            if (respuestaCI4.status === 'success' && respuestaCI4.pdf_sin_firmar) {
-                
-                // Mensaje informativo antes de la firma
-                console.log('Iniciando conexión con Jacobitus. Verifique si aparece una ventana pidiendo su PIN.');
-
-                // 3. Preparar los datos para Jacobitus API Local
-                const datosJacobitus = {
-                    base64: respuestaCI4.pdf_sin_firmar, // Campo común usado por la API de ADSIB
-                    nombre: "Reporte_Responsables_POA.pdf"
-                };
-
-
-                // 4. Enviar a la API local de Jacobitus (Asegura el puerto 4500 o 9999)
-                $.ajax({
-                    url: "https://localhost:9000/api/firmarPdf", 
-                    type: 'POST',
-                    contentType: 'application/json',
-                    data: JSON.stringify(datosJacobitus),
-                    success: function(respuestaJacobitus) {
-                        const pdfFirmadoBase64 = respuestaJacobitus.pdf_signed_base64 || (respuestaJacobitus.datos ? respuestaJacobitus.datos.archivo : null);
-
-                        if (pdfFirmadoBase64) {
-                            
-                            // 5. Abrir el PDF ya firmado de forma segura usando Blob (Mejor que Data URL)
-                            const byteCharacters = atob(pdfFirmadoBase64);
-                            const byteNumbers = new Array(byteCharacters.length);
-                            for (let i = 0; i < byteCharacters.length; i++) {
-                                byteNumbers[i] = byteCharacters.charCodeAt(i);
-                            }
-                            const byteArray = new Uint8Array(byteNumbers);
-                            const blob = new Blob([byteArray], { type: 'application/pdf' });
-                            const fileURL = URL.createObjectURL(blob);
-                            
-                            window.open(fileURL, '_blank');
-                            
-                            // Mensaje de éxito nativo
-                            alert('Éxito: El documento ha sido firmado y abierto correctamente.');
-
-                        } else {
-                            // Mensaje de error de firma nativo
-                            alert('Fallo en Firma: Jacobitus no devolvió un PDF firmado. Verifique el PIN o el certificado.');
-                        }
-                    },
-                    error: function(xhr) {
-                        console.error(xhr);
-                        // Mensaje de error de conexión local nativo
-                        alert('Error de Conexión Local: No se pudo conectar con el software Jacobitus (Puerto 4500/9999). Asegúrese de que esté abierto.');
-                    }
-                });
-
-            } else {
-                // Mensaje de error CI4 nativo
-                alert('Error: Error al generar el PDF en el servidor CI4 o el base64 estaba vacío.');
-            }
-        },
-        error: function() {
-            // Mensaje de error de servidor nativo
-            alert('Error de Servidor: No se pudo contactar al servidor CI4 para obtener el PDF base.');
-        }
-    });
-}
-
-
-//// firmar digitalmente con estilo de alertas
-function firmarYAbrirReporte2() {
-    Swal.fire({
-        title: 'Generando documento...',
-        text: 'Espere mientras preparamos el reporte para la firma.',
-        allowOutsideClick: false,
-        didOpen: () => { Swal.showLoading(); }
-    });
-
-    $.ajax({
-        url: base + "mnt/Pdf_responsables_sfirma", 
-        type: 'GET', 
-        dataType: 'json',
-        success: function(respuestaCI4) {
-            if (respuestaCI4.status === 'success' && respuestaCI4.pdf_sin_firmar) {
-                
-                Swal.fire({
-                    title: 'Iniciando firma...',
-                    text: 'Se abrirá la ventana de Jacobitus para ingresar su PIN del Softoken (.p12).',
-                    icon: 'info',
-                    showConfirmButton: false,
-                    timer: 3000
-                });
-
-                const datosJacobitus = {
-                    base64: respuestaCI4.pdf_sin_firmar, 
-                    nombre: "Reporte_Responsables_POA.pdf"
-                };
-
-                $.ajax({
-                    // Intenta con 4500. Si no funciona, prueba 9999.
-                    url: "https://localhost:4500/api/firmarPdf", 
-                    type: 'POST',
-                    contentType: 'application/json',
-                    data: JSON.stringify(datosJacobitus),
-                    success: function(respuestaJacobitus) {
-                        const pdfFirmadoBase64 = respuestaJacobitus.pdf_signed_base64 || (respuestaJacobitus.datos ? respuestaJacobitus.datos.archivo : null);
-
-                        if (pdfFirmadoBase64) {
-                            // Convertir Base64 a Blob de forma segura para navegadores modernos
-                            const byteCharacters = atob(pdfFirmadoBase64);
-                            const byteNumbers = new Array(byteCharacters.length);
-                            for (let i = 0; i < byteCharacters.length; i++) {
-                                byteNumbers[i] = byteNumbers[i] = byteCharacters.charCodeAt(i);
-                            }
-                            const byteArray = new Uint8Array(byteNumbers);
-                            const blob = new Blob([byteArray], { type: 'application/pdf' });
-                            const fileURL = URL.createObjectURL(blob);
-                            
-                            window.open(fileURL, '_blank');
-                            Swal.fire('Éxito', 'El documento ha sido firmado con su Softoken y abierto.', 'success');
-
-                        } else {
-                            Swal.fire('Fallo en Firma', 'Jacobitus no devolvió un PDF firmado. Verifique el PIN.', 'error');
-                        }
-                    },
-                    error: function() {
-                        Swal.fire('Error de Conexión Local', 'No se pudo conectar con el software Jacobitus. Asegúrese de que esté abierto y configurado para aceptar CORS.', 'error');
-                    }
-                });
-
-            } else {
-                Swal.fire('Error', 'Error al generar el PDF en el servidor CI4.', 'error');
-            }
-        },
-        error: function() {
-            Swal.fire('Error de Servidor', 'No se pudo contactar al servidor CI4.', 'error');
-        }
-    });
-}
-
-
-
 //// Generar Reporte en Base64
 function generarReporteBase64() {
     // 1. Referencia al botón y su contenido original
@@ -506,3 +342,92 @@ function eliminarResponsable(id, elemento) {
 }
 
 
+//// loading para descargar en archivo excel
+document.getElementById('btnExportar').addEventListener('click', function(e) {
+    const btn = this;
+    const iconContainer = document.getElementById('btnIcon');
+    const textContainer = document.getElementById('btnText');
+    
+    // 1. Guardar contenido original
+    const originalIcon = iconContainer.innerHTML;
+    const originalText = textContainer.innerText;
+
+    // 2. Aplicar estado "Cargando"
+    btn.classList.add('disabled');
+    iconContainer.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>';
+    textContainer.innerText = ' Descargando archivo.xls...';
+
+    // 3. Función para revisar si la cookie ya existe
+    const checkCookie = setInterval(function() {
+        if (document.cookie.indexOf("excel_status=terminado") !== -1) {
+            
+            // 4. Restaurar botón
+            clearInterval(checkCookie);
+            btn.classList.remove('disabled');
+            iconContainer.innerHTML = originalIcon;
+            textContainer.innerText = originalText;
+
+            // 5. Limpiar la cookie para la próxima vez
+            document.cookie = "excel_status=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+        }
+    }, 1000); // Revisa cada segundo
+});
+
+
+////// SEGUIMIENTO POA
+//// select Apertura programatica a traves de la regional
+$(document).ready(function() {
+    $("#reg_id2").change(function () {
+        // Obtener el valor seleccionado directamente
+        var reg_id = $(this).val(); 
+        // Validar que el valor no esté vacío (opcional, si tienes un "Seleccione...")
+        var url = base + "mnt/get_aper_seg";
+        var request = $.ajax({
+            url: url,
+            type: "POST",
+            dataType: 'json',
+            data: { 
+                dep_id: reg_id
+            }
+        });
+
+        request.done(function (response) {
+            if (response.respuesta == 'correcto') {
+                $("#programa").html(response.select_aper);
+            }
+        });
+
+        request.fail(function (jqXHR, textStatus, errorThrown) {
+            console.error("Error en la petición: " + textStatus, errorThrown);
+        });
+    }); 
+  })
+
+/// select Unidad Responsable a traves del proyecto
+$(document).ready(function() {
+    $("#proy_id").change(function () {
+        // Obtener el valor seleccionado directamente
+        var proy_id = $(this).val(); 
+
+        // Validar que el valor no esté vacío (opcional, si tienes un "Seleccione...")
+        var url = base + "mnt/get_uresp_seg";
+        var request = $.ajax({
+            url: url,
+            type: "POST",
+            dataType: 'json',
+            data: { 
+                proy_id: proy_id
+            }
+        });
+
+        request.done(function (response) {
+            if (response.respuesta == 'correcto') {
+                $("#uresp").html(response.select_unidad);
+            }
+        });
+
+        request.fail(function (jqXHR, textStatus, errorThrown) {
+            console.error("Error en la petición: " + textStatus, errorThrown);
+        });
+    }); 
+  })

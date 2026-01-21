@@ -46,6 +46,17 @@ class CResponsables extends BaseController{
         return view('View_mantenimiento/View_responsables/view_funcionarios',$data);
     }
 
+
+    /// Vista Lista Reponsables-Seguimiento POA
+    public function lista_responsables_seguimientopoa(){
+        $miLib_resp = new Libreria_Responsable();
+        $model_funcionario = new Model_funcionarios();
+
+        $data['formulario']=$miLib_resp->responsables_seguimiento_poa(); /// lista de responsables se Seguimiento POA (Libreria Responsable)
+        return view('View_mantenimiento/View_responsables/view_funcionarios',$data);
+    }
+
+
     /// Vista Form Update Responsable POA
     public function update_responsable($id){
         $miLib_resp = new Libreria_Responsable();
@@ -70,6 +81,16 @@ class CResponsables extends BaseController{
         $model_funcionario = new Model_funcionarios();
                 
         $data['formulario']=$miLib_resp->form_add_responsables_poa(); /// formulario de adicion de responsable (Libreria Responsable)
+        return view('View_mantenimiento/View_responsables/view_funcionarios',$data);
+     //   phpinfo();
+    }
+
+    /// Vista Form Add Responsable - Seguimiento POA
+    public function new_responsables_segpoa(){
+        $miLib_resp = new Libreria_Responsable();
+        $model_funcionario = new Model_funcionarios();
+                
+        $data['formulario']=$miLib_resp->form_add_responsables_seguimiento_poa(); /// formulario de adicion de responsable Seguimiento POA (Libreria Responsable)
         return view('View_mantenimiento/View_responsables/view_funcionarios',$data);
      //   phpinfo();
     }
@@ -178,44 +199,65 @@ private function enviarCredenciales3($para, $usuario, $password) {
     return $email->send();
 }
 
-/// anterior que funcionada cuando desactivabas el avast
-private function enviarCredenciales2($para, $usuario, $password) {
-    $email = \Config\Services::email();
+    /// Exportar Listado en Excel
+public function exportar_responsables(){
+    $model_funcionario = new Model_funcionarios();
+    $responsables=$model_funcionario->obtenerFuncionariosActivos();
+
+    $filename = "Listado_Responsables_" . date('Ymd_His') . ".xls";
+
+    // 1. PRIMERO: Configurar la cookie ANTES de enviar cualquier contenido
+    // Esto es lo que detectará tu JavaScript para quitar el loading
+    setcookie("excel_status", "terminado", [
+        'expires' => time() + 30, 
+        'path' => '/',
+        'samesite' => 'Lax'
+    ]);
+
+    // 2. Cabeceras del archivo
+    header("Content-Type: application/vnd.ms-excel; charset=utf-8");
+    header("Content-Disposition: attachment; filename=$filename");
+    header("Pragma: no-cache");
+    header("Expires: 0");
+
+    // 3. BOM para caracteres especiales
+    echo "\xEF\xBB\xBF";
+
+    // 4. Construcción de la tabla (HTML/CSS)
+    echo '<table border="1" style="font-family: Arial, sans-serif; border-collapse: collapse; width: 100%;">';
+    echo '<tr><th colspan="6" style="font-size: 18px; height: 40px; background-color: #1F4E78; color: #FFFFFF;">LISTADO DE RESPONSABLES POA</th></tr>';
+    echo '<thead>
+            <tr style="background-color: #D9D9D9; font-weight: bold; text-align: center; border: 1px solid #000;">
+                <th style="width: 50px;">#</th>
+                <th style="width: 300px;">RESPONSABLE POA</th>
+                <th style="width: 250px;">UNIDAD DEPENDIENTE</th>
+                <th style="width: 150px;">USUARIO</th>
+                <th style="width: 150px;">ADMINISTRACION</th>
+                <th style="width: 150px;">DISTRITAL</th>
+            </tr>
+          </thead>';
+    echo '<tbody>';
     
-    $config = [
-        'protocol'    => 'smtp',
-        'SMTPHost'    => 'smtp.gmail.com',
-        'SMTPUser'    => 'siiplas.dnplanificacion@gmail.com',
-        'SMTPPass'    => 'fmmgmikcadgrncsk',
-        'SMTPPort'    => 465,
-        'SMTPCrypto'  => 'ssl',
-        'mailType'    => 'html',
-        'newline'     => "\r\n",
-        'CRLF'        => "\r\n",
-        'SMTPOptions' => [
-            'ssl' => [
-                'verify_peer'       => false,
-                'verify_peer_name'  => false,
-                'allow_self_signed' => true,
-            ],
-        ],
-    ];
-
-    $email->initialize($config);
-    $email->setFrom('siiplas.dnplanificacion@gmail.com', 'Sistema POA');
-    $email->setTo($para);
-    $email->setSubject('Acceso al Sistema');
-    $email->setMessage("Usuario: $usuario - Clave: $password");
-
-    if (!$email->send()) {
-        // Si falla, el debugger ahora mostrará el error de autenticación o de conexión
-        echo $email->printDebugger();
-        exit;
+    $nro = 0;
+    foreach ($responsables as $row) {
+        $nro++;
+        $colorFila = ($nro % 2 == 0) ? '#F2F2F2' : '#FFFFFF';
+        echo '<tr style="background-color: '.$colorFila.';">';
+        echo '  <td style="text-align: center; border: 1px solid #CCC;">' . $nro . '</td>';
+        echo '  <td style="border: 1px solid #CCC; padding: 5px;">' . mb_strtoupper($row['fun_nombre'] . ' ' . $row['fun_paterno'] . ' ' . $row['fun_materno']) . '</td>';
+        echo '  <td style="border: 1px solid #CCC; padding: 5px;">' . $row['uni_unidad'] . '</td>';
+        echo '  <td style="border: 1px solid #CCC; text-align: center;">' . $row['fun_usuario'] . '</td>';
+        echo '  <td style="border: 1px solid #CCC; text-align: center;">' . $row['adm'] . '</td>';
+        echo '  <td style="border: 1px solid #CCC; text-align: center;">' . $row['dist_distrital'] . '</td>';
+        echo '</tr>';
     }
-    return true;
+    
+    echo '  </tbody>';
+    echo '</table>';
+
+    // 5. UN SOLO EXIT AL FINAL
+    exit; 
 }
-
-
 
 
   /// Valida Form Update Responsable
@@ -359,7 +401,7 @@ private function enviarCredenciales2($para, $usuario, $password) {
 
 
 
- /// Funcion GET DISTRITAL (form add)
+ /// Funcion GET DISTRITAL (form add) Res POA
   public function get_distritales_add() {
     $model_funcionario = new Model_funcionarios();
     $model_reg = new Model_regional();
@@ -378,6 +420,54 @@ private function enviarCredenciales2($para, $usuario, $password) {
     $result = [
         'respuesta'      => 'correcto',
         'select_dist' => $select_dist // Distrital
+    ];
+
+    return $this->response->setJSON($result);
+  }
+
+
+ /// Funcion GET Apertura Prog - Seguimiento POA
+  public function get_aper_add() {
+    $model_funcionario = new Model_funcionarios();
+    $model_reg = new Model_regional();
+
+    $dep_id = $this->request->getPost('dep_id'); /// tipo adm
+    $aperturas=$model_reg->obtenerAperturasxRegional($dep_id);
+
+    $select_aper='';
+      foreach($aperturas as $row){
+        $select_aper.='<option value="'.$row['proy_id'].'" >'.$row['aper_programa'].' '.$row['aper_proyecto'].' '.$row['aper_actividad'].'-'.strtoupper($row['actividad']).' '.$row['abrev'].'</option>'; 
+      }
+
+    $result = [
+        'respuesta'      => 'correcto',
+        'select_aper' => $select_aper // Distrital
+    ];
+
+    return $this->response->setJSON($result);
+  }
+
+
+   /// Funcion GET Apertura Unidad Responsable - Seguimiento POA
+  public function get_uresp_add() {
+    $model_funcionario = new Model_funcionarios();
+    $model_reg = new Model_regional();
+
+    $proy_id = $this->request->getPost('proy_id'); /// proy_id
+    $uresponsables=$model_funcionario->get_list_unidadresponsables($proy_id);
+
+    $select_unidad='';
+      foreach($uresponsables as $row){
+        $verif=$model_funcionario->verif_uresponsable_existente_seguimiento($row['com_id']);
+        if(count($verif)==0){
+          $select_unidad.='<option value="'.$row['com_id'].'" >'.$row['tipo_subactividad'].' '.$row['serv_descripcion'].'</option>'; 
+        }
+        
+      }
+
+    $result = [
+        'respuesta'      => 'correcto',
+        'select_unidad' => $select_unidad // Distrital
     ];
 
     return $this->response->setJSON($result);

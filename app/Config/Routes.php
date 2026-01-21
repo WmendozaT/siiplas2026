@@ -39,6 +39,12 @@ $routes->post('mnt/add_resp', 'CMantenimiento\CResponsables::Add_resp'); /// Val
 $routes->post('mnt/update_resp', 'CMantenimiento\CResponsables::Update_resp'); /// Valida Update Responsable
 $routes->post('mnt/verif_usuario', 'CMantenimiento\CResponsables::verif_usuario'); /// Verifica La duplicidad de Usuario
 $routes->post('mnt/delete_responsable', 'CMantenimiento\CResponsables::delete_responsable'); /// Elimina Usuario
+$routes->get('mnt/exportar_responsablePoa', 'CMantenimiento\CResponsables::exportar_responsables'); /// Exportar Responsable POA
+
+$routes->get('mnt/resp_seguimientopoa', 'CMantenimiento\CResponsables::lista_responsables_seguimientopoa'); /// lista de Responsables-Seguimiento POA
+$routes->get('mnt/nuevo_reponsable_seguimientopoa', 'CMantenimiento\CResponsables::new_responsables_segpoa'); /// Add Responsable POA-Seguimiento POA
+$routes->post('mnt/get_aper_seg', 'CMantenimiento\CResponsables::get_aper_add'); /// get Apertura segun la regional-Seguimiento POA
+$routes->post('mnt/get_uresp_seg', 'CMantenimiento\CResponsables::get_uresp_add'); /// get Apertura segun la regional-Seguimiento POA
 
 $routes->get('mnt/Pdf_responsables', 'CMantenimiento\CResponsables_Pdf::Pdf_lista_responsables'); /// Pdf Responsables en base64
 $routes->get('mnt/Pdf_responsables_sfirma', 'CMantenimiento\CResponsables_Pdf::Pdf_lista_responsables_para_firmar'); /// Pdf Responsables en base64

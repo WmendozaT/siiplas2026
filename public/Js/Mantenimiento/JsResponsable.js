@@ -180,7 +180,7 @@ $(document).ready(function() {
   })
 
 
-///// Js Valida Add Informacion
+///// Js Valida Add Formulario Responsable POA
 $(document).ready(function() {
     $("#form_add").on("submit", function(e) {
         // 1. SIEMPRE detener el envío automático
@@ -376,7 +376,7 @@ document.getElementById('btnExportar').addEventListener('click', function(e) {
 
 ////// SEGUIMIENTO POA
 //// select Apertura programatica a traves de la regional
-$(document).ready(function() {
+  $(document).ready(function() {
     $("#reg_id2").change(function () {
         // Obtener el valor seleccionado directamente
         var reg_id = $(this).val(); 
@@ -431,3 +431,90 @@ $(document).ready(function() {
         });
     }); 
   })
+
+
+///// Js Valida Add Formulario Responsable-Seguimiento POA
+$(document).ready(function() {
+    $("#form_addspoa").on("submit", function(e) {
+        // 1. SIEMPRE detener el envío automático
+        e.preventDefault();
+        
+        let formulario = this; // Guardamos la referencia al formulario
+        let esValido = true;
+
+        // 2. Validar campos de texto y número
+        $("#fn_usu, #fun_password").each(function() {
+            if ($(this).val().trim() === "") {
+                $(this).addClass("is-invalid").removeClass("is-valid");
+                esValido = false;
+            } else {
+                $(this).removeClass("is-invalid").addClass("is-valid");
+            }
+        });
+
+        // 3. Validar Selects (Regional, Programa, Unidad Responsable)
+        $("#reg_id2,#proy_id,#com_id").each(function() {
+            let valor = $(this).val();
+            if (valor === "0" || valor === "" || valor === null) {
+                $(this).addClass("is-invalid").removeClass("is-valid");
+                esValido = false;
+            } else {
+                $(this).removeClass("is-invalid").addClass("is-valid");
+            }
+        });
+
+        // 4. Si la validación visual falla, no continuar
+        if (!esValido) {
+            alert("Por favor, complete todos los campos obligatorios correctamente.");
+            return false;
+        }
+
+        // 5. Validación AJAX (¿Existe el usuario?)
+        let usuarioDigitado = $("#fn_usu").val().trim();
+        let urlVerificacion = base + "mnt/verif_usuario";
+
+        // Deshabilitar botón para evitar múltiples clics
+        $("#btnGuardar").prop("disabled", true);
+        $("#textGuardar").text("Verificando...");
+
+        $.ajax({
+            url: urlVerificacion,
+            type: "POST",
+            dataType: 'json',
+            data: { usuario: usuarioDigitado },
+            success: function(response) {
+                if (response.respuesta === 'correcto') {
+                    // EL USUARIO NO EXISTE: Proceder con el guardado
+                    $("#textGuardar").text("Guardando...");
+                    $("#spinnerGuardar").removeClass("d-none");
+
+                    // Esperar un breve momento para efecto visual y enviar
+                    setTimeout(function() {
+                        // Importante: usamos formulario.submit() (nativo) 
+                        // para que no vuelva a entrar en este bucle de jQuery
+                        formulario.submit();
+                    }, 800);
+
+                } else {
+                    // EL USUARIO YA EXISTE
+                    alert("El nombre de usuario '" + usuarioDigitado + "' ya se encuentra registrado. Intente con otro.");
+                    $("#fn_usu").addClass("is-invalid").focus();
+                    $("#btnGuardar").prop("disabled", false);
+                    $("#textGuardar").text("Guardar");
+                }
+            },
+            error: function() {
+                alert("Error de conexión con el servidor.");
+                $("#btnGuardar").prop("disabled", false);
+                $("#textGuardar").text("Guardar");
+            }
+        });
+    });
+
+    // Limpiar clases de error dinámicamente cuando el usuario corrige el campo
+    $("input, select").on("input change", function() {
+        if ($(this).val().trim() !== "" && $(this).val() !== "0") {
+            $(this).removeClass("is-invalid");
+        }
+    });
+});

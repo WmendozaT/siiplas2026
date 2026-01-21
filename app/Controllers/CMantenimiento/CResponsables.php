@@ -63,7 +63,6 @@ class CResponsables extends BaseController{
         $model_funcionario = new Model_funcionarios();
         $get_rep=$model_funcionario->get_responsablePoa($id);
                 
-
         if (empty($get_rep)) {
             $data['formulario']='SIN REGISTRO POR MOSTRAR !!!';
         }
@@ -74,6 +73,22 @@ class CResponsables extends BaseController{
         return view('View_mantenimiento/View_responsables/view_funcionarios',$data);
     }
 
+
+    /// Vista Form Update Responsable-Seguimiento POA
+    public function update_segpoa($id){
+        $miLib_resp = new Libreria_Responsable();
+        $model_funcionario = new Model_funcionarios();
+        $get_rep=$model_funcionario->get_responsablePoa($id);
+                
+        if (empty($get_rep)) {
+            $data['formulario']='SIN REGISTRO POR MOSTRAR !!!';
+        }
+        else{
+            $data['formulario']=$miLib_resp->get_responsables_seguimiento_poa($get_rep); /// formulario de edicion de responsable-Seguimiento (Libreria Responsable)
+        }
+
+        return view('View_mantenimiento/View_responsables/view_funcionarios',$data);
+    }
 
     /// Vista Form Add Responsable POA
     public function new_responsables(){
@@ -98,7 +113,7 @@ class CResponsables extends BaseController{
 
   /// Formulario 
 
-  /// Valida Add Responsable
+  /// Valida Add Responsable POA
   public function Add_resp() {
     $db = \Config\Database::connect(); 
     try {
@@ -152,18 +167,77 @@ class CResponsables extends BaseController{
         
         return redirect()->back()->withInput()->with('error', 'Ocurrió un error inesperado: ' . $e->getMessage());
     }
-
   }
 
-private function enviarCredenciales($para, $usuario, $password) {
+
+  /// Valida Add Responsable-Seguimiento POA
+  public function Add_segpoa() {
+    $db = \Config\Database::connect(); 
+    try {
+        $model_funcionario = new Model_funcionarios();
+        $get_proy=$model_funcionario->get_AperturasxRegional($this->request->getPost('proy_id'));
+
+        $data = [
+            'fun_nombre'   => strtoupper($this->request->getPost('fn_usu')),
+            'car_id'  => 0,
+            'fun_paterno'  => 'CNS',
+            'fun_materno'  => 'CNS',
+            'fun_cargo'    => 'SEGUIMIENTO POA',
+            'fun_adm'      => 2,
+            'fun_dist'     => $get_proy['dist_id'],
+            'uni_id'       => 0,
+            'cm_id'  => $this->request->getPost('com_id'),
+            'sw_pass'  => 1,
+            'fun_usuario'  => strtoupper($this->request->getPost('fn_usu')),
+        ];
+
+        $email_destino = 'mendozatrujillowilmer@gmail.com'; // Asegúrate de capturar el correo del formulari
+        $usuario = $this->request->getPost('fn_usu');
+        $pass = $this->request->getPost('fun_password');
+
+        if (!empty($pass)) {
+          // 1. Hashear la contraseña
+          $data['fun_password'] = password_hash($pass, PASSWORD_BCRYPT);
+
+          // 2. PRIMERO insertar el funcionario para generar el ID
+            $db->table('funcionario')->insert($data);
+            $id_generado = $db->insertID(); // Ahora sí tenemos el ID
+
+            // 3. SEGUNDO insertar en el historial usando el ID generado
+            $db->table('historial_psw')->insert([
+                'fun_id'        => $id_generado, // Usamos la variable correcta
+                'fun_apassword' => $pass
+            ]);
+
+            // --- INICIO ENVÍO DE CORREO ---
+            //$this->enviarCredenciales($email_destino, $usuario, $pass);
+            // --- FIN ENVÍO DE CORREO ---
+
+            return redirect()->to(base_url('mnt/resp_seguimientopoa'))
+                             ->with('success', 'Datos guardados correctamente.');
+        } else {
+            return redirect()->back()->withInput()->with('error', 'La contraseña es obligatoria.');
+        }
+
+    } catch (Exception $e) {
+        // 5. Manejo de la excepción: Loguear el error y avisar al usuario
+        log_message('error', 'Error en Formulario: ' . $e->getMessage());
+        
+        return redirect()->back()->withInput()->with('error', 'Ocurrió un error inesperado: ' . $e->getMessage());
+    }
+  }
+
+
+/// Envia Usuario y Password a Correo electronico
+  private function enviarCredenciales($para, $usuario, $password) {
     $email = \Config\Services::email();
     $email->setTo($para);
     $email->setSubject('Acceso al Sistema');
     $email->setMessage("Usuario: $usuario - Clave: $password");
     return $email->send();
-}
+  }
 
-private function enviarCredenciales3($para, $usuario, $password) {
+/*private function enviarCredenciales3($para, $usuario, $password) {
     $email = \Config\Services::email();
     
     $config = [
@@ -197,7 +271,7 @@ private function enviarCredenciales3($para, $usuario, $password) {
     $email->setMessage("Usuario: $usuario - Clave: $password");
 
     return $email->send();
-}
+}*/
 
     /// Exportar Listado en Excel
 public function exportar_responsables(){
@@ -429,12 +503,13 @@ public function exportar_responsables(){
  /// Funcion GET Apertura Prog - Seguimiento POA
   public function get_aper_add() {
     $model_funcionario = new Model_funcionarios();
-    $model_reg = new Model_regional();
+  //  $model_reg = new Model_regional();
 
     $dep_id = $this->request->getPost('dep_id'); /// tipo adm
-    $aperturas=$model_reg->obtenerAperturasxRegional($dep_id);
+    $aperturas=$model_funcionario->obtenerAperturasxRegional($dep_id);
 
     $select_aper='';
+      $select_aper.='<option value="0" >Seleccione ..</option>';
       foreach($aperturas as $row){
         $select_aper.='<option value="'.$row['proy_id'].'" >'.$row['aper_programa'].' '.$row['aper_proyecto'].' '.$row['aper_actividad'].'-'.strtoupper($row['actividad']).' '.$row['abrev'].'</option>'; 
       }
@@ -457,6 +532,7 @@ public function exportar_responsables(){
     $uresponsables=$model_funcionario->get_list_unidadresponsables($proy_id);
 
     $select_unidad='';
+    $select_unidad.='<option value="0" >Seleccione ..</option>';
       foreach($uresponsables as $row){
         $verif=$model_funcionario->verif_uresponsable_existente_seguimiento($row['com_id']);
         if(count($verif)==0){

@@ -227,7 +227,7 @@ class Libreria_Responsable{
                           <td>'.$row['adm'].'</td>
                           <td>'.$row['dist_distrital'].'</td>
                           <td>
-                            <a href="'.base_url().'mnt/update_responsable/'.$row['id'].'" 
+                            <a href="'.base_url().'mnt/update_segpoa/'.$row['id'].'" 
                                class="btn btn-primary btn-sm" 
                                data-bs-toggle="tooltip" 
                                data-bs-placement="top" 
@@ -284,7 +284,7 @@ class Libreria_Responsable{
           }
         </style>
         <input name="base" type="hidden" value="'.base_url().'">
-        
+        <div id="btnExportar"></div>
         <div class="col-12">
                       <div class="card w-100 border position-relative overflow-hidden mb-0">
                         <div class="card-body p-4">
@@ -390,14 +390,8 @@ class Libreria_Responsable{
 
     ////Formulario Datos del Responsable Seguimiento POA para su registro
     public function form_add_responsables_seguimiento_poa(){
-    //  $model_funcionario = new Model_funcionarios();
       $model_reg = new Model_regional();
       $regionales=$model_reg->obtenerRegionales();
-
-    ////
-    /// $regionales=$model_reg->obtenerRegionales();
-    // $unidadOrganizacional=$model_reg->obtenerUnidadesOrganizacionales();
-    ////
 
         $tabla='';
         $tabla.='
@@ -411,112 +405,67 @@ class Libreria_Responsable{
         
         <div id="btnExportar"></div>
         <div class="col-12">
-                      <div class="card w-100 border position-relative overflow-hidden mb-0">
-                        <div class="card-body p-4">
-                          <h4 class="card-title">Adicionar Responsable-Seguimiento POA</h4>
-                          <p class="card-subtitle mb-4">Formulario para Adicionar Nuevo Reponsable para el Seguimiento POA</p>
-                          <form role="form" action="'.base_url('mnt/add_resp').'" method="post" id="form_add" class="login-form">
-                            <input name="base" type="hidden" value="'.base_url().'">
-                            <div class="row">
-                              <div class="col-lg-4">
-                                <div class="mb-3">
-                                  <label for="exampleInputtext" class="form-label">SELECCIONE REGIONAL</label>
-                                  <select class="form-select" name="reg_id2" id="reg_id2" aria-label="Default select example">
-                                  <option value="0" >Seleccione ..</option>';
-                                  foreach($regionales as $row){
-                                    $tabla.='<option value="'.$row['dep_id'].'" >'.strtoupper($row['dep_departamento']).'</option>'; 
-                                  }
-                                  $tabla.='
-                                  </select>
-                                </div>
-                                <div class="mb-3">
-                                  <label for="exampleInputtext" class="form-label">PROGRAMA</label>
-                                  <select class="form-select" name="proy_id" id="proy_id" aria-label="Default select example">
-                                    <div id="programa"></div>
-                                  </select>
-                                </div>
-                                <div class="mb-3">
-                                  <label for="exampleInputtext" class="form-label">UNIDAD RESPONSABLE</label>
-                                  <select class="form-select" name="com_id" id="com_id" aria-label="Default select example">
-                                    <div id="uresp"></div>
-                                  </select>
-                                </div>
-                                <div class="mb-3">
-                                  <label for="exampleInputtext" class="form-label">CI</label>
-                                  <input type="number" class="form-control" id="fn_ci" name="fn_ci" placeholder="Nro Ci ..">
-                                </div>
-                                <div class="mb-3">
-                                  <label for="exampleInputtext" class="form-label">NRO DE CELULAR</label>
-                                  <input type="number" class="form-control" id="fn_fono" name="fn_fono" placeholder="">
-                                </div>
-                              </div>
-
-                              <div class="col-lg-4">
-                                <div class="mb-3">
-                                  <label for="exampleInputtext" class="form-label">CARGO ADMINISTRATIVO</label>
-                                  <input type="text" class="form-control" id="fn_cargo" name="fn_cargo" placeholder="Cargo ..">
-                                </div>
-                                <div class="mb-3">
-                                  <label class="form-label">ADMINISTRACIÓN</label>
-                                  <select class="form-select" name="tp_adm1" id="tp_adm1"aria-label="Default select example">
-                                    <option value="0">Seleccione ..</option>
-                                    <option value="1">NACIONAL</option>
-                                    <option value="2">REGIONAL</option>
-                                  </select>
-                                </div>
-                                <div class="mb-3">
-                                  <label class="form-label">REGIONAL</label>
-                                  <select class="form-select" name="reg_id1" id="reg_id1" aria-label="Default select example">
-                                  
-                                    <div id="select_reg"><option value="0">Seleccione ..</option></div>
-                                  </select>
-                                  
-                                </div>
-                                <div class="mb-3">
-                                  <label class="form-label">DISTRITAL</label>
-                                  <select class="form-select" name="dist_id" id="dist_id" aria-label="Default select example">
-                                  
-                                    <div id="select_dist"><option value="0">Seleccione ..</option></div>
-                                  </select>
-                                </div>
-                              </div>
-
-                              <div class="col-lg-4">
-                                <div class="mb-3">
-                                  <label class="form-label">UNIDAD ORGANIZACIONAL</label>
-                                  <select class="form-select" name="uni_id" id="uni_id" aria-label="Default select example">';
-                                      
-                                    $tabla.='
-                                  </select>
-                                </div>
-                                <div class="mb-3">
-                                  <label for="exampleInputtext2" class="form-label">USUARIO</label>
-                                  <input type="text" class="form-control" id="fn_usu" name="fn_usu" placeholder="Asignar Usuario ..">
-                                </div>
-                                <div class="mb-3">
-                                  <label for="exampleInputtext2" class="form-label">PASSWORD</label>
-                                  <input type="text" class="form-control" id="fun_password" name="fun_password" placeholder="Asignar Contraseña ..">
-                                </div>
-                                <div class="mb-3">
-                                  <label for="exampleInputtext2" class="form-label">CORREO</label>
-                                  <input type="text" class="form-control" id="fn_email" name="fn_email" placeholder="ejemplo@gmail.com">
-                                </div>
-                              </div>
-                              <div class="col-12">
-                                <div class="d-flex align-items-center justify-content-end mt-4 gap-6">
-                                  <button type="submit" id="btnGuardar" class="btn btn-primary">
-                                    <span id="textGuardar">Guardar Información</span>
-                                    <span id="spinnerGuardar" class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
-                                  </button>
-                                  <a href="'.base_url('mnt/resp_seguimientopoa').'" class="btn bg-danger-subtle text-danger">Cancelar</a>
-                                </div>
-
-                              </div>
-                            </div>
-                          </form>
+              <div class="card w-100 border position-relative overflow-hidden mb-0">
+                <div class="card-body p-4">
+                  <h4 class="card-title">Adicionar Responsable-Seguimiento POA</h4>
+                  <p class="card-subtitle mb-4">Formulario para Adicionar Nuevo Reponsable para el Seguimiento POA</p>
+                  <form role="form" action="'.base_url('mnt/add_segpoa').'" method="post" id="form_addspoa" class="login-form">
+                    <input name="base" type="hidden" value="'.base_url().'">
+                    <div class="row">
+                      <div class="col-lg-6">
+                        <div class="mb-3">
+                          <label for="exampleInputtext" class="form-label">SELECCIONE REGIONAL</label>
+                          <select class="form-select" name="reg_id2" id="reg_id2" aria-label="Default select example">
+                          <option value="0" >Seleccione ..</option>';
+                          foreach($regionales as $row){
+                            $tabla.='<option value="'.$row['dep_id'].'" >'.strtoupper($row['dep_departamento']).'</option>'; 
+                          }
+                          $tabla.='
+                          </select>
+                        </div>
+                        <div class="mb-3">
+                          <label for="exampleInputtext" class="form-label">PROGRAMA</label>
+                          <select class="form-select" name="proy_id" id="proy_id" aria-label="Default select example">
+                            <div id="programa"></div>
+                          </select>
+                        </div>
+                        <div class="mb-3">
+                          <label for="exampleInputtext" class="form-label">UNIDAD RESPONSABLE</label>
+                          <select class="form-select" name="com_id" id="com_id" aria-label="Default select example">
+                            <div id="uresp"></div>
+                          </select>
                         </div>
                       </div>
-                    </div>';
+
+                      <div class="col-lg-6">
+                        <div class="mb-3">
+                          <label for="exampleInputtext2" class="form-label">USUARIO</label>
+                          <input type="text" class="form-control" id="fn_usu" name="fn_usu" placeholder="Asignar Usuario ..">
+                        </div>
+                        <div class="mb-3">
+                          <label for="exampleInputtext2" class="form-label">PASSWORD</label>
+                          <input type="text" class="form-control" id="fun_password" name="fun_password" placeholder="Asignar Contraseña ..">
+                        </div>
+                        <div class="mb-3">
+                          <label for="exampleInputtext2" class="form-label">CORREO</label>
+                          <input type="text" class="form-control" id="fn_email" name="fn_email" placeholder="ejemplo@gmail.com">
+                        </div>
+                      </div>
+                      <div class="col-12">
+                        <div class="d-flex align-items-center justify-content-end mt-4 gap-6">
+                          <button type="submit" id="btnGuardar" class="btn btn-primary">
+                            <span id="textGuardar">Guardar Información</span>
+                            <span id="spinnerGuardar" class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
+                          </button>
+                          <a href="'.base_url('mnt/resp_seguimientopoa').'" class="btn bg-danger-subtle text-danger">Cancelar</a>
+                        </div>
+
+                      </div>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            </div>';
         return $tabla;
     }
 
@@ -558,7 +507,7 @@ class Libreria_Responsable{
           }
         </style>
         <input name="base" type="hidden" value="'.base_url().'">
-        
+        <div id="btnExportar"></div>
         <div class="col-12">
                       <div class="card w-100 border position-relative overflow-hidden mb-0">
                         <div class="card-body p-4">
@@ -690,6 +639,143 @@ class Libreria_Responsable{
                                     <span id="spinnerGuardar" class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
                                   </button>
                                   <a href="'.base_url('mnt/responsables').'" class="btn bg-danger-subtle text-danger">Cancelar</a>
+                                </div>
+
+                              </div>
+                            </div>
+                          </form>
+                        </div>
+                      </div>
+                    </div>';
+        return $tabla;
+    }
+
+
+
+     ////Formulario Datos del Responsable-Seguimiento POA para su edicion
+    public function get_responsables_seguimiento_poa($get_rep){
+      $model_funcionario = new Model_funcionarios();
+      $model_reg = new Model_regional();
+
+      ////
+      $get_pss=$model_funcionario->get_pwd($get_rep[0]['id']);
+      if (empty($get_pss)) {
+        $pss='';
+      }
+      else{
+        $pss=$get_pss[0]['fun_apassword'];
+      }
+      ////
+
+      ////
+      $regionales=$model_reg->obtenerRegionales();
+      $distritales=$model_reg->obtenerDistritales($get_rep[0]['dep_id']);
+      $unidadOrganizacional=$model_reg->obtenerUnidadesOrganizacionales();
+
+      $get_uni=$model_funcionario->get_uniresponsable($get_rep[0]['cm_id']); /// relacion unires->programa
+      $get_prog=$model_funcionario->get_AperturasxRegional($get_rep[0]['proy_id'])
+      ////
+
+      ////
+      $info = password_get_info($get_rep[0]['fun_password']);
+      $has_title='<div style="color:green"><b> Hasheado</b></div>';
+      if($info['algoName']=='unknown'){
+        $has_title='<div style="color:red"><b>No Hasheado</b></div>';
+      }
+      ////
+        $tabla='';
+        $tabla.='
+        <style>
+          .is-loading {
+              cursor: wait;
+              opacity: 0.7;
+              pointer-events: none; /* Bloquea clics en toda la página */
+          }
+        </style>
+        <input name="base" type="hidden" value="'.base_url().'">
+        <div id="btnExportar"></div>
+        <div class="col-12">
+                      <div class="card w-100 border position-relative overflow-hidden mb-0">
+                        <div class="card-body p-4">
+                          <h4 class="card-title">Datos del Responsable-Seguimiento POA</h4>
+                          <p class="card-subtitle mb-4">Formulario para cambiar editar Información del Reponsable POA</p>
+                          <form role="form" action="'.base_url('mnt/update_resp').'" method="post" id="form" class="login-form">
+                          <input name="fun_id" id="fun_id" type="hidden" value="'.$get_rep[0]['id'].'">
+                            <div class="row">
+
+                              <div class="col-lg-6">
+                                <div class="mb-3">
+                                  <label class="form-label">REGIONAL</label>
+                                  <select class="form-select" name="reg_id3" id="reg_id3" aria-label="Default select example">
+                                    <option value="0">Seleccione ..</option>';
+                                      foreach($regionales as $row){
+                                      if($row['dep_id']==$get_rep[0]['dep_id']){
+                                          $tabla.='<option value="'.$row['dep_id'].'" selected>'.strtoupper($row['dep_departamento']).'</option>';    
+                                        }
+                                        else{
+                                          $tabla.='<option value="'.$row['dep_id'].'">'.strtoupper($row['dep_departamento']).'</option>';
+                                        }
+                                      }
+                                    $tabla.='
+                                  </select>
+                                </div>
+                                <div class="mb-3">
+                                  <label class="form-label">PROGRAMA</label>
+                                  <select class="form-select" name="reg_id" id="reg_id" aria-label="Default select example">
+                                    <div id="select_reg">
+                                    <option value="0">Seleccione ..</option>';
+                                      foreach($regionales as $row){
+                                      if($row['dep_id']==$get_rep[0]['dep_id']){
+                                          $tabla.='<option value="'.$row['dep_id'].'" selected>'.strtoupper($row['dep_departamento']).'</option>';    
+                                        }
+                                        else{
+                                          $tabla.='<option value="'.$row['dep_id'].'">'.strtoupper($row['dep_departamento']).'</option>';
+                                        }
+                                      }
+                                    $tabla.='
+                                    </div>
+                                  </select>
+                                  
+                                </div>
+                                <div class="mb-3">
+                                  <label class="form-label">UNIDAD RESPONSABLE</label>
+                                  <select class="form-select" name="dist_id" id="dist_id" aria-label="Default select example">
+                                    <div id="select_dist">';
+                                    
+                                    $tabla.='
+                                    </div>
+                                  </select>
+                                </div>
+                              </div>
+
+                              <div class="col-lg-6">
+                                <div class="mb-3">
+                                  <label class="form-label">UNIDAD ORGANIZACIONAL</label>
+                                  <select class="form-select" name="uni_id" id="uni_id" aria-label="Default select example">';
+                                     
+                                    $tabla.='
+                                  </select>
+                                </div>
+                                <div class="mb-3">
+                                  <label for="exampleInputtext2" class="form-label">USUARIO</label>
+                                  <input type="text" class="form-control" id="fn_usu" name="fn_usu" placeholder="'.$get_rep[0]['fun_usuario'].'" value="'.$get_rep[0]['fun_usuario'].'">
+                                </div>
+                                <div class="mb-3">
+                                  <label for="exampleInputtext2" class="form-label">PASSWORD'.$has_title.'</label>
+                                  <input type="text" class="form-control" id="fun_password" name="fun_password" placeholder="Contraseña" value="'.$pss.'">
+                                </div>
+                                <div class="mb-3">
+                                  <label for="exampleInputtext2" class="form-label">CORREO</label>
+                                  <input type="text" class="form-control" id="fn_email" name="fn_email" placeholder="ejemplo@gmail.com">
+                                </div>
+                              </div>
+                              <div class="col-12">
+                                <div class="d-flex align-items-center justify-content-end mt-4 gap-6">
+                                  <button type="submit" id="btnGuardar" class="btn btn-primary">
+                                    <span id="textGuardar">Guardar Cambios</span>
+                                    <span id="spinnerGuardar" class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
+                                  </button>
+                                  <a href="'.base_url('mnt/resp_seguimientopoa').'" class="btn bg-danger-subtle text-danger">Cancelar</a>
                                 </div>
 
                               </div>

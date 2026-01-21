@@ -105,6 +105,32 @@ public function get_usuario_responsablePoa($usuario) {
         return $query->getResultArray();
     }
 
+    /// lista de Aperturas por Regional
+    public function obtenerAperturasxRegional($dep_id){
+        $gestion = session()->get('configuracion')['conf_gestion'] ?? null;
+        $sql = '
+            SELECT *
+            from lista_poa_gastocorriente_nacional('.$gestion.')
+            where ta_id!=2 and dep_id='.$dep_id.'
+            order by da,aper_programa asc';
+        $query = $this->query($sql);
+        return $query->getResultArray();
+    }
+
+
+    /// Get apertura Programatica
+    public function get_AperturasxRegional($proy_id){
+        $gestion = session()->get('configuracion')['conf_gestion'] ?? null;
+        $sql = '
+            SELECT *
+            from lista_poa_gastocorriente_nacional('.$gestion.')
+            where proy_id='.$proy_id.'';
+        $query = $this->query($sql);
+        return $query->getRowArray();
+    }
+
+
+
 
     /// Gestion Activo
     public function get_gestion_activo(){
@@ -127,6 +153,16 @@ public function get_usuario_responsablePoa($usuario) {
         $query = $this->query($sql);
         
         return $query->getResultArray();
+    }
+
+    //// get datos unidad responsable registrado para el seguimiento poa
+    public function get_uniresponsable($com_id){
+        $sql = 'SELECT *
+                from vista_subactividades
+                where com_id='.$com_id.'';
+        $query = $this->query($sql);
+        
+        return $query->getRowArray();
     }
 
     /// Verif si existe ya unidad registrado para el Seguimiento POA

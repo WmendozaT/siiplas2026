@@ -28,17 +28,7 @@ class Model_regional extends Model{
     }
 
 
-    /// lista de Aperturas por Regional
-    public function obtenerAperturasxRegional($dep_id){
-        $gestion = session()->get('configuracion')['conf_gestion'] ?? null;
-        $sql = '
-            SELECT *
-            from lista_poa_gastocorriente_nacional('.$gestion.')
-            where ta_id!=2 and dep_id='.$dep_id.'
-            order by da,aper_programa asc';
-        $query = $this->query($sql);
-        return $query->getResultArray();
-    }
+
 
 
     /// lista Unidades Organizacionales

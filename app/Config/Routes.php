@@ -45,6 +45,10 @@ $routes->get('mnt/resp_seguimientopoa', 'CMantenimiento\CResponsables::lista_res
 $routes->get('mnt/nuevo_reponsable_seguimientopoa', 'CMantenimiento\CResponsables::new_responsables_segpoa'); /// Add Responsable POA-Seguimiento POA
 $routes->post('mnt/get_aper_seg', 'CMantenimiento\CResponsables::get_aper_add'); /// get Apertura segun la regional-Seguimiento POA
 $routes->post('mnt/get_uresp_seg', 'CMantenimiento\CResponsables::get_uresp_add'); /// get Apertura segun la regional-Seguimiento POA
+$routes->post('mnt/add_segpoa', 'CMantenimiento\CResponsables::Add_segpoa'); /// Valida Add Responsable-Seguimiento POA
+$routes->get('mnt/update_segpoa/(:num)', 'CMantenimiento\CResponsables::update_segpoa/$1'); /// Update Responsable-Seguimiento POA
+
+
 
 $routes->get('mnt/Pdf_responsables', 'CMantenimiento\CResponsables_Pdf::Pdf_lista_responsables'); /// Pdf Responsables en base64
 $routes->get('mnt/Pdf_responsables_sfirma', 'CMantenimiento\CResponsables_Pdf::Pdf_lista_responsables_para_firmar'); /// Pdf Responsables en base64

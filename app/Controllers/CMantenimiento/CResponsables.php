@@ -75,7 +75,7 @@ class CResponsables extends BaseController{
 
 
     /// Vista Form Update Responsable-Seguimiento POA
-    public function update_segpoa($id){
+    public function form_update_segpoa($id){
         $miLib_resp = new Libreria_Responsable();
         $model_funcionario = new Model_funcionarios();
         $get_rep=$model_funcionario->get_responsablePoa($id);
@@ -373,8 +373,6 @@ public function exportar_responsables(){
                 ]);
             }
           }
-
-          
       }
 
       // Actualización del funcionario (Operación independiente)
@@ -394,6 +392,57 @@ public function exportar_responsables(){
   }
 
 
+/// Valida Form Update Responsable-Seguimiento POA
+  public function Update_respspoa() {
+    $db = \Config\Database::connect(); 
+    try {
+      $model_funcionario = new Model_funcionarios();
+      $get_proy=$model_funcionario->get_AperturasxRegional($this->request->getPost('proy_id'));
+      $id=$this->request->getPost('fun_id');
+
+      if (!$id) {
+        throw new \Exception("ID de funcionario no proporcionado.");
+      }
+
+      $data = [
+            'fun_nombre'   => strtoupper($this->request->getPost('fn_usu')),
+            'fun_dist'      => $get_proy['dist_id'],
+            'fun_usuario'  => strtoupper($this->request->getPost('fn_usu')),
+        ];
+
+        $pass = $this->request->getPost('fun_password');
+        if (!empty($pass)) {
+          //$data['fun_password'] = $pass;
+
+          $pass_ini=$model_funcionario->get_pwd($id);
+          if(!empty($pass_ini)){
+            if($pass_ini[0]['fun_apassword']!=$pass){
+                $db->table('historial_psw')->insert([
+                'fun_id'        => $id,
+                'fun_apassword' => $pass
+                ]);
+
+                
+            }
+            $data['fun_password'] = password_hash($pass, PASSWORD_DEFAULT);
+          }
+
+          //// update funcionario
+          $db->table('funcionario')
+               ->where('fun_id', $id) // Aquí defines tu condición
+               ->update($data);
+        }
+
+        return redirect()->to(base_url('mnt/resp_seguimientopoa'))
+                         ->with('success', 'Datos actualizados correctamente.');
+
+    } catch (Exception $e) {
+        // 5. Manejo de la excepción: Loguear el error y avisar al usuario
+        log_message('error', 'Error en update_resp: ' . $e->getMessage());
+        
+        return redirect()->back()->withInput()->with('error', 'Ocurrió un error inesperado: ' . $e->getMessage());
+    }
+  }
 
   /// Funcion GET REGIONAL UPDATE
   public function get_reg_nal_add() {

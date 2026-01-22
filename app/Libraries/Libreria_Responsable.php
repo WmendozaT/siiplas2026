@@ -227,7 +227,7 @@ class Libreria_Responsable{
                           <td>'.$row['adm'].'</td>
                           <td>'.$row['dist_distrital'].'</td>
                           <td>
-                            <a href="'.base_url().'mnt/update_segpoa/'.$row['id'].'" 
+                            <a href="'.base_url().'mnt/form_update_segpoa/'.$row['id'].'" 
                                class="btn btn-primary btn-sm" 
                                data-bs-toggle="tooltip" 
                                data-bs-placement="top" 
@@ -475,7 +475,7 @@ class Libreria_Responsable{
       $model_reg = new Model_regional();
 
       ////
-      $get_pss=$model_funcionario->get_pwd($get_rep[0]['id']);
+      $get_pss=$model_funcionario->get_pwd($get_rep['id']);
       if (empty($get_pss)) {
         $pss='';
       }
@@ -486,12 +486,12 @@ class Libreria_Responsable{
 
       ////
       $regionales=$model_reg->obtenerRegionales();
-      $distritales=$model_reg->obtenerDistritales($get_rep[0]['dep_id']);
+      $distritales=$model_reg->obtenerDistritales($get_rep['dep_id']);
       $unidadOrganizacional=$model_reg->obtenerUnidadesOrganizacionales();
       ////
 
       ////
-      $info = password_get_info($get_rep[0]['fun_password']);
+      $info = password_get_info($get_rep['fun_password']);
       $has_title='<div style="color:green"><b> Hasheado</b></div>';
       if($info['algoName']=='unknown'){
         $has_title='<div style="color:red"><b>No Hasheado</b></div>';
@@ -514,41 +514,41 @@ class Libreria_Responsable{
                           <h4 class="card-title">Datos del Responsable POA</h4>
                           <p class="card-subtitle mb-4">Formulario para cambiar editar Información del Reponsable POA</p>
                           <form role="form" action="'.base_url('mnt/update_resp').'" method="post" id="form" class="login-form">
-                          <input name="fun_id" id="fun_id" type="hidden" value="'.$get_rep[0]['id'].'">
+                          <input name="fun_id" id="fun_id" type="hidden" value="'.$get_rep['id'].'">
                             <div class="row">
                               <div class="col-lg-4">
                                 <div class="mb-3">
                                   <label for="exampleInputtext" class="form-label">NOMBRE</label>
-                                  <input type="text" class="form-control" id="fn_nom" name="fn_nom" placeholder="'.$get_rep[0]['fun_nombre'].'" value="'.$get_rep[0]['fun_nombre'].'">
+                                  <input type="text" class="form-control" id="fn_nom" name="fn_nom" placeholder="'.$get_rep['fun_nombre'].'" value="'.$get_rep['fun_nombre'].'">
                                 </div>
                                 <div class="mb-3">
                                   <label for="exampleInputtext" class="form-label">APELLIDO PATERNO</label>
-                                  <input type="text" class="form-control" id="fn_pt" name="fn_pt" placeholder="'.$get_rep[0]['fun_paterno'].'" value="'.$get_rep[0]['fun_paterno'].'">
+                                  <input type="text" class="form-control" id="fn_pt" name="fn_pt" placeholder="'.$get_rep['fun_paterno'].'" value="'.$get_rep['fun_paterno'].'">
                                 </div>
                                 <div class="mb-3">
                                   <label for="exampleInputtext" class="form-label">APELLIDO PATERNO</label>
-                                  <input type="text" class="form-control" id="fn_mt" name="fn_mt" placeholder="'.$get_rep[0]['fun_materno'].'" value="'.$get_rep[0]['fun_materno'].'">
+                                  <input type="text" class="form-control" id="fn_mt" name="fn_mt" placeholder="'.$get_rep['fun_materno'].'" value="'.$get_rep['fun_materno'].'">
                                 </div>
                                 <div class="mb-3">
                                   <label for="exampleInputtext" class="form-label">CI</label>
-                                  <input type="number" class="form-control" id="fn_ci" name="fn_ci" placeholder="'.$get_rep[0]['fun_ci'].'" value="'.$get_rep[0]['fun_ci'].'">
+                                  <input type="number" class="form-control" id="fn_ci" name="fn_ci" placeholder="'.$get_rep['fun_ci'].'" value="'.$get_rep['fun_ci'].'">
                                 </div>
                                 <div class="mb-3">
                                   <label for="exampleInputtext" class="form-label">NRO DE CELULAR</label>
-                                  <input type="number" class="form-control" id="fn_fono" name="fn_fono" placeholder="'.$get_rep[0]['fun_telefono'].'" value="'.$get_rep[0]['fun_telefono'].'">
+                                  <input type="number" class="form-control" id="fn_fono" name="fn_fono" placeholder="'.$get_rep['fun_telefono'].'" value="'.$get_rep['fun_telefono'].'">
                                 </div>
                               </div>
 
                               <div class="col-lg-4">
                                 <div class="mb-3">
                                   <label for="exampleInputtext" class="form-label">CARGO ADMINISTRATIVO</label>
-                                  <input type="text" class="form-control" id="fn_cargo" name="fn_cargo" placeholder="'.$get_rep[0]['fun_cargo'].'" value="'.$get_rep[0]['fun_cargo'].'">
+                                  <input type="text" class="form-control" id="fn_cargo" name="fn_cargo" placeholder="'.$get_rep['fun_cargo'].'" value="'.$get_rep['fun_cargo'].'">
                                 </div>
                                 <div class="mb-3">
                                   <label class="form-label">ADMINISTRACIÓN</label>
                                   <select class="form-select" name="tp_adm" id="tp_adm"aria-label="Default select example">
                                     <option value="0">Seleccione ..</option>';
-                                    if ($get_rep[0]['fun_adm']==1) {
+                                    if ($get_rep['fun_adm']==1) {
                                       $tabla.=' <option value="1" selected="true">NACIONAL</option>
                                                 <option value="2">REGIONAL</option>';
                                     }
@@ -563,12 +563,12 @@ class Libreria_Responsable{
                                   <label class="form-label">REGIONAL</label>
                                   <select class="form-select" name="reg_id" id="reg_id" aria-label="Default select example">
                                     <div id="select_reg">';
-                                    if($get_rep[0]['fun_adm']==1){
+                                    if($get_rep['fun_adm']==1){
                                       $tabla.='<option value="10" selected>Administración Central</option>';    
                                     }
                                     else{
                                       foreach($regionales as $row){
-                                      if($row['dep_id']==$get_rep[0]['dep_id']){
+                                      if($row['dep_id']==$get_rep['dep_id']){
                                           $tabla.='<option value="'.$row['dep_id'].'" selected>'.strtoupper($row['dep_departamento']).'</option>';    
                                         }
                                         else{
@@ -585,12 +585,12 @@ class Libreria_Responsable{
                                   <label class="form-label">DISTRITAL</label>
                                   <select class="form-select" name="dist_id" id="dist_id" aria-label="Default select example">
                                     <div id="select_dist">';
-                                    if($get_rep[0]['fun_adm']==1){
+                                    if($get_rep['fun_adm']==1){
                                       $tabla.='<option value="22" selected>Oficina Nacional</option>';    
                                     }
                                     else{
                                       foreach($distritales as $row){
-                                      if($row['dist_id']==$get_rep[0]['dist_id']){
+                                      if($row['dist_id']==$get_rep['dist_id']){
                                           $tabla.='<option value="'.$row['dist_id'].'" selected>'.strtoupper($row['dist_distrital']).'</option>';    
                                         }
                                         else{
@@ -609,7 +609,7 @@ class Libreria_Responsable{
                                   <label class="form-label">UNIDAD ORGANIZACIONAL</label>
                                   <select class="form-select" name="uni_id" id="uni_id" aria-label="Default select example">';
                                       foreach($unidadOrganizacional as $row){
-                                      if($row['uni_id']==$get_rep[0]['uni_id']){
+                                      if($row['uni_id']==$get_rep['uni_id']){
                                           $tabla.='<option value="'.$row['uni_id'].'" selected>'.strtoupper($row['uni_unidad']).'</option>';    
                                         }
                                         else{
@@ -621,7 +621,7 @@ class Libreria_Responsable{
                                 </div>
                                 <div class="mb-3">
                                   <label for="exampleInputtext2" class="form-label">USUARIO</label>
-                                  <input type="text" class="form-control" id="fn_usu" name="fn_usu" placeholder="'.$get_rep[0]['fun_usuario'].'" value="'.$get_rep[0]['fun_usuario'].'">
+                                  <input type="text" class="form-control" id="fn_usu" name="fn_usu" placeholder="'.$get_rep['fun_usuario'].'" value="'.$get_rep['fun_usuario'].'">
                                 </div>
                                 <div class="mb-3">
                                   <label for="exampleInputtext2" class="form-label">PASSWORD'.$has_title.'</label>
@@ -652,13 +652,13 @@ class Libreria_Responsable{
 
 
 
-     ////Formulario Datos del Responsable-Seguimiento POA para su edicion
+    ////Formulario Datos del Responsable-Seguimiento POA para su edicion
     public function get_responsables_seguimiento_poa($get_rep){
       $model_funcionario = new Model_funcionarios();
       $model_reg = new Model_regional();
 
       ////
-      $get_pss=$model_funcionario->get_pwd($get_rep[0]['id']);
+      $get_pss=$model_funcionario->get_pwd($get_rep['id']);
       if (empty($get_pss)) {
         $pss='';
       }
@@ -669,15 +669,18 @@ class Libreria_Responsable{
 
       ////
       $regionales=$model_reg->obtenerRegionales();
-      $distritales=$model_reg->obtenerDistritales($get_rep[0]['dep_id']);
-      $unidadOrganizacional=$model_reg->obtenerUnidadesOrganizacionales();
+     /// $distritales=$model_reg->obtenerDistritales($get_rep[0]['dep_id']);
+     /// $unidadOrganizacional=$model_reg->obtenerUnidadesOrganizacionales();
 
-      $get_uni=$model_funcionario->get_uniresponsable($get_rep[0]['cm_id']); /// relacion unires->programa
-      $get_prog=$model_funcionario->get_AperturasxRegional($get_rep[0]['proy_id'])
+      $get_uni=$model_funcionario->get_uniresponsable($get_rep['cm_id']); /// relacion unires->programa
+      //$get_prog=$model_funcionario->get_AperturasxRegional($get_uni['proy_id']); /// id detalle proyecto
+      $get_reg=$model_funcionario->datos_regional($get_rep['fun_dist']); //// id distrital, id regional
+      $lista_programas=$model_funcionario->obtenerAperturasxRegional($get_reg['dep_id']); /// lista de programas por regional
+      $lista_unidadresp=$model_funcionario->get_list_unidadresponsables($get_uni['proy_id']); /// lista de unidades responsables por proyecto
       ////
 
       ////
-      $info = password_get_info($get_rep[0]['fun_password']);
+      $info = password_get_info($get_rep['fun_password']);
       $has_title='<div style="color:green"><b> Hasheado</b></div>';
       if($info['algoName']=='unknown'){
         $has_title='<div style="color:red"><b>No Hasheado</b></div>';
@@ -695,95 +698,97 @@ class Libreria_Responsable{
         <input name="base" type="hidden" value="'.base_url().'">
         <div id="btnExportar"></div>
         <div class="col-12">
-                      <div class="card w-100 border position-relative overflow-hidden mb-0">
-                        <div class="card-body p-4">
-                          <h4 class="card-title">Datos del Responsable-Seguimiento POA</h4>
-                          <p class="card-subtitle mb-4">Formulario para cambiar editar Información del Reponsable POA</p>
-                          <form role="form" action="'.base_url('mnt/update_resp').'" method="post" id="form" class="login-form">
-                          <input name="fun_id" id="fun_id" type="hidden" value="'.$get_rep[0]['id'].'">
-                            <div class="row">
-
-                              <div class="col-lg-6">
-                                <div class="mb-3">
-                                  <label class="form-label">REGIONAL</label>
-                                  <select class="form-select" name="reg_id3" id="reg_id3" aria-label="Default select example">
-                                    <option value="0">Seleccione ..</option>';
-                                      foreach($regionales as $row){
-                                      if($row['dep_id']==$get_rep[0]['dep_id']){
-                                          $tabla.='<option value="'.$row['dep_id'].'" selected>'.strtoupper($row['dep_departamento']).'</option>';    
-                                        }
-                                        else{
-                                          $tabla.='<option value="'.$row['dep_id'].'">'.strtoupper($row['dep_departamento']).'</option>';
-                                        }
-                                      }
-                                    $tabla.='
-                                  </select>
-                                </div>
-                                <div class="mb-3">
-                                  <label class="form-label">PROGRAMA</label>
-                                  <select class="form-select" name="reg_id" id="reg_id" aria-label="Default select example">
-                                    <div id="select_reg">
-                                    <option value="0">Seleccione ..</option>';
-                                      foreach($regionales as $row){
-                                      if($row['dep_id']==$get_rep[0]['dep_id']){
-                                          $tabla.='<option value="'.$row['dep_id'].'" selected>'.strtoupper($row['dep_departamento']).'</option>';    
-                                        }
-                                        else{
-                                          $tabla.='<option value="'.$row['dep_id'].'">'.strtoupper($row['dep_departamento']).'</option>';
-                                        }
-                                      }
-                                    $tabla.='
-                                    </div>
-                                  </select>
-                                  
-                                </div>
-                                <div class="mb-3">
-                                  <label class="form-label">UNIDAD RESPONSABLE</label>
-                                  <select class="form-select" name="dist_id" id="dist_id" aria-label="Default select example">
-                                    <div id="select_dist">';
-                                    
-                                    $tabla.='
-                                    </div>
-                                  </select>
-                                </div>
-                              </div>
-
-                              <div class="col-lg-6">
-                                <div class="mb-3">
-                                  <label class="form-label">UNIDAD ORGANIZACIONAL</label>
-                                  <select class="form-select" name="uni_id" id="uni_id" aria-label="Default select example">';
-                                     
-                                    $tabla.='
-                                  </select>
-                                </div>
-                                <div class="mb-3">
-                                  <label for="exampleInputtext2" class="form-label">USUARIO</label>
-                                  <input type="text" class="form-control" id="fn_usu" name="fn_usu" placeholder="'.$get_rep[0]['fun_usuario'].'" value="'.$get_rep[0]['fun_usuario'].'">
-                                </div>
-                                <div class="mb-3">
-                                  <label for="exampleInputtext2" class="form-label">PASSWORD'.$has_title.'</label>
-                                  <input type="text" class="form-control" id="fun_password" name="fun_password" placeholder="Contraseña" value="'.$pss.'">
-                                </div>
-                                <div class="mb-3">
-                                  <label for="exampleInputtext2" class="form-label">CORREO</label>
-                                  <input type="text" class="form-control" id="fn_email" name="fn_email" placeholder="ejemplo@gmail.com">
-                                </div>
-                              </div>
-                              <div class="col-12">
-                                <div class="d-flex align-items-center justify-content-end mt-4 gap-6">
-                                  <button type="submit" id="btnGuardar" class="btn btn-primary">
-                                    <span id="textGuardar">Guardar Cambios</span>
-                                    <span id="spinnerGuardar" class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
-                                  </button>
-                                  <a href="'.base_url('mnt/resp_seguimientopoa').'" class="btn bg-danger-subtle text-danger">Cancelar</a>
-                                </div>
-
-                              </div>
+              <div class="card w-100 border position-relative overflow-hidden mb-0">
+                <div class="card-body p-4">
+                  <h4 class="card-title">Datos del Responsable-Seguimiento POA</h4>
+                  <p class="card-subtitle mb-4">Formulario para cambiar editar Información del Reponsable POA</p>
+                  <form role="form" action="'.base_url('mnt/update_respspoa').'" method="post" id="form_update" class="login-form">
+                  <input name="fun_id" id="fun_id" type="hidden" value="'.$get_rep['id'].'">
+                    <div class="row">
+                      <div class="col-lg-6">
+                        <div class="mb-3">
+                          <label class="form-label">REGIONAL</label>
+                          <select class="form-select" name="reg_id" id="reg_id" aria-label="Default select example" disabled>
+                            <option value="0">Seleccione ..</option>';
+                              foreach($regionales as $row){
+                              if($row['dep_id']==$get_rep['dep_id']){
+                                  $tabla.='<option value="'.$row['dep_id'].'" selected>'.strtoupper($row['dep_departamento']).'</option>';    
+                                }
+                                else{
+                                  $tabla.='<option value="'.$row['dep_id'].'">'.strtoupper($row['dep_departamento']).'</option>';
+                                }
+                              }
+                            $tabla.='
+                          </select>
+                        </div>
+                        <div class="mb-3">
+                          <label class="form-label">PROGRAMA</label>
+                          <select class="form-select" name="proy_id" id="proy_id" aria-label="Default select example">
+                            <div id="select_reg">
+                            <option value="0">Seleccione ..</option>';
+                              foreach($lista_programas as $row){
+                                if($row['proy_id']==$get_uni['proy_id']){
+                                  $tabla.='<option value="'.$row['proy_id'].'" selected>'.$row['aper_programa'].' '.$row['aper_proyecto'].' '.$row['aper_actividad'].'-'.strtoupper($row['aper_descripcion']).'</option>';    
+                                }
+                                else{
+                                  $tabla.='<option value="'.$row['proy_id'].'">'.$row['aper_programa'].' '.$row['aper_proyecto'].' '.$row['aper_actividad'].'-'.strtoupper($row['aper_descripcion']).'</option>';
+                                }
+                              }
+                            $tabla.='
                             </div>
-                          </form>
+                          </select>
+                          
+                        </div>
+                        <div class="mb-3">
+                          <label class="form-label">UNIDAD RESPONSABLE</label>
+                          <select class="form-select" name="com_id" id="com_id" aria-label="Default select example">
+                            <div id="uresp">';
+                              foreach($lista_unidadresp as $row){
+                                if($row['com_id']==$get_rep['cm_id']){
+                                    $tabla.='<option value="'.$row['com_id'].'" selected>'.$row['tipo_subactividad'].' '.$row['serv_descripcion'].'</option>';    
+                                  }
+                                  else{
+                                    $verif=$model_funcionario->verif_uresponsable_existente_seguimiento($row['com_id']);
+                                    if(count($verif)==0){
+                                      $tabla.='<option value="'.$row['com_id'].'">'.$row['tipo_subactividad'].' '.$row['serv_descripcion'].'</option>';
+                                    }
+                                  }
+                              }
+                            $tabla.='
+                            </div>
+                          </select>
                         </div>
                       </div>
-                    </div>';
+
+                      <div class="col-lg-6">
+                        <div class="mb-3">
+                          <label for="exampleInputtext2" class="form-label">USUARIO</label>
+                          <input type="text" class="form-control" id="fn_usu" name="fn_usu" placeholder="'.$get_rep['fun_usuario'].'" value="'.$get_rep['fun_usuario'].'">
+                        </div>
+                        <div class="mb-3">
+                          <label for="exampleInputtext2" class="form-label">PASSWORD'.$has_title.'</label>
+                          <input type="text" class="form-control" id="fun_password" name="fun_password" placeholder="Contraseña" value="'.$pss.'">
+                        </div>
+                        <div class="mb-3">
+                          <label for="exampleInputtext2" class="form-label">CORREO</label>
+                          <input type="text" class="form-control" id="fn_email" name="fn_email" placeholder="ejemplo@gmail.com">
+                        </div>
+                      </div>
+                      <div class="col-12">
+                        <div class="d-flex align-items-center justify-content-end mt-4 gap-6">
+                          <button type="submit" id="btnGuardar" class="btn btn-primary">
+                            <span id="textGuardar">Guardar Cambios</span>
+                            <span id="spinnerGuardar" class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
+                          </button>
+                          <a href="'.base_url('mnt/resp_seguimientopoa').'" class="btn bg-danger-subtle text-danger">Cancelar</a>
+                        </div>
+
+                      </div>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            </div>';
         return $tabla;
     }
 }

@@ -408,7 +408,6 @@ $(document).ready(function() {
     $("#proy_id").change(function () {
         // Obtener el valor seleccionado directamente
         var proy_id = $(this).val(); 
-
         // Validar que el valor no esté vacío (opcional, si tienes un "Seleccione...")
         var url = base + "mnt/get_uresp_seg";
         var request = $.ajax({
@@ -513,6 +512,60 @@ $(document).ready(function() {
 
     // Limpiar clases de error dinámicamente cuando el usuario corrige el campo
     $("input, select").on("input change", function() {
+        if ($(this).val().trim() !== "" && $(this).val() !== "0") {
+            $(this).removeClass("is-invalid");
+        }
+    });
+});
+
+
+///// Js Update Informacion responsable-seguimiento
+$(document).ready(function() {
+    $("#form_update").on("submit", function(e) {
+        let esValido = true;
+
+        // 1. Validar campos de texto y número
+        // Nota: eliminé el duplicado de fn_usu que tenías en tu HTML
+        $("#fn_usu, #fun_password").each(function() {
+            if ($(this).val().trim() === "") {
+                $(this).addClass("is-invalid");
+                esValido = false;
+            } else {
+                $(this).removeClass("is-invalid").addClass("is-valid");
+            }
+        });
+
+        // 2. Validar Select de Administración
+        $("#proy_id,#com_id").each(function() {
+            let valor = $(this).val();
+            if (valor === "0" || valor === "" || valor === null) {
+                $(this).addClass("is-invalid").removeClass("is-valid");
+                esValido = false;
+            } else {
+                $(this).removeClass("is-invalid").addClass("is-valid");
+            }
+        });
+
+        // 3. Lógica de Envío
+        if (!esValido) {
+            e.preventDefault(); // Detiene el envío si hay error
+            alert("Por favor, complete todos los campos obligatorios.");
+        } else {
+            e.preventDefault(); // Detenemos el envío inmediato
+    
+            $("#btnGuardar").prop("disabled", true);
+            $("#textGuardar").text("Procesando...");
+            $("#spinnerGuardar").removeClass("d-none");
+
+            // Esperar 3 segundos antes de enviar realmente el formulario
+            setTimeout(function() {
+                $("#form_update").off("submit").submit(); // Quita el evento actual y envía el form
+            }, 1000);
+        }
+    });
+
+    // Limpiar errores mientras el usuario escribe
+    $("input, select").on("change keyup", function() {
         if ($(this).val().trim() !== "" && $(this).val() !== "0") {
             $(this).removeClass("is-invalid");
         }

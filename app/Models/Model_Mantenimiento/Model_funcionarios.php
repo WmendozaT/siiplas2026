@@ -73,7 +73,7 @@ public function get_usuario_responsablePoa($usuario) {
                 where id='.$id.'';
         $query = $this->query($sql);
         
-        return $query->getResultArray();
+        return $query->getRowArray();
     }
 
     /// Get Password 2026

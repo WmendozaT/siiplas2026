@@ -50,5 +50,5 @@ $routes->get('mnt/form_update_segpoa/(:num)', 'CMantenimiento\CResponsables::for
 $routes->post('mnt/update_respspoa', 'CMantenimiento\CResponsables::Update_respspoa'); /// Valida Update Responsable
 
 
-$routes->get('mnt/Pdf_responsables', 'CMantenimiento\CResponsables_Pdf::Pdf_lista_responsables'); /// Pdf Responsables en base64
+$routes->post('mnt/Pdf_responsables', 'CMantenimiento\CResponsables_Pdf::Pdf_lista_responsables'); /// Pdf Responsables en base64
 $routes->get('mnt/Pdf_responsables_sfirma', 'CMantenimiento\CResponsables_Pdf::Pdf_lista_responsables_para_firmar'); /// Pdf Responsables en base64

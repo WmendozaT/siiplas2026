@@ -74,6 +74,7 @@ class Libreria_Responsable{
 
                 <div class="table-responsive pb-4">
                     <input name="base" type="hidden" value="'.base_url().'">
+                    <input name="tp_rep" type="hidden" value="0">
                     <table id="all-student" class="table table-striped table-bordered border text-nowrap align-middle" style="font-size:10.5px;">
                       <thead>
                         <tr>
@@ -201,6 +202,7 @@ class Libreria_Responsable{
 
                 <div class="table-responsive pb-4">
                     <input name="base" type="hidden" value="'.base_url().'">
+                    <input name="tp_rep" type="hidden" value="1">
                     <table id="all-student" class="table table-striped table-bordered border text-nowrap align-middle" style="font-size:10.5px;">
                       <thead>
                         <tr>

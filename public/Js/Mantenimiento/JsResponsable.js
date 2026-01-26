@@ -271,20 +271,22 @@ $(document).ready(function() {
 
 
 
-//// Generar Reporte en Base64
+//// Generar Reporte en Base64 - Responsables POA
 function generarReporteBase64() {
     // 1. Referencia al botón y su contenido original
     var $btn = $("#btnGenerarReporte");
     var originalHtml = $btn.html();
-
+    tp = $('[name="tp_rep"]').val();
+    //alert(tp)
     // 2. Mostrar Loading: Desactivar botón y cambiar icono
     $btn.prop("disabled", true);
     $btn.html('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Generando...');
 
     $.ajax({
         url: base + "mnt/Pdf_responsables",
-        type: 'GET',
+        type: 'POST',
         dataType: 'json',
+        data: { tp_rep: tp },
         success: function(response) {
             if (response.status === 'success') {
                 // Abrir en pestaña nueva

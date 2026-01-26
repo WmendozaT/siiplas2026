@@ -38,10 +38,8 @@ class CResponsables_Pdf extends BaseController{
 
     /// Reporte Lista de Reponsables POA
     public function Pdf_lista_responsables(){
-    $miLib_resp = new Libreria_Responsable();
-    $model_funcionario = new Model_funcionarios();
-    $responsables=$model_funcionario->obtenerFuncionariosActivos();
-
+    
+    $tp_rep = $this->request->getPost('tp_rep'); /// tipo de Reporte
     $fecha = date('d/m/Y'); // Definir la variable fecha
     
     $options = new Options();
@@ -127,8 +125,16 @@ class CResponsables_Pdf extends BaseController{
         <body>
             <!-- Estos elementos se repetirán en cada hoja automáticamente -->
             <header>
-                <h3>'.$this->session->get('configuracion')['conf_nombre_entidad'].'</h3>
-                <p>Reporte Oficial de Responsables POA - Gestión '.$this->session->get('configuracion')['conf_gestion'].'</p>
+                <h3>'.$this->session->get('configuracion')['conf_nombre_entidad'].'</h3>';
+                if($tp_rep==0){
+                    $html.='
+                    <p>Reporte Oficial de Responsables POA - Gestión '.$this->session->get('configuracion')['conf_gestion'].'</p>';
+                }
+                else{
+                     $html.='
+                    <p>Reporte Oficial de Responsables para el Seguimiento POA - Gestión '.$this->session->get('configuracion')['conf_gestion'].'</p>';
+                }
+                $html.='
             </header>
 
             <footer>
@@ -137,40 +143,7 @@ class CResponsables_Pdf extends BaseController{
 
             <!-- El contenido principal va aquí -->
             <main>
-                <table class="table-report">
-                    <thead>
-                        <tr>
-                          <th width="1%" class="text-center">#</th>
-                          <th width="15%" class="text-center">REPONSABLE POA</th>
-                          <th width="5%" class="text-center">CI</th>
-                          <th width="10%" class="text-center">CARGO</th>
-                          <th width="10%" class="text-center">TELEFONO</th>
-                          <th width="10%" class="text-center">CORREO</th>
-                          <th width="8%" class="text-center">USUARIO</th>
-                          <th width="10%" class="text-center">TIPO ADM.</th>
-                          <th width="10%" class="text-center">DISTRITAL</th>
-                        </tr>
-                      </thead>
-                      <tbody>';
-                      $nro=0;
-                      foreach($responsables as $row){ 
-                        $nro++;
-                        $html.='
-                        <tr>
-                          <td style="aling:center;">'.$nro.'</td>
-                          <td>'.$row['fun_nombre'].' '.$row['fun_paterno'].' '.$row['fun_materno'].'</td>
-                          <td>'.$row['fun_ci'].'</td>
-                          <td>'.$row['fun_cargo'].'</td>
-                          <td>'.$row['fun_telefono'].'</td>
-                          <td></td>
-                          <td>'.$row['fun_usuario'].'</td>
-                          <td>'.$row['adm'].'</td>
-                          <td>'.$row['dist_distrital'].'</td>
-                        </tr>';
-                      }
-                      $html.='
-                      </tbody>
-                    </table>
+                '.$this->responsables_poa($tp_rep).'
             </main>
         </body>
         </html>';
@@ -193,6 +166,100 @@ class CResponsables_Pdf extends BaseController{
             'pdf'    => 'data:application/pdf;base64,' . $base64
         ]);
     }
+
+
+
+    /// Reporte Lista de Reponsables POA para firmar Digitalmente
+    public function responsables_poa($tp){
+        $miLib_resp = new Libreria_Responsable();
+        $model_funcionario = new Model_funcionarios();
+        $tabla='';
+        if($tp==0){ //// Responsables POA
+            $responsables=$model_funcionario->obtenerFuncionariosActivos(); //// responsables poa
+            $tabla.='<table class="table-report">
+                    <thead>
+                        <tr>
+                          <th width="1%" class="text-center">#</th>
+                          <th width="15%" class="text-center">REPONSABLE POA</th>
+                          <th width="5%" class="text-center">CI</th>
+                          <th width="10%" class="text-center">CARGO</th>
+                          <th width="10%" class="text-center">TELEFONO</th>
+                          <th width="10%" class="text-center">CORREO</th>
+                          <th width="8%" class="text-center">USUARIO</th>
+                          <th width="10%" class="text-center">TIPO ADM.</th>
+                          <th width="10%" class="text-center">DISTRITAL</th>
+                        </tr>
+                      </thead>
+                      <tbody>';
+                      $nro=0;
+                      foreach($responsables as $row){ 
+                        $nro++;
+                        $tabla.='
+                        <tr>
+                          <td style="aling:center;">'.$nro.'</td>
+                          <td>'.$row['fun_nombre'].' '.$row['fun_paterno'].' '.$row['fun_materno'].'</td>
+                          <td>'.$row['fun_ci'].'</td>
+                          <td>'.$row['fun_cargo'].'</td>
+                          <td>'.$row['fun_telefono'].'</td>
+                          <td></td>
+                          <td>'.$row['fun_usuario'].'</td>
+                          <td>'.$row['adm'].'</td>
+                          <td>'.$row['dist_distrital'].'</td>
+                        </tr>';
+                      }
+                      $tabla.='
+                      </tbody>
+                    </table>';
+        }
+        else{ //// Responsables Seguimiento POA
+            $responsables=$model_funcionario->obtenerFuncionariosActivos_seguimientoPOA();
+             $tabla.='<table class="table-report">
+                    <thead>
+                        <tr>
+                          <th width="1%" class="text-center">#</th>
+                          <th width="15%" class="text-center">UNIDAD ORGANIZACIONAL</th>
+                          <th width="10%" class="text-center">UNIDAD RESPONSABLE</th>
+                          <th width="10%" class="text-center">ADMINISTRACIÓN</th>
+                          <th width="10%" class="text-center">USUARIO</th>
+                          <th width="10%" class="text-center">CREDENCIAL</th>
+                        </tr>
+                      </thead>
+                      <tbody>';
+                      $nro=0;
+                      foreach($responsables as $row){ 
+                        $info = password_get_info($row['fun_password']);
+                          if($info['algoName']=='unknown'){
+                            $has_title='<div style="color:red"><b>No Hasheado</b></div>';
+                          }
+                          else{
+                            $get_pss=$model_funcionario->get_pwd($row['id']);
+                            if(count($get_pss)!=0) {
+                                $has_title=$get_pss[0]['fun_apassword']; 
+                            }
+                            else{
+                             $has_title='<div style="color:red"><b>sin Credencial</b></div>';
+                            }
+                          }
+                        $nro++;
+                        $tabla.='
+                        <tr>
+                          <td style="aling:center;">'.$nro.'</td>
+                          <td>'.$row['aper_programa'].' '.$row['aper_proyecto'].' '.$row['aper_actividad'].' - '.$row['aper_descripcion'].'</td>
+                          <td>'.$row['tipo_subactividad'].' '.$row['serv_descripcion'].'</td>
+                          <td>'.strtoupper($row['dist_distrital']).'</td>
+                          <td>'.$row['fun_usuario'].'</td>
+                          <td>'.$has_title.'</td>
+                        </tr>';
+                      }
+                      $tabla.='
+                      </tbody>
+                    </table>';
+        }
+
+        return $tabla;
+    }
+
+
 
 
 

@@ -27,6 +27,39 @@ class IndexModel extends Model{
         return $query->getRowArray();
     }
 
+
+    /// List Gestiones Disponibles
+    public function list_gestiones_disponibles(){
+        $sql = "SELECT *
+                from configuracion
+                where estado=1
+                order by ide asc";
+        $query = $this->query($sql);
+        
+        return $query->getResultArray();
+    }
+
+    /// List Trimestres Disponibles
+    public function list_trimestre_disponibles(){
+        $sql = "SELECT *
+                from trimestre_mes
+                where estado=1
+                order by trm_id asc";
+        $query = $this->query($sql);
+        
+        return $query->getResultArray();
+    }
+
+    /// List Meses Disponibles
+    public function list_meses_disponibles(){
+        $sql = "SELECT *
+                from mes
+                order by m_id asc";
+        $query = $this->query($sql);
+        
+        return $query->getResultArray();
+    }
+
     /// Modulos Activos
     public function modulos($ide,$tp_adm){
         if($tp_adm==1){ /// Nacional

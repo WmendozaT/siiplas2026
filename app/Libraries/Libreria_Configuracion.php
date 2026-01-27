@@ -1,0 +1,445 @@
+<?php 
+namespace App\Libraries;
+use App\Controllers\BaseController; 
+// Importa las clases necesarias para initController
+use CodeIgniter\HTTP\RequestInterface;
+use CodeIgniter\HTTP\ResponseInterface;
+use Psr\Log\LoggerInterface;
+use App\Models\Index\IndexModel;
+use App\Models\Model_Mantenimiento\Model_funcionarios;
+use App\Models\Model_Mantenimiento\Model_regional;
+use App\Models\Model_Mantenimiento\Model_configuracion;
+
+
+class Libreria_Configuracion{
+
+    //// Conf Entidad
+    public function conf_form1(){
+        $model_index = new IndexModel();
+        $conf = $model_index->get_gestion_activo(); /// configuracion gestion activo
+        $gestiones=$model_index->list_gestiones_disponibles(); /// list Gestiones
+        $trimestre=$model_index->list_trimestre_disponibles(); /// list Trimestres
+        $meses=$model_index->list_meses_disponibles(); /// list Meses
+
+       // $responsables=$model_funcionario->obtenerFuncionariosActivos();
+        $tabla='';
+        $tabla.='<div class="row">
+                    <div class="col-12">
+                      <div class="card w-100 border position-relative overflow-hidden mb-0">
+                        <div class="card-body p-4">
+                          <h4 class="card-title">Datos Entidad</h4>
+                          <form>
+                            <div class="row">
+                              <div class="col-lg-3">
+                                <div class="mb-3">
+                                  <label for="NombreEntidad" class="form-label">Nombre de la Entidad</label>
+                                  <input type="text" class="form-control" id="NombreEntidad" value="'.$conf['conf_nombre_entidad'].'">
+                                </div>
+                                <div class="mb-3">
+                                  <label for="SiglaEntidad" class="form-label">Sigla Entidad</label>
+                                  <input type="text" class="form-control" id="SiglaEntidad" value="'.$conf['conf_sigla_entidad'].'">
+                                </div>
+                                <div class="mb-3">
+                                  <label for="MisionEntidad" class="form-label">Misión Institucional</label>
+                                  <textarea type="text" class="form-control" id="MisionEntidad" style="height:150px;">'.$conf['conf_mision'].'</textarea>
+                                </div>
+                                <div class="mb-3">
+                                  <label for="VisionEntidad" class="form-label">Visión Institucional</label>
+                                  <textarea type="text" class="form-control" id="VisionEntidad" style="height:150px;">'.$conf['conf_vision'].'</textarea>
+                                </div>
+                              </div>
+
+                              <div class="col-lg-3">
+                                <div class="mb-3">
+                                  <label class="form-label">Gestión</label>
+                                  <select class="form-select" aria-label="Default select example" id="g_id">';
+                                    foreach ($gestiones as $row) {
+                                      $selected = ($conf['ide'] == $row['ide']) ? 'selected' : '';
+                                      $tabla .= '<option value="'.$row['ide'].'" '.$selected.'>'.$row['conf_gestion'].'</option>';
+                                    }
+                                  $tabla.='
+                                  </select>
+                                </div>
+                                <div class="mb-3">
+                                  <label class="form-label">Trimestre</label>
+                                  <select class="form-select" aria-label="Default select example" id="trm_id">';
+                                    foreach ($trimestre as $row) {
+                                      $selected = ($conf['conf_mes_otro'] == $row['trm_id']) ? 'selected' : '';
+                                      $tabla .= '<option value="'.$row['trm_id'].'" '.$selected.'>'.$row['trm_descripcion'].'</option>';
+                                    }
+                                  $tabla.='
+                                  </select>
+                                </div>
+                                <div class="mb-3">
+                                  <label class="form-label">Mes</label>
+                                  <select class="form-select" aria-label="Default select example" name="conf_mes" id="conf_mes">';
+                                    foreach ($meses as $row) {
+                                      $selected = ($conf['conf_mes'] == $row['m_id']) ? 'selected' : '';
+                                      $tabla .= '<option value="'.$row['m_id'].'" '.$selected.'>'.$row['m_descripcion'].'</option>';
+                                    }
+                                  $tabla.='
+                                  </select>
+                                </div>
+                                <div class="mb-3">
+                                  <label for="conf_gestion_desde" class="form-label">Pei - Inicio</label>
+                                  <input type="number" class="form-control" name="conf_gestion_desde" id="conf_gestion_desde" value="'.$conf['conf_gestion_desde'].'">
+                                </div>
+                                <div class="mb-3">
+                                  <label for="conf_gestion_hasta" class="form-label">Pei - Fin</label>
+                                  <input type="number" class="form-control" name="conf_gestion_hasta" id="conf_gestion_hasta" value="'.$conf['conf_gestion_hasta'].'">
+                                </div>
+                              </div>
+
+                              <div class="col-lg-3">
+                                <div class="mb-3">
+                                  <label class="form-label">Ajustar Saldos</label>
+                                  <select class="form-select" aria-label="Default select example" name="conf_ajuste_poa" id="conf_ajuste_poa">';
+                                    if($conf['conf_ajuste_poa']==1){
+                                      $tabla.='
+                                      <option value="1" selected>SI</option>
+                                      <option value="0">NO</option>';
+                                    }
+                                    else{
+                                      $tabla.='
+                                      <option value="1">SI</option>
+                                      <option value="0" selected>NO</option>';
+                                    }
+                                  $tabla.='
+                                  </select>
+                                </div>
+                                
+                                <div class="mb-3">
+                                  <label class="form-label">Ajustar Credenciales</label>
+                                  <select class="form-select" aria-label="Default select example" name="conf_ajuste_poa" id="conf_ajuste_poa">';
+                                    if($conf['conf_psw']==1){
+                                      $tabla.='
+                                      <option value="1" selected>SI</option>
+                                      <option value="0">NO</option>';
+                                    }
+                                    else{
+                                      $tabla.='
+                                      <option value="1">SI</option>
+                                      <option value="0" selected>NO</option>';
+                                    }
+                                  $tabla.='
+                                  </select>
+                                </div>
+                                <div class="mb-3">
+                                  <label class="form-label">Tipo de Mensaje</label>
+                                  <select class="form-select" aria-label="Default select example" name="tp_msn" id="tp_msn">';
+                                    if($conf['tp_msn']==0){
+                                      $tabla.='
+                                      <option value="0" selected>NINGUN MENSAJE</option>
+                                      <option value="1">ALERTA ROJA</option>
+                                      <option value="2">ALERTA AMARILLO</option>
+                                      <option value="3">ALERTA VERDE</option>';
+                                    }
+                                    elseif($conf['tp_msn']==1){
+                                      $tabla.='
+                                      <option value="0">NINGUN MENSAJE</option>
+                                      <option value="1" selected>ALERTA ROJA</option>
+                                      <option value="2">ALERTA AMARILLO</option>
+                                      <option value="3">ALERTA VERDE</option>';
+                                    }
+                                    elseif($conf['tp_msn']==2){
+                                      $tabla.='
+                                      <option value="0">NINGUN MENSAJE</option>
+                                      <option value="1">ALERTA ROJA</option>
+                                      <option value="2" selected>ALERTA AMARILLO</option>
+                                      <option value="3">ALERTA VERDE</option>';
+                                    }
+                                    elseif($conf['tp_msn']==3){
+                                      $tabla.='
+                                      <option value="0">NINGUN MENSAJE</option>
+                                      <option value="1">ALERTA ROJA</option>
+                                      <option value="2">ALERTA AMARILLO</option>
+                                      <option value="3" selected>ALERTA VERDE</option>';
+                                    }
+                                  $tabla.='
+                                  </select>
+                                </div>
+                                <div class="mb-3">
+                                  <label for="conf_mensaje" class="form-label">Mensaje</label>
+                                  <textarea type="text" class="form-control" name="conf_mensaje" id="conf_mensaje" >'.$conf['conf_mensaje'].'</textarea>
+                                </div>
+                              </div>
+
+                              <div class="col-lg-3">
+                                <div class="mb-3">
+                                  <label for="rd_aprobacion_poa" class="form-label">RD Aprobacion POA</label>
+                                  <textarea type="text" class="form-control" name="rd_aprobacion_poa" id="rd_aprobacion_poa" >'.$conf['rd_aprobacion_poa'].'</textarea>
+                                </div>
+                                
+                                <div class="mb-3">
+                                  <label for="rd_abrev_sistema" class="form-label">Abrev. Sistema</label>
+                                  <input type="text" class="form-control" name="rd_abrev_sistema" id="rd_abrev_sistema" value="'.$conf['conf_abrev_sistema'].'">
+                                </div>
+                                <div class="mb-3">
+                                  <label for="conf_unidad_resp" class="form-label">Unidad Responsable</label>
+                                  <textarea type="text" class="form-control" name="conf_unidad_resp" id="conf_unidad_resp" >'.$conf['conf_unidad_resp'].'</textarea>
+                                </div>
+                                <div class="mb-3">
+                                  <label for="conf_sis_pie" class="form-label">Pie de reporte</label>
+                                  <textarea type="text" class="form-control" name="conf_sis_pie" id="conf_sis_pie" >'.$conf['conf_sis_pie'].'</textarea>
+                                </div>
+                              </div>
+
+                              <div class="col-12">
+                                <div class="d-flex align-items-center justify-content-end mt-4 gap-6">
+                                  <button class="btn btn-primary">Save</button>
+                                  <button class="btn bg-danger-subtle text-danger">Cancel</button>
+                                </div>
+                              </div>
+                            </div>
+                          </form>
+                        </div>
+                      </div>
+                    </div>
+                  </div>';
+
+
+        return $tabla;
+    }
+
+
+    public function conf_form2(){
+        $model_funcionario = new Model_funcionarios();
+        $responsables=$model_funcionario->obtenerFuncionariosActivos();
+        $tabla='<div class="row justify-content-center">
+                    <div class="col-lg-9">
+                      <div class="card border shadow-none">
+                        <div class="card-body p-4">
+                          <h4 class="card-title">Modulos</h4>
+                          <div>
+                            <div class="d-flex align-items-center justify-content-between mb-4">
+                              <div class="d-flex align-items-center gap-3">
+                                <div class="text-bg-light rounded-1 p-6 d-flex align-items-center justify-content-center">
+                                  <i class="ti ti-article text-dark d-block fs-7" width="22" height="22"></i>
+                                </div>
+                                <div>
+                                  <h5 class="fs-4 fw-semibold">Our newsletter</h5>
+                                  <p class="mb-0">Well always let you know about important changes</p>
+                                </div>
+                              </div>
+                              <div class="form-check form-switch mb-0">
+                                <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckChecked">
+                              </div>
+                            </div>
+                            <div class="d-flex align-items-center justify-content-between mb-4">
+                              <div class="d-flex align-items-center gap-3">
+                                <div class="text-bg-light rounded-1 p-6 d-flex align-items-center justify-content-center">
+                                  <i class="ti ti-checkbox text-dark d-block fs-7" width="22" height="22"></i>
+                                </div>
+                                <div>
+                                  <h5 class="fs-4 fw-semibold">Order Confirmation</h5>
+                                  <p class="mb-0">You will be notified when customer order any product</p>
+                                </div>
+                              </div>
+                              <div class="form-check form-switch mb-0">
+                                <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckChecked1" checked>
+                              </div>
+                            </div>
+                            <div class="d-flex align-items-center justify-content-between mb-4">
+                              <div class="d-flex align-items-center gap-3">
+                                <div class="text-bg-light rounded-1 p-6 d-flex align-items-center justify-content-center">
+                                  <i class="ti ti-clock-hour-4 text-dark d-block fs-7" width="22" height="22"></i>
+                                </div>
+                                <div>
+                                  <h5 class="fs-4 fw-semibold">Order Status Changed</h5>
+                                  <p class="mb-0">You will be notified when customer make changes to the order</p>
+                                </div>
+                              </div>
+                              <div class="form-check form-switch mb-0">
+                                <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckChecked2" checked>
+                              </div>
+                            </div>
+                            <div class="d-flex align-items-center justify-content-between mb-4">
+                              <div class="d-flex align-items-center gap-3">
+                                <div class="text-bg-light rounded-1 p-6 d-flex align-items-center justify-content-center">
+                                  <i class="ti ti-truck-delivery text-dark d-block fs-7" width="22" height="22"></i>
+                                </div>
+                                <div>
+                                  <h5 class="fs-4 fw-semibold">Order Delivered</h5>
+                                  <p class="mb-0">You will be notified once the order is delivered</p>
+                                </div>
+                              </div>
+                              <div class="form-check form-switch mb-0">
+                                <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckChecked3">
+                              </div>
+                            </div>
+                            <div class="d-flex align-items-center justify-content-between">
+                              <div class="d-flex align-items-center gap-3">
+                                <div class="text-bg-light rounded-1 p-6 d-flex align-items-center justify-content-center">
+                                  <i class="ti ti-mail text-dark d-block fs-7" width="22" height="22"></i>
+                                </div>
+                                <div>
+                                  <h5 class="fs-4 fw-semibold">Email Notification</h5>
+                                  <p class="mb-0">Turn on email notificaiton to get updates through email</p>
+                                </div>
+                              </div>
+                              <div class="form-check form-switch mb-0">
+                                <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckChecked4" checked>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-12">
+                      <div class="d-flex align-items-center justify-content-end gap-6">
+                        <button class="btn btn-primary">Save</button>
+                        <button class="btn bg-danger-subtle text-danger">Cancel</button>
+                      </div>
+                    </div>
+                  </div>';
+
+
+        return $tabla;
+    }
+
+    public function conf_form3(){
+        $model_funcionario = new Model_funcionarios();
+        $responsables=$model_funcionario->obtenerFuncionariosActivos();
+        $tabla='<div class="row justify-content-center">
+                    <div class="col-lg-9">
+                      <div class="card border shadow-none">
+                        <div class="card-body p-4">
+                          <h4 class="card-title mb-3">Billing Information</h4>
+                          <form>
+                            <div class="row">
+                              <div class="col-lg-6">
+                                <div class="mb-3">
+                                  <label for="exampleInputtext6" class="form-label">Business
+                                    Name*</label>
+                                  <input type="text" class="form-control" id="exampleInputtext6" placeholder="Visitor Analytics">
+                                </div>
+                                <div class="mb-3">
+                                  <label for="exampleInputtext7" class="form-label">Business
+                                    Address*</label>
+                                  <input type="text" class="form-control" id="exampleInputtext7" placeholder="">
+                                </div>
+                                <div>
+                                  <label for="exampleInputtext8" class="form-label">First Name*</label>
+                                  <input type="text" class="form-control" id="exampleInputtext8" placeholder="">
+                                </div>
+                              </div>
+                              <div class="col-lg-6">
+                                <div class="mb-3">
+                                  <label for="exampleInputtext9" class="form-label">Business
+                                    Sector*</label>
+                                  <input type="text" class="form-control" id="exampleInputtext9" placeholder="Arts, Media & Entertainment">
+                                </div>
+                                <div class="mb-3">
+                                  <label for="exampleInputtext10" class="form-label">Country*</label>
+                                  <input type="text" class="form-control" id="exampleInputtext10" placeholder="Romania">
+                                </div>
+                                <div>
+                                  <label for="exampleInputtext11" class="form-label">Last Name*</label>
+                                  <input type="text" class="form-control" id="exampleInputtext11" placeholder="">
+                                </div>
+                              </div>
+                            </div>
+                          </form>
+                        </div>
+                      </div>
+                    </div>
+                 
+                    <div class="col-12">
+                      <div class="d-flex align-items-center justify-content-end gap-6">
+                        <button class="btn btn-primary">Save</button>
+                        <button class="btn bg-danger-subtle text-danger">Cancel</button>
+                      </div>
+                    </div>
+                  </div>';
+
+
+        return $tabla;
+    }
+
+
+    public function conf_form4(){
+        $model_funcionario = new Model_funcionarios();
+        $responsables=$model_funcionario->obtenerFuncionariosActivos();
+        $tabla='<div class="row">
+                    <div class="col-lg-8">
+                      <div class="card border shadow-none">
+                        <div class="card-body p-4">
+                          <h4 class="card-title mb-3">Two-factor Authentication</h4>
+                          <div class="d-flex align-items-center justify-content-between pb-7">
+                            <p class="card-subtitle mb-0">Lorem ipsum, dolor sit amet consectetur adipisicing elit. Corporis sapiente
+                              sunt earum officiis laboriosam ut.</p>
+                            <button class="btn btn-primary">Enable</button>
+                          </div>
+                          <div class="d-flex align-items-center justify-content-between py-3 border-top">
+                            <div>
+                              <h5 class="fs-4 fw-semibold mb-0">Authentication App</h5>
+                              <p class="mb-0">Google auth app</p>
+                            </div>
+                            <button class="btn bg-primary-subtle text-primary">Setup</button>
+                          </div>
+                          <div class="d-flex align-items-center justify-content-between py-3 border-top">
+                            <div>
+                              <h5 class="fs-4 fw-semibold mb-0">Another e-mail</h5>
+                              <p class="mb-0">E-mail to send verification link</p>
+                            </div>
+                            <button class="btn bg-primary-subtle text-primary">Setup</button>
+                          </div>
+                          <div class="d-flex align-items-center justify-content-between py-3 border-top">
+                            <div>
+                              <h5 class="fs-4 fw-semibold mb-0">SMS Recovery</h5>
+                              <p class="mb-0">Your phone number or something</p>
+                            </div>
+                            <button class="btn bg-primary-subtle text-primary">Setup</button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-lg-4">
+                      <div class="card">
+                        <div class="card-body p-4">
+                          <div class="text-bg-light rounded-1 p-6 d-inline-flex align-items-center justify-content-center mb-3">
+                            <i class="ti ti-device-laptop text-primary d-block fs-7" width="22" height="22"></i>
+                          </div>
+                          <h4 class="card-title mb-0">Devices</h4>
+                          <p class="mb-3">Lorem ipsum dolor sit amet consectetur adipisicing elit Rem.</p>
+                          <button class="btn btn-primary mb-4">Sign out from all devices</button>
+                          <div class="d-flex align-items-center justify-content-between py-3 border-bottom">
+                            <div class="d-flex align-items-center gap-3">
+                              <i class="ti ti-device-mobile text-dark d-block fs-7" width="26" height="26"></i>
+                              <div>
+                                <h5 class="fs-4 fw-semibold mb-0">iPhone 14</h5>
+                                <p class="mb-0">London UK, Oct 23 at 1:15 AM</p>
+                              </div>
+                            </div>
+                            <a class="text-dark fs-6 d-flex align-items-center justify-content-center bg-transparent p-2 fs-4 rounded-circle" href="javascript:void(0)">
+                              <i class="ti ti-dots-vertical"></i>
+                            </a>
+                          </div>
+                          <div class="d-flex align-items-center justify-content-between py-3">
+                            <div class="d-flex align-items-center gap-3">
+                              <i class="ti ti-device-laptop text-dark d-block fs-7" width="26" height="26"></i>
+                              <div>
+                                <h5 class="fs-4 fw-semibold mb-0">Macbook Air</h5>
+                                <p class="mb-0">Gujarat India, Oct 24 at 3:15 AM</p>
+                              </div>
+                            </div>
+                            <a class="text-dark fs-6 d-flex align-items-center justify-content-center bg-transparent p-2 fs-4 rounded-circle" href="javascript:void(0)">
+                              <i class="ti ti-dots-vertical"></i>
+                            </a>
+                          </div>
+                          <button class="btn bg-primary-subtle text-primary w-100 py-1">Need Help ?</button>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-12">
+                      <div class="d-flex align-items-center justify-content-end gap-6">
+                        <button class="btn btn-primary">Save</button>
+                        <button class="btn bg-danger-subtle text-danger">Cancel</button>
+                      </div>
+                    </div>
+                  </div>';
+
+
+        return $tabla;
+    }
+}

@@ -133,7 +133,7 @@ public function get_usuario_responsablePoa($usuario) {
 
 
     /// Gestion Activo
-    public function get_gestion_activo(){
+/*    public function get_gestion_activo(){
         $sql = "SELECT * 
                 FROM configuracion conf
                 Inner Join mes as m On m.m_id=conf.conf_mes
@@ -142,7 +142,7 @@ public function get_usuario_responsablePoa($usuario) {
         $query = $this->query($sql);
         
         return $query->getRowArray();
-    }
+    }*/
 
 
     /// Lista de Unidades Responsables segun el proyecto
@@ -176,7 +176,7 @@ public function get_usuario_responsablePoa($usuario) {
     }
 
     /// Modulos Activos
-    public function modulos($ide,$tp_adm){
+/*    public function modulos($ide,$tp_adm){
         if($tp_adm==1){ /// Nacional
             $sql = "select *
                 from modulo
@@ -191,18 +191,18 @@ public function get_usuario_responsablePoa($usuario) {
         }
         $query = $this->query($sql);
         return $query->getResultArray();
-    }
+    }*/
 
 
     /// Sub Modulos Activos
-    public function sub_modulos($id){
+/*    public function sub_modulos($id){
         $sql = "select *
                 from modulo_menu
                 where mod_id=".$id."
                 order by sub_id asc";
         $query = $this->query($sql);
         return $query->getResultArray();
-    }
+    }*/
 
 
     /// Get Buscando funcionario por su Usuario
@@ -220,7 +220,7 @@ public function get_usuario_responsablePoa($usuario) {
 
 
     /// Datos Regional Distrital
-    public function datos_regional($dist_id){
+/*    public function datos_regional($dist_id){
         $sql = 'select *
                 from _distritales ds
                 Inner Join _departamentos as d On d.dep_id=ds.dep_id
@@ -228,10 +228,10 @@ public function get_usuario_responsablePoa($usuario) {
 
         $query = $this->db->query($sql);
         return $query->getRowArray();
-    }
+    }*/
 
     /// Datos Rol del funcionario
-    public function get_rol_usuario($fun_id){
+/*    public function get_rol_usuario($fun_id){
         $sql = '
         select f.fun_id,f.r_id,f.r_estado,r.r_estado,r.r_nombre
         from fun_rol f
@@ -241,11 +241,11 @@ public function get_usuario_responsablePoa($usuario) {
 
         $query = $this->db->query($sql);
         return $query->getRowArray();
-    }
+    }*/
 
 
     /// Verifica Usuario activo
-    public function verificar_loggin($user_name, $password_plano, $captcha,$dat_captcha){
+/*    public function verificar_loggin($user_name, $password_plano, $captcha,$dat_captcha){
     $data = array(
         'bool'   => false,
         'fun_id' => null,
@@ -298,7 +298,7 @@ public function get_usuario_responsablePoa($usuario) {
         else{
             return $data;
         }
-    }
+    }*/
 
 
 

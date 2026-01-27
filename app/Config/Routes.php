@@ -49,6 +49,10 @@ $routes->post('mnt/add_segpoa', 'CMantenimiento\CResponsables::Add_segpoa'); ///
 $routes->get('mnt/form_update_segpoa/(:num)', 'CMantenimiento\CResponsables::form_update_segpoa/$1'); /// Form Update Responsable-Seguimiento POA
 $routes->post('mnt/update_respspoa', 'CMantenimiento\CResponsables::Update_respspoa'); /// Valida Update Responsable
 
-
 $routes->post('mnt/Pdf_responsables', 'CMantenimiento\CResponsables_Pdf::Pdf_lista_responsables'); /// Pdf Responsables en base64
+
+//// Para firma digital
 $routes->get('mnt/Pdf_responsables_sfirma', 'CMantenimiento\CResponsables_Pdf::Pdf_lista_responsables_para_firmar'); /// Pdf Responsables en base64
+
+//// Mantenimiento - configuracion Sistema
+$routes->get('mnt/ConfiguracionSistema', 'CMantenimiento\CConfiguracion::Menu_configuracion'); /// View Configuracion

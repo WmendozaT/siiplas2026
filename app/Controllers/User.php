@@ -21,15 +21,26 @@ class User extends BaseController{
 
 
     /// index
-    public function index(){
-        $data['formulario']=$this->form_login();
-        if (session()->get('isLoggedIn')) {
-            return redirect()->to(base_url('dashboard'));
-        }
-        
-        helper(['form']);
-        return view('index/login', $data);
+public function index() {
+    // 1. Instanciar el servicio de sesión
+    $session = session(); 
+
+    // 2. Si ya está logueado, redirigir al dashboard
+    if ($session->get('isLoggedIn')) {
+        return redirect()->to(base_url('dashboard'));
     }
+
+    // 3. Cargar helpers y preparar datos
+    helper(['form']);
+    
+    // Si quieres limpiar datos previos pero mantener los mensajes de error,
+    // es mejor no usar destroy() aquí, ya que borraría el mensaje de "Credenciales incorrectas"
+    
+    $data['formulario'] = $this->form_login();
+    
+    // 4. Retornar la vista
+    return view('index/login', $data);
+}
 
 
     //// formulario Login
@@ -115,9 +126,19 @@ class User extends BaseController{
 
                                     <h5 class="text-center fw-bold my-4 titleBienvenido">Bienvenido/a!</h5>';
 
-                                    if(session()->getFlashdata('errors')):
-                                        $tabla.='<div class="alert alert-danger">'.session()->getFlashdata('errors').'</div>';
-                                    endif;
+                                    if (session()->getFlashdata('errors')) {
+                                        $mensaje_error = session()->getFlashdata('errors');
+                                        
+                                        if (is_array($mensaje_error)) {
+                                            $mensaje_error = implode('<br>', $mensaje_error);
+                                        }
+                                        
+                                        // IMPORTANTE: Debes concatenar el resultado a $tabla
+                                        $tabla.= '<div class="alert alert-danger alert-dismissible fade show" role="alert">
+                                                    ' . $mensaje_error . '
+                                                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                                  </div>';
+                                    }
 
                                     $tabla.='
                                     <div class="row align-items-center">
@@ -217,16 +238,10 @@ class User extends BaseController{
         $tp = $this->request->getPost('tp');
         $captcha = $this->request->getPost('captcha');
         $dat_captcha = $this->request->getPost('dat_captcha');
-
-/*        if($tp==0){ /// Administracion
-
-        }
-        else{ /// Establecimiento de salud
-
-        }*/
-
-        $is_valid = $model_index->verificar_loggin($usuario, $password, $captcha,$dat_captcha);
-        if($is_valid['bool']==true){
+        $is_valid = $model_index->verificar_loggin($usuario, $password, $captcha, $dat_captcha);
+        $conf = $model_index->get_gestion_activo(); /// configuracion gestion activo
+//echo $is_valid['data']['fun_nombre'].' '.$is_valid['data']['fun_paterno'].' '.$is_valid['data']['fun_materno'].' -- '.$is_valid['data']['fun_cargo'].' -- '.$conf['conf_abrev_sistema'].' -- '.$conf['conf_img'];
+         if($is_valid['bool']==true){
             $conf = $model_index->get_gestion_activo(); /// configuracion gestion activo
             $modulos = $model_index->modulos($conf['ide'],$is_valid['data']['tp_adm']); /// modulos
             $view_modulos=$this->Modulos_disponibles($modulos); /// vista modulos Cabecera
@@ -258,12 +273,81 @@ class User extends BaseController{
 
             // 2. Redirigir al usuario a una página protegida (ej. dashboard)
             return redirect()->to(base_url('dashboard')); 
+           // return redirect()->to('dashboard'); 
         }
         else{
-            return redirect()->to(base_url('login'))->with('errors', $is_valid['message']);
+            //$session->destroy(); 
+            return redirect()->to(base_url('login'))->with('errors', $is_valid['message'] ?? 'Error de acceso contactarse con el Administrador.');
         }
-      
+
     }
+
+//     public function loginAction2(){
+//         $session = session();
+//         $model_index = new IndexModel();
+
+//         $rules = [
+//             'user_name' => 'required|min_length[3]|max_length[20]', // Ajusta longitudes
+//             'password' => 'required|min_length[5]|max_length[20]', // Ajusta longitudes
+//         ];
+        
+//         // 2. Ejecutar la validación básica
+//         if (!$this->validate($rules)) {
+//             return redirect()->back()->withInput()->with('errors', $this->validator->getErrors());
+//         }
+
+//         $usuario = $this->request->getPost('user_name');
+//         $password = $this->request->getPost('password');
+//         $tp = $this->request->getPost('tp');
+//         $captcha = $this->request->getPost('captcha');
+//         $dat_captcha = $this->request->getPost('dat_captcha');
+
+// /*        if($tp==0){ /// Administracion
+
+//         }
+//         else{ /// Establecimiento de salud
+
+//         }*/
+
+//         $is_valid = $model_index->verificar_loggin($usuario, $password, $captcha,$dat_captcha);
+//         if($is_valid['bool']==true){
+//             $conf = $model_index->get_gestion_activo(); /// configuracion gestion activo
+//             $modulos = $model_index->modulos($conf['ide'],$is_valid['data']['tp_adm']); /// modulos
+//             $view_modulos=$this->Modulos_disponibles($modulos); /// vista modulos Cabecera
+//             $view_modulos_Sidebar=$this->Modulos_disponibles_Sidebar($modulos,$is_valid['data']['fun_nombre'].' '.$is_valid['data']['fun_paterno'].' '.$is_valid['data']['fun_materno'],$is_valid['data']['fun_cargo'],$conf['conf_abrev_sistema']); /// vista modulos Cabecera Sidebar
+//             $userData = [
+//             'fun_id'    => $is_valid['data']['fun_id'], // Asegúrate de que tu modelo devuelve 'id'
+//             'user_name'   => $is_valid['data']['fun_nombre'].' '.$is_valid['data']['fun_paterno'].' '.$is_valid['data']['fun_materno'],
+//             'usuario'   => $is_valid['data']['fun_usuario'],
+//             'cargo'   => $is_valid['data']['fun_cargo'],
+//             'credencial_funcionario'   => $is_valid['data']['sw_pass'],
+//             'fun_estado'   => $is_valid['data']['fun_estado'],
+//             'com_id'   => $is_valid['data']['cm_id'],
+//             'dist_id'   => $is_valid['data']['fun_dist'],
+//             'tp_adm'   => $is_valid['data']['tp_adm'],
+//             'rol'   => $model_index->get_rol_usuario($is_valid['data']['fun_id']),
+//             'configuracion'   => $conf,
+//             'modulos'   => $modulos,
+//             'view_modulos'   => $view_modulos,
+//             'view_modulos_sidebar'   => $view_modulos_Sidebar,
+//             'view_cabecera'   => $this->Cabecera_sistema($is_valid['data']['fun_nombre'].' '.$is_valid['data']['fun_paterno'].' '.$is_valid['data']['fun_materno'],$is_valid['data']['fun_cargo'],$conf['conf_abrev_sistema'],$conf['conf_img']),
+//             'view_cabecera_layout'   => $this->Cabecera_sistema_layout($is_valid['data']['fun_nombre'].' '.$is_valid['data']['fun_paterno'].' '.$is_valid['data']['fun_materno'],$is_valid['data']['fun_cargo'],$conf['conf_abrev_sistema'],$conf['conf_img']),
+//             'view_menu_izquierdo'   => $this->Menu_izquierdo(), /// menu izquierdo
+//             'view_bienvenida'   => $this->bienvenida($conf['conf_abrev_sistema'],$conf['conf_unidad_resp']), /// bienvenida
+//             'regional'   => $model_index->datos_regional($is_valid['data']['fun_dist']),
+            
+//             'isLoggedIn' => TRUE, // Bandera clave para tus filtros de acceso
+//             ];
+//             $session->set($userData); // Guarda la sesión
+
+//             // 2. Redirigir al usuario a una página protegida (ej. dashboard)
+//             return redirect()->to(base_url('dashboard')); 
+//         }
+//         else{
+//             return redirect()->to(base_url('login'))->with('errors', $is_valid['message']);
+//         }
+      
+//     }
 
     /// Bienvenida
     public function bienvenida($sistema,$unidad_responsable){

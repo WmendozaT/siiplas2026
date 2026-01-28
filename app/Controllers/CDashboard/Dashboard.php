@@ -30,15 +30,17 @@ class Dashboard extends BaseController{
 
 
     /// Dasboard Administrador
-    public function dashboard_admin(){
-
-
-        $data['boton']='<a href="'.base_url().'logout" class="boton-login">
-                    Ir a Inicio de Sesión
-                </a>';
-
-        return view('View_dashboard/viewdashboard_poa',$data);
-    }
+public function dashboard_admin(){
+    // 1. Verificación forzada: Si NO existe la bandera o es falsa, destruir y mandar al login
+   /* if (!session()->get('isLoggedIn')) {
+        session()->destroy(); // Limpia cualquier residuo de sesión corrupta
+        return redirect()->to(base_url('login'))->with('errors', 'Debes iniciar sesión.');
+    }*/
+session()->destroy();
+    // 2. Si pasa la validación, carga el contenido
+    $data['boton'] = '<a href="'.base_url().'logout" class="boton-login">Cerrar Sesión</a>';
+    return view('View_dashboard/viewdashboard_poa', $data);
+}
 }
 
 

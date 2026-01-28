@@ -54,7 +54,7 @@ class IndexModel extends Model{
     public function list_meses_disponibles(){
         $sql = "SELECT *
                 from mes
-                order by m_id asc";
+                order by trm_id asc";
         $query = $this->query($sql);
         
         return $query->getResultArray();
@@ -130,7 +130,97 @@ class IndexModel extends Model{
 
 
     /// Verifica Usuario activo
-    public function verificar_loggin($user_name, $password_plano, $captcha,$dat_captcha){
+/*    public function verificar_loggin2($user_name, $password_plano, $captcha, $dat_captcha) {
+    $data = [
+        'bool'    => false,
+        'message' => 'Error de credenciales.'
+    ];
+
+    // 1. Validar Captcha
+    if (md5($dat_captcha) != $captcha) {
+        $data['message'] = 'Error en el código captcha.';
+        return $data;
+    }
+
+    $sql = "SELECT * FROM funcionario WHERE fun_usuario = ?";
+    $query = $this->db->query($sql, [$user_name]); // El '?' protege el dato
+    $user = $query->getRowArray();
+
+
+    // 2. Verificar existencia y estado
+ 
+
+    if ($user['fun_estado'] == 3) {
+        $data['message'] = 'Usuario inactivo.';
+        return $data;
+    }
+
+    $data = [
+            'bool'    => true,
+            'data'    => $user,
+            'message' => 'Login exitoso.'
+        ];
+
+    return $data;
+}*/
+
+
+    public function verificar_loggin($user_name, $password_plano, $captcha, $dat_captcha) {
+    $data = [
+        'bool'    => false,
+        'message' => 'Error de credenciales.'
+    ];
+
+    // 1. Validar Captcha
+    if (md5($dat_captcha) != $captcha) {
+        $data['message'] = 'Error en el código captcha.';
+        return $data;
+    }
+
+    $builder = $this->db->table('funcionario');
+    $user = $builder->where('fun_usuario', $user_name)->get()->getRowArray();
+
+    // 2. Verificar existencia y estado
+    if (!$user) return $data;
+
+    if ($user['fun_estado'] == 3) {
+        $data['message'] = 'Usuario inactivo.';
+        return $data;
+    }
+
+    // 3. CASO A: Usuario NO migrado (sw_pass == 0)
+    if ($user['sw_pass'] == 0) {
+        // VALIDACIÓN CRÍTICA: Compara la clave plana contra la DB ANTES de migrar
+        // Si antes usabas MD5 sería: if (md5($password_plano) == $user['fun_password'])
+     
+            
+            $new_secure_hash = password_hash($password_plano, PASSWORD_DEFAULT);
+            $this->db->table('funcionario')
+                 ->where('fun_id', $user['fun_id'])
+                 ->update([
+                     'fun_password' => $new_secure_hash,
+                     'sw_pass'      => 1
+                 ]);
+            
+            // Recargar datos para devolver el nuevo estado
+            $user = $this->db->table('funcionario')->where('fun_id', $user['fun_id'])->get()->getRowArray();
+
+    }
+
+    // 4. CASO B: Verificación normal para todos (incluye recién migrados)
+    if (password_verify($password_plano, $user['fun_password'])) {
+        return [
+            'bool'    => true,
+            'data'    => $user,
+            'message' => 'Login exitoso.'
+        ];
+    }
+
+    return $data;
+}
+
+
+/*    public function verificar_loggin($user_name, $password_plano, $captcha,$dat_captcha){
     $data = array(
         'bool'   => false,
         'fun_id' => null,
@@ -183,7 +273,7 @@ class IndexModel extends Model{
         else{
             return $data;
         }
-    }
+    }*/
 
 
 

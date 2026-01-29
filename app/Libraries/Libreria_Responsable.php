@@ -435,7 +435,6 @@ class Libreria_Responsable{
                                   </button>
                                   <a href="'.base_url('mnt/responsables').'" class="btn bg-danger-subtle text-danger">Cancelar</a>
                                 </div>
-
                               </div>
                             </div>
                           </form>

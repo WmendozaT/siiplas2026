@@ -42,7 +42,7 @@ class CConfiguracion extends BaseController{
     /// Vista Configuracion sistema POA
     public function Menu_configuracion(){
         $miLib_conf = new Libreria_Configuracion();
-        $model_funcionario = new Model_funcionarios();
+        //$model_funcionario = new Model_funcionarios();
         $data['formulario']='    
           <!--  Header End -->
           <div class="mb-3 overflow-hidden position-relative">
@@ -85,7 +85,7 @@ class CConfiguracion extends BaseController{
                 </div>
 
                 <div class="tab-pane fade" id="pills-notifications" role="tabpanel" aria-labelledby="pills-notifications-tab" tabindex="0">
-                  DOS
+                  '.$miLib_conf->conf_form2().'
                 </div>
 
 
@@ -104,6 +104,92 @@ class CConfiguracion extends BaseController{
         //$data['formulario']=$miLib_resp->responsables_poa(); /// lista de responsables (Libreria Responsable)
         return view('View_mantenimiento/View_configuracion/view_configuracion',$data);
     }
+
+
+/// Valida Form Update Configuracion
+  public function Update_configuracion() {
+    $db = \Config\Database::connect(); 
+    $session = session(); // Necesario para romper la sesión
+
+    try {
+        $id_actual = $this->request->getPost('ide');
+        $id_nuevo_seleccionado = $this->request->getPost('g_id');
+        $eval_inicio = $this->request->getPost('eval_inicio');
+        $eval_fin    = $this->request->getPost('eval_fin');
+
+        if (!$id_actual) {
+            throw new \Exception("ID de configuración actual no proporcionado.");
+        }
+
+        // 1. Preparar datos (Asegúrate que los names en el HTML coincidan)
+        $data = [
+            'conf_nombre_entidad' => strtoupper(trim($this->request->getPost('NombreEntidad'))),
+            'conf_sigla_entidad'  => strtoupper(trim($this->request->getPost('SiglaEntidad'))),
+            'conf_mision'         => strtoupper(trim($this->request->getPost('MisionEntidad'))),
+            'conf_vision'         => strtoupper(trim($this->request->getPost('VisionEntidad'))),
+            'conf_mes_otro'       => $this->request->getPost('trm_id'),
+            'conf_mes'            => $this->request->getPost('conf_mes'),
+            'conf_gestion_desde'  => $this->request->getPost('conf_gestion_desde'),
+            'conf_gestion_hasta'  => $this->request->getPost('conf_gestion_hasta'),
+            'conf_ajuste_poa'     => $this->request->getPost('conf_ajuste_poa'),
+            'tp_msn'              => $this->request->getPost('tp_msn'),
+            'conf_mensaje'        => trim($this->request->getPost('conf_mensaje')),
+            'eval_inicio' => (!empty($eval_inicio)) ? $eval_inicio : null,
+            'eval_fin'    => (!empty($eval_fin))    ? $eval_fin    : null,
+            'rd_aprobacion_poa'   => trim($this->request->getPost('rd_aprobacion_poa')),
+            'conf_abrev_sistema'  => trim($this->request->getPost('conf_abrev_sistema')),
+            'conf_unidad_resp'    => strtoupper(trim($this->request->getPost('conf_unidad_resp'))),
+            'conf_sis_pie'        => trim($this->request->getPost('conf_sis_pie')),
+        ];
+
+        // 2. Actualizar la configuración actual
+        $db->table('configuracion')->where('ide', $id_actual)->update($data);
+
+        // 3. Lógica de Cambio de Gestión Activa
+        if ($id_actual != $id_nuevo_seleccionado) {
+            // Desactivar la anterior
+            $db->table('configuracion')->where('ide', $id_actual)->update(['conf_estado' => 0]);
+            
+            // Activar la nueva
+            $db->table('configuracion')->where('ide', $id_nuevo_seleccionado)->update(['conf_estado' => 1]);
+
+            // --- ROMPER SESIÓN Y REDIRIGIR ---
+            $session->destroy();
+            return redirect()->to(base_url('login'))
+                             ->with('error', 'Gestión cambiada. Por favor, inicie sesión nuevamente.');
+        } 
+        
+        return redirect()->to(base_url('mnt/ConfiguracionSistema'))
+                         ->with('success', 'Configuración actualizada correctamente.');
+
+    } catch (\Exception $e) {
+        log_message('error', 'Error en Update_configuracion: ' . $e->getMessage());
+        return redirect()->back()->withInput()->with('error', 'Error: ' . $e->getMessage());
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
     /// Vista Lista Reponsables-Seguimiento POA

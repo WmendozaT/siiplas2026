@@ -63,15 +63,16 @@ class IndexModel extends Model{
     /// Modulos Activos
     public function modulos($ide,$tp_adm){
         if($tp_adm==1){ /// Nacional
-            $sql = "select *
+            $sql = "SELECT *
                 from modulos_sistema
+                where modulo_estado=1
                 order by modulo_id asc";
         }
         else{ /// regional / distrital
-            $sql = "select * 
+            $sql = "SELECT * 
                 from confi_modulo conf
-                Inner Join modulos_sistema as mod On mod.modulo_id=conf.mod_id
-                WHERE conf.ide = ".$ide."
+                Inner Join modulos_sistema as modu On modu.modulo_id=conf.mod_id
+                where ide=".$ide." and modu.modulo_estado=1
                 order by conf.mod_id asc";
         }
         $query = $this->query($sql);
@@ -81,9 +82,9 @@ class IndexModel extends Model{
 
     /// Sub Modulos Activos
     public function sub_modulos($id){
-        $sql = "select *
+        $sql = "SELECT *
                 from modulo_menu
-                where mod_id=".$id."
+                where mod_id=".$id." and sub_menu_estado=1
                 order by sub_id asc";
         $query = $this->query($sql);
         return $query->getResultArray();
@@ -93,7 +94,7 @@ class IndexModel extends Model{
     /// Get Buscando funcionario por su Usuario
     public function fun_usuario($usuario){
         // Usando el Query Builder de CI4 para una consulta segura
-            $sql = 'select *
+            $sql = 'SELECT *
                 from funcionario
                 where fun_usuario=\''.$usuario.'\' and fun_estado!=3';
 
@@ -106,7 +107,7 @@ class IndexModel extends Model{
 
     /// Datos Regional Distrital
     public function datos_regional($dist_id){
-        $sql = 'select *
+        $sql = 'SELECT *
                 from _distritales ds
                 Inner Join _departamentos as d On d.dep_id=ds.dep_id
                 where ds.dist_id='.$dist_id.'';
@@ -118,7 +119,7 @@ class IndexModel extends Model{
     /// Datos Rol del funcionario
     public function get_rol_usuario($fun_id){
         $sql = '
-        select f.fun_id,f.r_id,f.r_estado,r.r_estado,r.r_nombre
+        SELECT f.fun_id,f.r_id,f.r_estado,r.r_estado,r.r_nombre
         from fun_rol f
         Inner Join rol as r On r.r_id=f.r_id
         where f.fun_id='.$fun_id.'
@@ -129,42 +130,7 @@ class IndexModel extends Model{
     }
 
 
-    /// Verifica Usuario activo
-/*    public function verificar_loggin2($user_name, $password_plano, $captcha, $dat_captcha) {
-    $data = [
-        'bool'    => false,
-        'message' => 'Error de credenciales.'
-    ];
-
-    // 1. Validar Captcha
-    if (md5($dat_captcha) != $captcha) {
-        $data['message'] = 'Error en el código captcha.';
-        return $data;
-    }
-
-    $sql = "SELECT * FROM funcionario WHERE fun_usuario = ?";
-    $query = $this->db->query($sql, [$user_name]); // El '?' protege el dato
-    $user = $query->getRowArray();
-
-
-    // 2. Verificar existencia y estado
- 
-
-    if ($user['fun_estado'] == 3) {
-        $data['message'] = 'Usuario inactivo.';
-        return $data;
-    }
-
-    $data = [
-            'bool'    => true,
-            'data'    => $user,
-            'message' => 'Login exitoso.'
-        ];
-
-    return $data;
-}*/
-
-
+    /// Verificar Login
     public function verificar_loggin($user_name, $password_plano, $captcha, $dat_captcha) {
     $data = [
         'bool'    => false,
@@ -218,64 +184,6 @@ class IndexModel extends Model{
 
     return $data;
 }
-
-
-/*    public function verificar_loggin($user_name, $password_plano, $captcha,$dat_captcha){
-    $data = array(
-        'bool'   => false,
-        'fun_id' => null,
-        'data'   => null,
-        'message'=> 'Error de credenciales.'
-    );
-
-    $builder = $this->db->table('funcionario');
-    $user = $builder->where('fun_usuario', $user_name)->get()->getRowArray();
-
-        // 3. Verificar si el usuario existe
-        if (!$user) {
-            return $data;
-        }
-
-        if(md5($dat_captcha)!=$captcha){
-            $data['message'] = 'Error en el código.';
-            return $data; // Sale de la función, el bool sigue siendo false
-        }
-
-        if ($user['fun_estado'] == 3) {
-            $data['message'] = 'Usuario inactivo.';
-            return $data; // Sale de la función, el bool sigue siendo false
-        }
-
-        if($user['sw_pass']==0){
-            // ---  MIGRAR A UN HASH SEGURO INMEDIATAMENTE (password_hash) ---
-            $new_secure_hash = password_hash($password_plano, PASSWORD_DEFAULT); // Usa bcrypt/argon2
-            // Actualizar la base de datos con el nuevo hash seguro y marcar como migrado
-            $builder->where('fun_id', $user['fun_id'])
-                    ->update([
-                        'fun_password' => $new_secure_hash,
-                        'sw_pass'      => 1
-                    ]);
-        }
-
-        $builder = $this->db->table('funcionario');
-        $user = $builder->where('fun_usuario', $user_name)->get()->getRowArray();
-
-     //   5. Verificar la contraseña usando password_verify()
-        if (password_verify($password_plano, $user['fun_password'])) {
-            // --- Contraseña correcta: Preparar respuesta de éxito ---
-            $data['bool']   = true;
-            $data['fun_id'] = $user['fun_id'];
-            $data['data']   = $user;
-            $data['message'] = 'Login exitoso.';
-
-            return $data;
-        }
-        else{
-            return $data;
-        }
-    }*/
-
-
 
 
 

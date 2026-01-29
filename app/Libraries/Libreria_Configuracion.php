@@ -12,6 +12,15 @@ use App\Models\Model_Mantenimiento\Model_configuracion;
 
 
 class Libreria_Configuracion{
+    protected $session;
+    protected $db;
+
+    public function __construct() {
+        // Inicializamos el servicio de sesión
+        $this->session = \Config\Services::session();
+        // Si necesitas base de datos también:
+        $this->db = \Config\Database::connect();
+    }
 
     //// Conf Entidad
     public function conf_form1(){
@@ -20,39 +29,58 @@ class Libreria_Configuracion{
         $gestiones=$model_index->list_gestiones_disponibles(); /// list Gestiones
         $trimestre=$model_index->list_trimestre_disponibles(); /// list Trimestres
         $meses=$model_index->list_meses_disponibles(); /// list Meses
-
+        $eval_inicio = (!empty($conf['eval_inicio'])) ? date('Y-m-d', strtotime($conf['eval_inicio'])) : '';
+        $eval_fin = (!empty($conf['eval_fin'])) ? date('Y-m-d', strtotime($conf['eval_fin'])) : '';
        // $responsables=$model_funcionario->obtenerFuncionariosActivos();
         $tabla='';
         $tabla.='<div class="row">
                     <div class="col-12">
                       <div class="card w-100 border position-relative overflow-hidden mb-0">
                         <div class="card-body p-4">
-                          <h4 class="card-title">Datos Entidad</h4>
-                          <form>
+                          <h4 class="card-title">Datos Entidad</h4>';
+                          if (session()->getFlashdata('success')) {
+                              $tabla .= '
+                              <div class="alert alert-success alert-dismissible fade show" role="alert">
+                                  <i class="ti ti-check fs-4 me-2"></i> ' . session()->getFlashdata('success') . '
+                                  <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                              </div>';
+                          }
+
+                          if (session()->getFlashdata('error')) {
+                              $tabla .= '
+                              <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                                  <i class="ti ti-alert-circle fs-4 me-2"></i> ' . session()->getFlashdata('error') . '
+                                  <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                              </div>';
+                          }
+                          $tabla.='
+                          <input name="base" type="hidden" value="'.base_url().'">
+                          <form role="form" action="'.base_url('mnt/update_conf').'" method="post" id="form_conf" class="login-form">
+                          <input name="ide" id="ide" type="hidden" value="'.$conf['ide'].'">
                             <div class="row">
                               <div class="col-lg-3">
                                 <div class="mb-3">
                                   <label for="NombreEntidad" class="form-label">Nombre de la Entidad</label>
-                                  <input type="text" class="form-control" id="NombreEntidad" value="'.$conf['conf_nombre_entidad'].'">
+                                  <input type="text" class="form-control" name="NombreEntidad" id="NombreEntidad" value="'.$conf['conf_nombre_entidad'].'">
                                 </div>
                                 <div class="mb-3">
                                   <label for="SiglaEntidad" class="form-label">Sigla Entidad</label>
-                                  <input type="text" class="form-control" id="SiglaEntidad" value="'.$conf['conf_sigla_entidad'].'">
+                                  <input type="text" class="form-control" name="SiglaEntidad" id="SiglaEntidad" value="'.$conf['conf_sigla_entidad'].'">
                                 </div>
                                 <div class="mb-3">
                                   <label for="MisionEntidad" class="form-label">Misión Institucional</label>
-                                  <textarea type="text" class="form-control" id="MisionEntidad" style="height:150px;">'.$conf['conf_mision'].'</textarea>
+                                  <textarea type="text" class="form-control" name="MisionEntidad" id="MisionEntidad" style="height:150px;">'.$conf['conf_mision'].'</textarea>
                                 </div>
                                 <div class="mb-3">
                                   <label for="VisionEntidad" class="form-label">Visión Institucional</label>
-                                  <textarea type="text" class="form-control" id="VisionEntidad" style="height:150px;">'.$conf['conf_vision'].'</textarea>
+                                  <textarea type="text" class="form-control" name="VisionEntidad" id="VisionEntidad" style="height:150px;">'.$conf['conf_vision'].'</textarea>
                                 </div>
                               </div>
 
                               <div class="col-lg-3">
                                 <div class="mb-3">
                                   <label class="form-label">Gestión</label>
-                                  <select class="form-select" aria-label="Default select example" id="g_id">';
+                                  <select class="form-select" aria-label="Default select example" name="g_id" id="g_id">';
                                     foreach ($gestiones as $row) {
                                       $selected = ($conf['ide'] == $row['ide']) ? 'selected' : '';
                                       $tabla .= '<option value="'.$row['ide'].'" '.$selected.'>'.$row['conf_gestion'].'</option>';
@@ -62,7 +90,7 @@ class Libreria_Configuracion{
                                 </div>
                                 <div class="mb-3">
                                   <label class="form-label">Trimestre</label>
-                                  <select class="form-select" aria-label="Default select example" id="trm_id">';
+                                  <select class="form-select" aria-label="Default select example" name="trm_id" id="trm_id">';
                                     foreach ($trimestre as $row) {
                                       $selected = ($conf['conf_mes_otro'] == $row['trm_id']) ? 'selected' : '';
                                       $tabla .= '<option value="'.$row['trm_id'].'" '.$selected.'>'.$row['trm_descripcion'].'</option>';
@@ -162,6 +190,14 @@ class Libreria_Configuracion{
                                   <label for="conf_mensaje" class="form-label">Mensaje</label>
                                   <textarea type="text" class="form-control" name="conf_mensaje" id="conf_mensaje" >'.$conf['conf_mensaje'].'</textarea>
                                 </div>
+                                <div class="mb-3">
+                                  <label for="EvalIni" class="form-label">Fecha Evaluación Inicial</label>
+                                  <input type="date" name="eval_inicio" class="form-control" name="EvalIni" id="EvalIni" value="'.$eval_inicio.'"/>
+                                </div>
+                                <div class="mb-3">
+                                  <label for="EvalFin" class="form-label">Fecha Evaluación Final</label>
+                                  <input type="date" name="eval_fin" class="form-control" name="EvalFin" id="EvalFin" value="'.$eval_fin.'"/>
+                                </div>
                               </div>
 
                               <div class="col-lg-3">
@@ -172,7 +208,7 @@ class Libreria_Configuracion{
                                 
                                 <div class="mb-3">
                                   <label for="rd_abrev_sistema" class="form-label">Abrev. Sistema</label>
-                                  <input type="text" class="form-control" name="rd_abrev_sistema" id="rd_abrev_sistema" value="'.$conf['conf_abrev_sistema'].'">
+                                  <input type="text" class="form-control" name="conf_abrev_sistema" id="conf_abrev_sistema" value="'.$conf['conf_abrev_sistema'].'">
                                 </div>
                                 <div class="mb-3">
                                   <label for="conf_unidad_resp" class="form-label">Unidad Responsable</label>
@@ -186,101 +222,55 @@ class Libreria_Configuracion{
 
                               <div class="col-12">
                                 <div class="d-flex align-items-center justify-content-end mt-4 gap-6">
-                                  <button class="btn btn-primary">Save</button>
-                                  <button class="btn bg-danger-subtle text-danger">Cancel</button>
+                                  <button type="submit" id="btnGuardar" class="btn btn-primary">
+                                    <span id="textGuardar">Guardar Información</span>
+                                    <span id="spinnerGuardar" class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
+                                  </button>
+                                  <a href="'.base_url('dashboard').'" class="btn bg-danger-subtle text-danger">Cancelar</a>
                                 </div>
                               </div>
+
                             </div>
                           </form>
                         </div>
                       </div>
                     </div>
                   </div>';
-
-
         return $tabla;
     }
 
-
+    //// Conf Modulo
     public function conf_form2(){
-        $model_funcionario = new Model_funcionarios();
-        $responsables=$model_funcionario->obtenerFuncionariosActivos();
-        $tabla='<div class="row justify-content-center">
+        //$model_index = new IndexModel();
+        $modulos=$this->session->get('modulos'); 
+        //$responsables=$model_funcionario->obtenerFuncionariosActivos();
+        $tabla='';
+        $tabla.='<div class="row justify-content-center">
                     <div class="col-lg-9">
                       <div class="card border shadow-none">
                         <div class="card-body p-4">
-                          <h4 class="card-title">Modulos</h4>
-                          <div>
+                          <h4 class="card-title">Modulos Disponibles</h4>
+                          <hr>
+                          <div>';
+                          foreach ($modulos as $row) {
+                            $tabla.='
                             <div class="d-flex align-items-center justify-content-between mb-4">
                               <div class="d-flex align-items-center gap-3">
                                 <div class="text-bg-light rounded-1 p-6 d-flex align-items-center justify-content-center">
                                   <i class="ti ti-article text-dark d-block fs-7" width="22" height="22"></i>
                                 </div>
                                 <div>
-                                  <h5 class="fs-4 fw-semibold">Our newsletter</h5>
+                                  <h5 class="fs-4 fw-semibold">'.mb_strtoupper($row['modulo_descripcion']).'</h5>
                                   <p class="mb-0">Well always let you know about important changes</p>
                                 </div>
                               </div>
                               <div class="form-check form-switch mb-0">
                                 <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckChecked">
                               </div>
-                            </div>
-                            <div class="d-flex align-items-center justify-content-between mb-4">
-                              <div class="d-flex align-items-center gap-3">
-                                <div class="text-bg-light rounded-1 p-6 d-flex align-items-center justify-content-center">
-                                  <i class="ti ti-checkbox text-dark d-block fs-7" width="22" height="22"></i>
-                                </div>
-                                <div>
-                                  <h5 class="fs-4 fw-semibold">Order Confirmation</h5>
-                                  <p class="mb-0">You will be notified when customer order any product</p>
-                                </div>
-                              </div>
-                              <div class="form-check form-switch mb-0">
-                                <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckChecked1" checked>
-                              </div>
-                            </div>
-                            <div class="d-flex align-items-center justify-content-between mb-4">
-                              <div class="d-flex align-items-center gap-3">
-                                <div class="text-bg-light rounded-1 p-6 d-flex align-items-center justify-content-center">
-                                  <i class="ti ti-clock-hour-4 text-dark d-block fs-7" width="22" height="22"></i>
-                                </div>
-                                <div>
-                                  <h5 class="fs-4 fw-semibold">Order Status Changed</h5>
-                                  <p class="mb-0">You will be notified when customer make changes to the order</p>
-                                </div>
-                              </div>
-                              <div class="form-check form-switch mb-0">
-                                <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckChecked2" checked>
-                              </div>
-                            </div>
-                            <div class="d-flex align-items-center justify-content-between mb-4">
-                              <div class="d-flex align-items-center gap-3">
-                                <div class="text-bg-light rounded-1 p-6 d-flex align-items-center justify-content-center">
-                                  <i class="ti ti-truck-delivery text-dark d-block fs-7" width="22" height="22"></i>
-                                </div>
-                                <div>
-                                  <h5 class="fs-4 fw-semibold">Order Delivered</h5>
-                                  <p class="mb-0">You will be notified once the order is delivered</p>
-                                </div>
-                              </div>
-                              <div class="form-check form-switch mb-0">
-                                <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckChecked3">
-                              </div>
-                            </div>
-                            <div class="d-flex align-items-center justify-content-between">
-                              <div class="d-flex align-items-center gap-3">
-                                <div class="text-bg-light rounded-1 p-6 d-flex align-items-center justify-content-center">
-                                  <i class="ti ti-mail text-dark d-block fs-7" width="22" height="22"></i>
-                                </div>
-                                <div>
-                                  <h5 class="fs-4 fw-semibold">Email Notification</h5>
-                                  <p class="mb-0">Turn on email notificaiton to get updates through email</p>
-                                </div>
-                              </div>
-                              <div class="form-check form-switch mb-0">
-                                <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckChecked4" checked>
-                              </div>
-                            </div>
+                            </div>';
+                          }
+                          $tabla.='
+                            
                           </div>
                         </div>
                       </div>

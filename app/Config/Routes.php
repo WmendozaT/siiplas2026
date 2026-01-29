@@ -59,3 +59,4 @@ $routes->get('mnt/Pdf_responsables_sfirma', 'CMantenimiento\CResponsables_Pdf::P
 
 //// Mantenimiento - configuracion Sistema
 $routes->get('mnt/ConfiguracionSistema', 'CMantenimiento\CConfiguracion::Menu_configuracion'); /// View Configuracion
+$routes->post('mnt/update_conf', 'CMantenimiento\CConfiguracion::Update_configuracion'); /// Valida Update Responsable

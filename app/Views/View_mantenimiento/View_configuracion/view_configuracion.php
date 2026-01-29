@@ -42,6 +42,7 @@
     </div>
     <div class="dark-transparent sidebartoggler"></div>
   </div>
+
   <script src="<?= base_url('Js/PlantillaJs/vendor.min.js') ?>"></script>
   <!-- Import Js Files -->
   <script src="<?= base_url('Js/PlantillaJs/bootstrap.bundle.min.js') ?>"></script>
@@ -56,7 +57,7 @@
   <!-- highlight.js (code view) -->
   <script src="<?= base_url('Js/PlantillaJs/highlight.min.js') ?>"></script>
   <script src="<?= base_url('Js/PlantillaJs/apexcharts.min.js') ?>"></script>
-  <script src="<?= base_url('Js/PlantillaJs/dashboard.js') ?>"></script>
+  <script src=<?= base_url('Js/Mantenimiento/JsConfiguracion.js') ?>></script>
 </body>
 
 </html>

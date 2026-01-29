@@ -376,6 +376,53 @@ document.getElementById('btnExportar').addEventListener('click', function(e) {
 });
 
 
+
+$(document).on('change', '.btn-switch-update', function() {
+    const $input = $(this);
+    
+    // Recuperamos los nombres y valores desde los meta tags
+    const csrfName = $('meta[name="csrf-token-name"]').attr('content');
+    const csrfHash = $('meta[name="csrf-token-value"]').attr('content');
+
+    const dataPost = {
+        id: $input.data('id'),
+        columna: $input.data('columna'),
+        valor: $input.is(':checked') ? 1 : 0
+    };
+
+    // Añadimos el token dinámicamente al objeto de datos
+    dataPost[csrfName] = csrfHash;
+
+    $.ajax({
+        url: base + "mnt/update_permisos_responsable",
+        type: 'POST',
+        data: dataPost,
+        dataType: 'json',
+        success: function(response) {
+            // IMPORTANTE: Si CI4 regenera el token, debemos actualizar el meta tag
+            if (response.token) {
+                //alert(response.token)
+                $('meta[name="csrf-token-value"]').attr('content', response.token);
+            }
+
+            if (response.status !== 'success') {
+                alert('Error: ' + response.message);
+                $input.prop('checked', !$input.is(':checked'));
+            }
+        },
+        error: function() {
+            alert('Error de comunicación con el servidor');
+            $input.prop('checked', !$input.is(':checked'));
+        }
+    });
+});
+
+
+
+
+
+
+
 ////// SEGUIMIENTO POA
 //// select Apertura programatica a traves de la regional
   $(document).ready(function() {

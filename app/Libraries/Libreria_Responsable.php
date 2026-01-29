@@ -82,8 +82,14 @@ class Libreria_Responsable{
                           <th>REPONSABLE POA</th>
                           <th>UNIDAD DEPENDIENTE</th>
                           <th>USUARIO</th>
-                          <th>ADMINISTRACIÓN</th>
                           <th>DISTRITAL</th>
+                          <th>ADMIN</th>
+                          <th>MOD. FORM4.</th>
+                          <th>MOD. FORM5.</th>
+                          <th>MOD. PPTO.</th>
+                          <th>CERT. POA</th>
+                          <th>EVAL. POA.</th>
+                          <th>PASS.</th>
                           <th></th>
                           <th></th>
                         </tr>
@@ -91,15 +97,65 @@ class Libreria_Responsable{
                       <tbody>';
                       $nro=0;
                       foreach($responsables as $row){ 
+                        $id=$row['id'];
                         $nro++;
+                        
                         $tabla.='
                         <tr>
                           <td style="aling:center;">'.$nro.'</td>
                           <td>'.$row['fun_nombre'].' '.$row['fun_paterno'].' '.$row['fun_materno'].'</td>
                           <td>'.$row['uni_unidad'].'</td>
                           <td>'.$row['fun_usuario'].'</td>
-                          <td>'.$row['adm'].'</td>
                           <td>'.$row['dist_distrital'].'</td>
+                          <td class="text-center">
+                              <div class="form-check form-switch d-flex justify-content-center">
+                                  <input class="form-check-input btn-switch-update" type="checkbox" 
+                                         data-id="'.$id.'" data-columna="tp_adm" 
+                                         '.($row['tp_adm'] == 1 ? 'checked' : '').' style="width: 2.5em; height: 1.3em;">
+                              </div>
+                          </td>
+                          <td class="text-center">
+                              <div class="form-check form-switch d-flex justify-content-center">
+                                  <input class="form-check-input btn-switch-update" type="checkbox" 
+                                         data-id="'.$id.'" data-columna="conf_mod_form4" 
+                                         '.($row['conf_mod_form4'] == 1 ? 'checked' : '').' style="width: 2.5em; height: 1.3em;">
+                              </div>
+                          </td>
+                          <td class="text-center">
+                              <div class="form-check form-switch d-flex justify-content-center">
+                                  <input class="form-check-input btn-switch-update" type="checkbox" 
+                                         data-id="'.$id.'" data-columna="conf_mod_form5" 
+                                         '.($row['conf_mod_form5'] == 1 ? 'checked' : '').' style="width: 2.5em; height: 1.3em;">
+                              </div>
+                          </td>
+                          <td class="text-center">
+                              <div class="form-check form-switch d-flex justify-content-center">
+                                  <input class="form-check-input btn-switch-update" type="checkbox" 
+                                         data-id="'.$id.'" data-columna="conf_mod_ppto" 
+                                         '.($row['conf_mod_ppto'] == 1 ? 'checked' : '').' style="width: 2.5em; height: 1.3em;">
+                              </div>
+                          </td>
+                          <td class="text-center">
+                              <div class="form-check form-switch d-flex justify-content-center">
+                                  <input class="form-check-input btn-switch-update" type="checkbox" 
+                                         data-id="'.$id.'" data-columna="conf_cert_poa" 
+                                         '.($row['conf_cert_poa'] == 1 ? 'checked' : '').' style="width: 2.5em; height: 1.3em;">
+                              </div>
+                          </td>
+                          <td class="text-center">
+                              <div class="form-check form-switch d-flex justify-content-center">
+                                  <input class="form-check-input btn-switch-update" type="checkbox" 
+                                         data-id="'.$id.'" data-columna="conf_eval_poa" 
+                                         '.($row['conf_eval_poa'] == 1 ? 'checked' : '').' style="width: 2.5em; height: 1.3em;">
+                              </div>
+                          </td>
+                          <td class="text-center">
+                              <div class="form-check form-switch d-flex justify-content-center">
+                                  <input class="form-check-input btn-switch-update" type="checkbox" 
+                                         data-id="'.$id.'" data-columna="sw_pass" 
+                                         '.($row['sw_pass'] == 1 ? 'checked' : '').' style="width: 2.5em; height: 1.3em;">
+                              </div>
+                          </td>
                           <td>
                             <a href="'.base_url().'mnt/update_responsable/'.$row['id'].'" 
                                class="btn btn-primary btn-sm" 

@@ -239,9 +239,7 @@ public function index() {
         $captcha = $this->request->getPost('captcha');
         $dat_captcha = $this->request->getPost('dat_captcha');
         $is_valid = $model_index->verificar_loggin($usuario, $password, $captcha, $dat_captcha);
-        $conf = $model_index->get_gestion_activo(); /// configuracion gestion activo
-//echo $is_valid['data']['fun_nombre'].' '.$is_valid['data']['fun_paterno'].' '.$is_valid['data']['fun_materno'].' -- '.$is_valid['data']['fun_cargo'].' -- '.$conf['conf_abrev_sistema'].' -- '.$conf['conf_img'];
-         if($is_valid['bool']==true){
+        if($is_valid['bool']==true){
             $conf = $model_index->get_gestion_activo(); /// configuracion gestion activo
             $modulos = $model_index->modulos($conf['ide'],$is_valid['data']['tp_adm']); /// modulos
             $view_modulos=$this->Modulos_disponibles($modulos); /// vista modulos Cabecera
@@ -269,11 +267,12 @@ public function index() {
             
             'isLoggedIn' => TRUE, // Bandera clave para tus filtros de acceso
             ];
+       
             $session->set($userData); // Guarda la sesión
 
             // 2. Redirigir al usuario a una página protegida (ej. dashboard)
             return redirect()->to(base_url('dashboard')); 
-           // return redirect()->to('dashboard'); 
+           
         }
         else{
             //$session->destroy(); 
@@ -281,73 +280,6 @@ public function index() {
         }
 
     }
-
-//     public function loginAction2(){
-//         $session = session();
-//         $model_index = new IndexModel();
-
-//         $rules = [
-//             'user_name' => 'required|min_length[3]|max_length[20]', // Ajusta longitudes
-//             'password' => 'required|min_length[5]|max_length[20]', // Ajusta longitudes
-//         ];
-        
-//         // 2. Ejecutar la validación básica
-//         if (!$this->validate($rules)) {
-//             return redirect()->back()->withInput()->with('errors', $this->validator->getErrors());
-//         }
-
-//         $usuario = $this->request->getPost('user_name');
-//         $password = $this->request->getPost('password');
-//         $tp = $this->request->getPost('tp');
-//         $captcha = $this->request->getPost('captcha');
-//         $dat_captcha = $this->request->getPost('dat_captcha');
-
-// /*        if($tp==0){ /// Administracion
-
-//         }
-//         else{ /// Establecimiento de salud
-
-//         }*/
-
-//         $is_valid = $model_index->verificar_loggin($usuario, $password, $captcha,$dat_captcha);
-//         if($is_valid['bool']==true){
-//             $conf = $model_index->get_gestion_activo(); /// configuracion gestion activo
-//             $modulos = $model_index->modulos($conf['ide'],$is_valid['data']['tp_adm']); /// modulos
-//             $view_modulos=$this->Modulos_disponibles($modulos); /// vista modulos Cabecera
-//             $view_modulos_Sidebar=$this->Modulos_disponibles_Sidebar($modulos,$is_valid['data']['fun_nombre'].' '.$is_valid['data']['fun_paterno'].' '.$is_valid['data']['fun_materno'],$is_valid['data']['fun_cargo'],$conf['conf_abrev_sistema']); /// vista modulos Cabecera Sidebar
-//             $userData = [
-//             'fun_id'    => $is_valid['data']['fun_id'], // Asegúrate de que tu modelo devuelve 'id'
-//             'user_name'   => $is_valid['data']['fun_nombre'].' '.$is_valid['data']['fun_paterno'].' '.$is_valid['data']['fun_materno'],
-//             'usuario'   => $is_valid['data']['fun_usuario'],
-//             'cargo'   => $is_valid['data']['fun_cargo'],
-//             'credencial_funcionario'   => $is_valid['data']['sw_pass'],
-//             'fun_estado'   => $is_valid['data']['fun_estado'],
-//             'com_id'   => $is_valid['data']['cm_id'],
-//             'dist_id'   => $is_valid['data']['fun_dist'],
-//             'tp_adm'   => $is_valid['data']['tp_adm'],
-//             'rol'   => $model_index->get_rol_usuario($is_valid['data']['fun_id']),
-//             'configuracion'   => $conf,
-//             'modulos'   => $modulos,
-//             'view_modulos'   => $view_modulos,
-//             'view_modulos_sidebar'   => $view_modulos_Sidebar,
-//             'view_cabecera'   => $this->Cabecera_sistema($is_valid['data']['fun_nombre'].' '.$is_valid['data']['fun_paterno'].' '.$is_valid['data']['fun_materno'],$is_valid['data']['fun_cargo'],$conf['conf_abrev_sistema'],$conf['conf_img']),
-//             'view_cabecera_layout'   => $this->Cabecera_sistema_layout($is_valid['data']['fun_nombre'].' '.$is_valid['data']['fun_paterno'].' '.$is_valid['data']['fun_materno'],$is_valid['data']['fun_cargo'],$conf['conf_abrev_sistema'],$conf['conf_img']),
-//             'view_menu_izquierdo'   => $this->Menu_izquierdo(), /// menu izquierdo
-//             'view_bienvenida'   => $this->bienvenida($conf['conf_abrev_sistema'],$conf['conf_unidad_resp']), /// bienvenida
-//             'regional'   => $model_index->datos_regional($is_valid['data']['fun_dist']),
-            
-//             'isLoggedIn' => TRUE, // Bandera clave para tus filtros de acceso
-//             ];
-//             $session->set($userData); // Guarda la sesión
-
-//             // 2. Redirigir al usuario a una página protegida (ej. dashboard)
-//             return redirect()->to(base_url('dashboard')); 
-//         }
-//         else{
-//             return redirect()->to(base_url('login'))->with('errors', $is_valid['message']);
-//         }
-      
-//     }
 
     /// Bienvenida
     public function bienvenida($sistema,$unidad_responsable){
@@ -434,9 +366,9 @@ public function index() {
                     $tabla.='
                     <li class="nav-small-cap">
                       <iconify-icon icon="solar:menu-dots-bold-duotone" class="nav-small-cap-icon fs-5"></iconify-icon>
-                      <span class="hide-menu">'.strtoupper($row['mod_descripcion']).'</span>
+                      <span class="hide-menu">'.strtoupper($row['modulo_descripcion']).'</span>
                     </li>';
-                        $sub_menu=$model_index->sub_modulos($row['mod_id']);
+                        $sub_menu=$model_index->sub_modulos($row['modulo_id']);
                         foreach($sub_menu as $row2){
                             $tabla.='
                             <li class="sidebar-item">
@@ -512,15 +444,15 @@ public function index() {
                   $tabla.='
                     <li class="nav-small-cap">
                         <i class="ti ti-dots nav-small-cap-icon fs-4"></i>
-                        <span class="hide-menu">'.$row['mod_descripcion'].'</span>
+                        <span class="hide-menu">'.$row['modulo_descripcion'].'</span>
                       </li>
                       <li class="sidebar-item">
                         <a class="sidebar-link has-arrow warning-hover-bg" href="javascript:void(0)" aria-expanded="false">
-                          <iconify-icon '.$row['icono_mod'].' class="fs-6 aside-icon"></iconify-icon>
-                          <span class="hide-menu ps-1"> <b>'.$row['mod_descripcion'].'</b></span>
+                          <iconify-icon '.$row['icono_modulo'].' class="fs-6 aside-icon"></iconify-icon>
+                          <span class="hide-menu ps-1"> <b>'.$row['modulo_descripcion'].'</b></span>
                         </a>
                         <ul aria-expanded="false" class="collapse first-level">';
-                        $sub_menu=$model_index->sub_modulos($row['mod_id']);
+                        $sub_menu=$model_index->sub_modulos($row['modulo_id']);
                         foreach($sub_menu as $row2){
                             $tabla.='
                             <li class="sidebar-item">

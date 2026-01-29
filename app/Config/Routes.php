@@ -41,6 +41,9 @@ $routes->post('mnt/verif_usuario', 'CMantenimiento\CResponsables::verif_usuario'
 $routes->post('mnt/delete_responsable', 'CMantenimiento\CResponsables::delete_responsable'); /// Elimina Usuario
 $routes->get('mnt/exportar_responsablePoa', 'CMantenimiento\CResponsables::exportar_responsables'); /// Exportar Responsable POA
 
+$routes->post('mnt/update_permisos_responsable', 'CMantenimiento\CResponsables::update_permisos_responsable'); /// Permisos para el Usuario
+
+
 $routes->get('mnt/resp_seguimientopoa', 'CMantenimiento\CResponsables::lista_responsables_seguimientopoa'); /// lista de Responsables-Seguimiento POA
 $routes->get('mnt/nuevo_reponsable_seguimientopoa', 'CMantenimiento\CResponsables::new_responsables_segpoa'); /// form Add Responsable POA-Seguimiento POA
 $routes->post('mnt/get_aper_seg', 'CMantenimiento\CResponsables::get_aper_add'); /// get Apertura segun la regional-Seguimiento POA

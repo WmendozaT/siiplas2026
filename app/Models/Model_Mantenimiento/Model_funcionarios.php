@@ -220,7 +220,7 @@ public function get_usuario_responsablePoa($usuario) {
 
 
     /// Datos Regional Distrital
-/*    public function datos_regional($dist_id){
+    public function datos_regional($dist_id){
         $sql = 'select *
                 from _distritales ds
                 Inner Join _departamentos as d On d.dep_id=ds.dep_id
@@ -228,7 +228,7 @@ public function get_usuario_responsablePoa($usuario) {
 
         $query = $this->db->query($sql);
         return $query->getRowArray();
-    }*/
+    }
 
     /// Datos Rol del funcionario
 /*    public function get_rol_usuario($fun_id){

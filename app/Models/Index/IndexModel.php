@@ -64,13 +64,13 @@ class IndexModel extends Model{
     public function modulos($ide,$tp_adm){
         if($tp_adm==1){ /// Nacional
             $sql = "select *
-                from modulo
-                order by mod_id asc";
+                from modulos_sistema
+                order by modulo_id asc";
         }
         else{ /// regional / distrital
             $sql = "select * 
                 from confi_modulo conf
-                Inner Join modulo as mod On mod.mod_id=conf.mod_id
+                Inner Join modulos_sistema as mod On mod.modulo_id=conf.mod_id
                 WHERE conf.ide = ".$ide."
                 order by conf.mod_id asc";
         }

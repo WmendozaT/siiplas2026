@@ -14,16 +14,14 @@ use App\Libraries\Libreria_Responsable;
 class CResponsables extends BaseController{
     protected $Model_funcionarios;
     protected $Model_regional;
+    protected $session;
 
     public function initController(RequestInterface $request, ResponseInterface $response, LoggerInterface $logger){
         // LLAMADA OBLIGATORIA al initController del padre (DESCOMENTADA)
         parent::initController($request, $response, $logger); 
 
-        // 1. Inicializar sesión si no existe
-        $this->session = \Config\Services::session();
-
-        // 2. Control de sesión sencilla: Si no existe 'user_name', redirigir
-        if (!$this->session->has('fun_id')) {
+    $this->session = \Config\Services::session(); 
+       if (!$this->session->has('fun_id')) {
             // Esta es la forma limpia en CI4 de forzar una redirección desde initController
             response()->redirect(base_url('login'))->send();
             exit; 
@@ -37,10 +35,12 @@ class CResponsables extends BaseController{
     }
 
 
+
     /// Vista Lista Reponsables POA
     public function lista_responsables(){
         $miLib_resp = new Libreria_Responsable();
         $model_funcionario = new Model_funcionarios();
+
 
         $data['formulario']=$miLib_resp->responsables_poa(); /// lista de responsables (Libreria Responsable)
         return view('View_mantenimiento/View_responsables/view_funcionarios',$data);
@@ -109,6 +109,61 @@ class CResponsables extends BaseController{
         return view('View_mantenimiento/View_responsables/view_funcionarios',$data);
      //   phpinfo();
     }
+
+
+
+
+public function update_permisos_responsable() {
+    $db = \Config\Database::connect();
+
+    // 1. Validar que sea una petición AJAX
+    if (!$this->request->isAJAX()) {
+        return $this->response->setStatusCode(403)->setJSON(['status' => 'error', 'message' => 'Acceso no permitido']);
+    }
+
+    // 2. Recibir datos del POST
+    $id      = $this->request->getPost('id');
+    $columna = $this->request->getPost('columna');
+    $valor   = $this->request->getPost('valor');
+
+    // --- SEGURIDAD OBLIGATORIA ---
+    // Si no pones esto, un usuario podría enviar columna='fun_password' o 'fun_usuario'
+    $columnasPermitidas = ['tp_adm', 'conf_mod_form4', 'conf_mod_form5', 'conf_mod_ppto', 'conf_cert_poa', 'conf_eval_poa', 'sw_pass'];
+
+    if (!in_array($columna, $columnasPermitidas)) {
+        return $this->response->setJSON([
+            'status' => 'error', 
+            'message' => 'Columna no permitida',
+            'token'  => csrf_hash()
+        ]);
+    }
+    // ----------------------------
+
+    $data = [
+        $columna => $valor,
+    ];
+
+    // 3. Ejecutar actualización
+    $resultado = $db->table('funcionario')
+                    ->where('fun_id', $id)
+                    ->update($data);
+
+    if ($resultado) {
+        return $this->response->setJSON([
+            'status' => 'success',
+            'token'  => csrf_hash()
+        ]);
+    } else {
+        return $this->response->setJSON([
+            'status' => 'error',
+            'message' => 'No se pudo actualizar',
+            'token'  => csrf_hash()
+        ]);
+    }
+}
+
+
+
 
 
   /// Formulario 

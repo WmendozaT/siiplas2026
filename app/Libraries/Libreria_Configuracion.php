@@ -250,9 +250,11 @@ class Libreria_Configuracion{
                       <div class="card border shadow-none">
                         <div class="card-body p-4">
                           <h4 class="card-title">Modulos Disponibles</h4>
+                          <input name="hidden" type="text" value="'.base_url().'">
                           <hr>
                           <div>';
                           foreach ($modulos as $row) {
+                            $id=$row['modulo_id'];
                             $tabla.='
                             <div class="d-flex align-items-center justify-content-between mb-4">
                               <div class="d-flex align-items-center gap-3">
@@ -261,11 +263,14 @@ class Libreria_Configuracion{
                                 </div>
                                 <div>
                                   <h5 class="fs-4 fw-semibold">'.mb_strtoupper($row['modulo_descripcion']).'</h5>
-                                  <p class="mb-0">Well always let you know about important changes</p>
+                                  <p class="mb-0">colocar detalle '.$row['info'].'-'.$id.'</p>
                                 </div>
                               </div>
-                              <div class="form-check form-switch mb-0">
-                                <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckChecked">
+                     
+                              <div class="form-check form-switch d-flex justify-content-center">
+                                  <input class="form-check-input btn-switch-updates" type="checkbox" 
+                                         data-id="'.$id.'" data-columna="modulo_estado" 
+                                         '.($row['modulo_estado'] == 1 ? 'checked' : '').' style="width: 2.5em; height: 1.3em;">
                               </div>
                             </div>';
                           }

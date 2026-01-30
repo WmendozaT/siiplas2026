@@ -376,7 +376,7 @@ document.getElementById('btnExportar').addEventListener('click', function(e) {
 });
 
 
-
+//// Js para actualizar permisos al responsable
 $(document).on('change', '.btn-switch-update', function() {
     const $input = $(this);
     

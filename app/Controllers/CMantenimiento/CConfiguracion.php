@@ -194,6 +194,61 @@ class CConfiguracion extends BaseController{
 }
 
 
+//// Update Estado de los Modulos 
+public function update_estado_modulos() {
+    $db = \Config\Database::connect();
+    $model_funcionario = new Model_funcionarios();
+    $session = session(); // <--- IMPORTANTE: Definir la variable de sesión
+
+    if (!$this->request->isAJAX()) {
+        return $this->response->setStatusCode(403)->setJSON(['status' => 'error', 'message' => 'Acceso no permitido']);
+    }
+
+    $id      = $this->request->getPost('id');
+    $columna = $this->request->getPost('columna');
+    $valor   = $this->request->getPost('valor');
+
+    $columnasPermitidas = ['tp_adm', 'conf_mod_form4', 'conf_mod_form5', 'conf_mod_ppto', 'conf_cert_poa', 'conf_eval_poa', 'sw_pass'];
+
+    if (!in_array($columna, $columnasPermitidas)) {
+        return $this->response->setJSON([
+            'status' => 'error', 
+            'message' => 'Columna no permitida',
+            'token'  => csrf_hash()
+        ]);
+    }
+
+    $data = [$columna => $valor];
+
+    // Ejecutar actualización
+    $resultado = $db->table('funcionario')
+                    ->where('fun_id', $id)
+                    ->update($data);
+
+    if ($resultado) {
+        // Solo actualizamos la sesión si el ID editado es el mismo que está logueado
+        if ($session->get('fun_id') == $id) {
+            $funcionario = $model_funcionario->get_responsablePoa($id);
+            
+            $userData = [
+                'funcionario' => $funcionario,
+                // No es necesario setear 'isLoggedIn' de nuevo si ya existe
+            ];
+            $session->set($userData); 
+        }
+
+        return $this->response->setJSON([
+            'status' => 'success',
+            'token'  => csrf_hash()
+        ]);
+    }
+
+    return $this->response->setJSON([
+        'status' => 'error',
+        'message' => 'No se pudo actualizar',
+        'token'  => csrf_hash()
+    ]);
+}
 
 
 }

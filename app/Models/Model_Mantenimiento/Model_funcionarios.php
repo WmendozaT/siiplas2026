@@ -230,75 +230,7 @@ public function get_usuario_responsablePoa($usuario) {
         return $query->getRowArray();
     }
 
-    /// Datos Rol del funcionario
-/*    public function get_rol_usuario($fun_id){
-        $sql = '
-        select f.fun_id,f.r_id,f.r_estado,r.r_estado,r.r_nombre
-        from fun_rol f
-        Inner Join rol as r On r.r_id=f.r_id
-        where f.fun_id='.$fun_id.'
-        group by f.fun_id,f.r_id,f.r_estado,r.r_estado,r.r_nombre';
-
-        $query = $this->db->query($sql);
-        return $query->getRowArray();
-    }*/
-
-
-    /// Verifica Usuario activo
-/*    public function verificar_loggin($user_name, $password_plano, $captcha,$dat_captcha){
-    $data = array(
-        'bool'   => false,
-        'fun_id' => null,
-        'data'   => null,
-        'message'=> 'Error de credenciales.'
-    );
-
-    $builder = $this->db->table('funcionario');
-    $user = $builder->where('fun_usuario', $user_name)->get()->getRowArray();
-
-        // 3. Verificar si el usuario existe
-        if (!$user) {
-            return $data;
-        }
-
-        if(md5($dat_captcha)!=$captcha){
-            $data['message'] = 'Error en el código.';
-            return $data; // Sale de la función, el bool sigue siendo false
-        }
-
-        if ($user['fun_estado'] == 3) {
-            $data['message'] = 'Usuario inactivo.';
-            return $data; // Sale de la función, el bool sigue siendo false
-        }
-
-        if($user['sw_pass']==0){
-            // ---  MIGRAR A UN HASH SEGURO INMEDIATAMENTE (password_hash) ---
-            $new_secure_hash = password_hash($password_plano, PASSWORD_DEFAULT); // Usa bcrypt/argon2
-            // Actualizar la base de datos con el nuevo hash seguro y marcar como migrado
-            $builder->where('fun_id', $user['fun_id'])
-                    ->update([
-                        'fun_password' => $new_secure_hash,
-                        'sw_pass'      => 1
-                    ]);
-        }
-
-        $builder = $this->db->table('funcionario');
-        $user = $builder->where('fun_usuario', $user_name)->get()->getRowArray();
-
-     //   5. Verificar la contraseña usando password_verify()
-        if (password_verify($password_plano, $user['fun_password'])) {
-            // --- Contraseña correcta: Preparar respuesta de éxito ---
-            $data['bool']   = true;
-            $data['fun_id'] = $user['fun_id'];
-            $data['data']   = $user;
-            $data['message'] = 'Login exitoso.';
-
-            return $data;
-        }
-        else{
-            return $data;
-        }
-    }*/
+   
 
 
 

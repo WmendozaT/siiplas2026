@@ -15,32 +15,33 @@ class Dashboard extends BaseController{
         $this->session = \Config\Services::session();
 
         // 2. Control de sesión sencilla: Si no existe 'user_name', redirigir
-        if (!$this->session->has('fun_id')) {
+       /* if (!$this->session->has('fun_id')) {
             // Esta es la forma limpia en CI4 de forzar una redirección desde initController
             response()->redirect(base_url('login'))->send();
             exit; 
-        }
+        }*/
         
         $this->session->get('regional'); 
         $this->session->get('configuracion'); 
-        $this->session->get('user_name');
+       // $this->session->get('user_name');
         $this->session->get('view_modulos'); 
         $this->session->get('view_modulos_sidebar'); 
     }
 
 
     /// Dasboard Administrador
-public function dashboard_admin(){
-    // 1. Verificación forzada: Si NO existe la bandera o es falsa, destruir y mandar al login
-    if (!session()->get('isLoggedIn')) {
-        session()->destroy(); // Limpia cualquier residuo de sesión corrupta
-        return redirect()->to(base_url('login'))->with('errors', 'Debes iniciar sesión.');
+    public function dashboard_admin(){
+        // 1. Verificación forzada: Si NO existe la bandera o es falsa, destruir y mandar al login
+        if (!session()->get('isLoggedIn')) {
+            session()->destroy(); // Limpia cualquier residuo de sesión corrupta
+            return redirect()->to(base_url('login'))->with('errors', 'Debes iniciar sesión.');
+        }
+//session()->destroy();
+        // 2. Si pasa la validación, carga el contenido
+        $data['boton'] = '<a href="'.base_url().'logout" class="boton-login">Cerrar Sesión</a><br>'.$this->session->get('configuracion')['conf_mensaje'].'<br>
+        '.$this->session->get('funcionario')['conf_mod_form4'].'';
+        return view('View_dashboard/viewdashboard_poa', $data);
     }
-
-    // 2. Si pasa la validación, carga el contenido
-    $data['boton'] = '<a href="'.base_url().'logout" class="boton-login">Cerrar Sesión</a>';
-    return view('View_dashboard/viewdashboard_poa', $data);
-}
 }
 
 

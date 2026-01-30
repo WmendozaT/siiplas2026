@@ -8,6 +8,7 @@ use Psr\Log\LoggerInterface;
 use App\Models\Model_Mantenimiento\Model_funcionarios;
 use App\Models\Model_Mantenimiento\Model_regional;
 use App\Libraries\Libreria_Responsable;
+use App\Libraries\Libreria_Index;
 
 
 
@@ -29,7 +30,7 @@ class CResponsables extends BaseController{
         
         $this->session->get('regional'); 
         $this->session->get('configuracion'); 
-        $this->session->get('user_name');
+        $this->session->get('funcionario');
         $this->session->get('view_modulos'); 
         $this->session->get('view_modulos_sidebar'); 
     }
@@ -112,22 +113,20 @@ class CResponsables extends BaseController{
 
 
 
-
+//// Update Permisos 
 public function update_permisos_responsable() {
     $db = \Config\Database::connect();
+    $model_funcionario = new Model_funcionarios();
+    $session = session(); // <--- IMPORTANTE: Definir la variable de sesión
 
-    // 1. Validar que sea una petición AJAX
     if (!$this->request->isAJAX()) {
         return $this->response->setStatusCode(403)->setJSON(['status' => 'error', 'message' => 'Acceso no permitido']);
     }
 
-    // 2. Recibir datos del POST
     $id      = $this->request->getPost('id');
     $columna = $this->request->getPost('columna');
     $valor   = $this->request->getPost('valor');
 
-    // --- SEGURIDAD OBLIGATORIA ---
-    // Si no pones esto, un usuario podría enviar columna='fun_password' o 'fun_usuario'
     $columnasPermitidas = ['tp_adm', 'conf_mod_form4', 'conf_mod_form5', 'conf_mod_ppto', 'conf_cert_poa', 'conf_eval_poa', 'sw_pass'];
 
     if (!in_array($columna, $columnasPermitidas)) {
@@ -137,29 +136,37 @@ public function update_permisos_responsable() {
             'token'  => csrf_hash()
         ]);
     }
-    // ----------------------------
 
-    $data = [
-        $columna => $valor,
-    ];
+    $data = [$columna => $valor];
 
-    // 3. Ejecutar actualización
+    // Ejecutar actualización
     $resultado = $db->table('funcionario')
                     ->where('fun_id', $id)
                     ->update($data);
 
     if ($resultado) {
+        // Solo actualizamos la sesión si el ID editado es el mismo que está logueado
+        if ($session->get('fun_id') == $id) {
+            $funcionario = $model_funcionario->get_responsablePoa($id);
+            
+            $userData = [
+                'funcionario' => $funcionario,
+                // No es necesario setear 'isLoggedIn' de nuevo si ya existe
+            ];
+            $session->set($userData); 
+        }
+
         return $this->response->setJSON([
             'status' => 'success',
             'token'  => csrf_hash()
         ]);
-    } else {
-        return $this->response->setJSON([
-            'status' => 'error',
-            'message' => 'No se pudo actualizar',
-            'token'  => csrf_hash()
-        ]);
     }
+
+    return $this->response->setJSON([
+        'status' => 'error',
+        'message' => 'No se pudo actualizar',
+        'token'  => csrf_hash()
+    ]);
 }
 
 
@@ -392,6 +399,7 @@ public function exportar_responsables(){
   /// Valida Form Update Responsable
   public function Update_resp() {
     $db = \Config\Database::connect(); 
+    $session = session(); // <--- IMPORTANTE: Definir la variable de sesión
     try {
       $model_funcionario = new Model_funcionarios();
      // $datos = $this->request->getPost();
@@ -435,6 +443,12 @@ public function exportar_responsables(){
             throw new \Exception("No se pudo actualizar los datos del funcionario.");
         }
 
+        // --- ACTUALIZACIÓN DE SESIÓN EN CALIENTE ---
+        // Solo actualizamos si el usuario editado es el mismo que está operando
+        if ($session->get('fun_id') == $id) {
+            $funcionario = $model_funcionario->get_responsablePoa($id);
+            $session->set(['funcionario' => $funcionario]); 
+        }
         return redirect()->to(base_url('mnt/responsables'))
                          ->with('success', 'Datos actualizados correctamente.');
 
@@ -445,6 +459,9 @@ public function exportar_responsables(){
         return redirect()->back()->withInput()->with('error', 'Ocurrió un error inesperado: ' . $e->getMessage());
     }
   }
+
+
+
 
 
 /// Valida Form Update Responsable-Seguimiento POA

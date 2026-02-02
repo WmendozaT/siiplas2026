@@ -5,17 +5,26 @@
 $(document).on('change', '.btn-switch-updates', function() {
     const $input = $(this);
     
-    // Recuperamos los nombres y valores desde los meta tags
+    // 1. URL base (Asegúrate que el input hidden exista en el HTML)
+ //   const base = $('input[name="hidden"]').val();
+    
+    // 2. Variables del elemento
+    const id      = $input.data('id');      
+    const columna = $input.data('columna'); 
+    const valor   = $input.is(':checked') ? 1 : 0;
+
+    // 3. Captura de CSRF (Importante: capturarlos justo antes del envío)
     const csrfName = $('meta[name="csrf-token-name"]').attr('content');
     const csrfHash = $('meta[name="csrf-token-value"]').attr('content');
 
+    // 4. Preparación del objeto
     const dataPost = {
-        id: $input.data('id'),
-        columna: $input.data('columna'),
-        valor: $input.is(':checked') ? 1 : 0
+        id: id,
+        columna: columna,
+        valor: valor
     };
 
-    // Añadimos el token dinámicamente al objeto de datos
+    // 5. Inyección dinámica del token
     dataPost[csrfName] = csrfHash;
 
     $.ajax({
@@ -23,26 +32,42 @@ $(document).on('change', '.btn-switch-updates', function() {
         type: 'POST',
         data: dataPost,
         dataType: 'json',
+        beforeSend: function() {
+            // Opcional: Bloquear el switch mientras procesa para evitar doble clic
+            $input.prop('disabled', true);
+        },
         success: function(response) {
-            // IMPORTANTE: Si CI4 regenera el token, debemos actualizar el meta tag
+            // ACTUALIZACIÓN DEL TOKEN: Vital para que el siguiente clic no de error 403
             if (response.token) {
-                //alert(response.token)
                 $('meta[name="csrf-token-value"]').attr('content', response.token);
             }
 
-            if (response.status !== 'success') {
-                alert('Error: ' + response.message);
-                $input.prop('checked', !$input.is(':checked'));
+            if (response.status === 'success') {
+                console.log("Módulo actualizado correctamente");
+            } else {
+                alert('Error: ' + (response.message || 'No se pudo actualizar'));
+                // Revertir estado visual si el servidor reporta error
+                $input.prop('checked', !($input.is(':checked')));
             }
         },
-        error: function() {
+        error: function(xhr) {
+            console.error("Error del servidor:", xhr.responseText);
             alert('Error de comunicación con el servidor');
-            $input.prop('checked', !$input.is(':checked'));
+            // Revertir estado visual si hay error de red o 500
+            $input.prop('checked', !($input.is(':checked')));
+        },
+        complete: function() {
+            // Desbloquear el switch
+            $input.prop('disabled', false);
         }
     });
 });
 
-///// Js Update Permisos responsable-seguimiento
+
+
+
+
+///// Js Update formulario de configuracion del Sistema
 $(document).ready(function() {
     $("#form_conf").on("submit", function(e) {
         let esValido = true;

@@ -63,10 +63,23 @@ class IndexModel extends Model{
     /// Modulos Activos
     public function modulos($ide,$tp_adm){
         if($tp_adm==1){ /// Nacional
-            $sql = "SELECT *
+            $sql = "SELECT 
+                    ms.*,
+                    CASE 
+                        WHEN cm.mod_id IS NOT NULL THEN 1 
+                        ELSE 0 
+                    END AS incluido
+                FROM modulos_sistema ms
+                LEFT JOIN confi_modulo cm 
+                    ON ms.modulo_id = cm.mod_id 
+                    AND cm.ide = ".$ide."
+                    order by ms.modulo_id asc;";
+
+
+           /* $sql = "SELECT *
                 from modulos_sistema
                 where modulo_estado=1
-                order by modulo_id asc";
+                order by modulo_id asc";*/
         }
         else{ /// regional / distrital
             $sql = "SELECT * 
@@ -77,6 +90,13 @@ class IndexModel extends Model{
         }
         $query = $this->query($sql);
         return $query->getResultArray();
+    }
+
+    /// get modulo estado en la gestion
+    public function existe_modulo_configurado($id_modulo, $gestion) {
+    return $this->db->table('confi_modulo')
+                    ->where(['mod_id' => $id_modulo, 'ide' => $gestion])
+                    ->countAllResults() > 0; // Devuelve true o false
     }
 
 

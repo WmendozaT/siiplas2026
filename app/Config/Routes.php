@@ -60,4 +60,4 @@ $routes->get('mnt/Pdf_responsables_sfirma', 'CMantenimiento\CResponsables_Pdf::P
 //// Mantenimiento - configuracion Sistema
 $routes->get('mnt/ConfiguracionSistema', 'CMantenimiento\CConfiguracion::Menu_configuracion'); /// View Configuracion
 $routes->post('mnt/update_conf', 'CMantenimiento\CConfiguracion::Update_configuracion'); /// Valida Update Responsable
-$routes->post('mnt/update_estado_modulos', 'CMantenimiento\CResponsables::update_estado_modulos'); /// Estados para modulo disponibles
+$routes->post('mnt/update_estado_modulos', 'CMantenimiento\CConfiguracion::update_estado_modulos'); /// Estados para modulo disponibles

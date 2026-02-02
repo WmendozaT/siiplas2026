@@ -7,7 +7,7 @@ class Model_configuracion extends Model{
     protected $table = '_departamentos';
 
     /// lista de Regionales
-    public function obtenerRegionales(){
+/*    public function obtenerRegionales(){
         $sql = 'SELECT *
             from _departamentos
             where dep_id!=0
@@ -40,7 +40,7 @@ class Model_configuracion extends Model{
         $query = $this->query($sql);
         return $query->getResultArray();
     }
-
+*/
 
 
 

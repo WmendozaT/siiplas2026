@@ -74,12 +74,6 @@ class IndexModel extends Model{
                     ON ms.modulo_id = cm.mod_id 
                     AND cm.ide = ".$ide."
                     order by ms.modulo_id asc;";
-
-
-           /* $sql = "SELECT *
-                from modulos_sistema
-                where modulo_estado=1
-                order by modulo_id asc";*/
         }
         else{ /// regional / distrital
             $sql = "SELECT * 
@@ -106,6 +100,18 @@ class IndexModel extends Model{
                 from modulo_menu
                 where mod_id=".$id." and sub_menu_estado=1
                 order by sub_id asc";
+        $query = $this->query($sql);
+        return $query->getResultArray();
+    }
+
+
+    /// Listado de Aperturas Programaticas
+    public function List_aperturas($gestion){
+        $sql = "
+                SELECT *
+                from aperturaprogramatica a
+                where a.aper_estado!=3 and a.aper_gestion=".$gestion." and a.aper_asignado=1
+                order by a.aper_gestion,a.aper_programa,a.aper_proyecto,a.aper_actividad asc";
         $query = $this->query($sql);
         return $query->getResultArray();
     }

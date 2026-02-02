@@ -71,6 +71,7 @@ class User extends BaseController{
             $funcionario=$model_funcionario->get_responsablePoa($is_valid['data']['fun_id']); /// Datos del Funcionario
             $conf = $model_index->get_gestion_activo(); /// configuracion gestion activo
             $modulos = $model_index->modulos($conf['ide'],$is_valid['data']['tp_adm']); /// modulos
+            
             $view_modulos=$miLib_index->Modulos_disponibles($modulos); /// vista modulos Cabecera
             $view_modulos_Sidebar=$miLib_index->Modulos_disponibles_Sidebar($modulos,$funcionario['fun_nombre'].' '.$funcionario['fun_paterno'].' '.$funcionario['fun_materno'],$funcionario['fun_cargo'],$conf['conf_abrev_sistema']); /// vista modulos Cabecera Sidebar
             $userData = [

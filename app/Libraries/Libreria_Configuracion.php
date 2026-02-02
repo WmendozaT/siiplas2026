@@ -241,9 +241,7 @@ class Libreria_Configuracion{
 
     //// Conf Modulo
     public function conf_form2(){
-        //$model_index = new IndexModel();
         $modulos=$this->session->get('modulos'); 
-        //$responsables=$model_funcionario->obtenerFuncionariosActivos();
         $tabla='';
         $tabla.='<div class="row justify-content-center">
                     <div class="col-lg-9">
@@ -286,60 +284,130 @@ class Libreria_Configuracion{
         return $tabla;
     }
 
+    //// Aperuras Programaticas
     public function conf_form3(){
-        $model_funcionario = new Model_funcionarios();
-        $responsables=$model_funcionario->obtenerFuncionariosActivos();
-        $tabla='<div class="row justify-content-center">
-                    <div class="col-lg-9">
-                      <div class="card border shadow-none">
-                        <div class="card-body p-4">
-                          <h4 class="card-title mb-3">Billing Information</h4>
-                          <form>
-                            <div class="row">
-                              <div class="col-lg-6">
-                                <div class="mb-3">
-                                  <label for="exampleInputtext6" class="form-label">Business
-                                    Name*</label>
-                                  <input type="text" class="form-control" id="exampleInputtext6" placeholder="Visitor Analytics">
-                                </div>
-                                <div class="mb-3">
-                                  <label for="exampleInputtext7" class="form-label">Business
-                                    Address*</label>
-                                  <input type="text" class="form-control" id="exampleInputtext7" placeholder="">
-                                </div>
-                                <div>
-                                  <label for="exampleInputtext8" class="form-label">First Name*</label>
-                                  <input type="text" class="form-control" id="exampleInputtext8" placeholder="">
-                                </div>
-                              </div>
-                              <div class="col-lg-6">
-                                <div class="mb-3">
-                                  <label for="exampleInputtext9" class="form-label">Business
-                                    Sector*</label>
-                                  <input type="text" class="form-control" id="exampleInputtext9" placeholder="Arts, Media & Entertainment">
-                                </div>
-                                <div class="mb-3">
-                                  <label for="exampleInputtext10" class="form-label">Country*</label>
-                                  <input type="text" class="form-control" id="exampleInputtext10" placeholder="Romania">
-                                </div>
-                                <div>
-                                  <label for="exampleInputtext11" class="form-label">Last Name*</label>
-                                  <input type="text" class="form-control" id="exampleInputtext11" placeholder="">
-                                </div>
+        $model_index = new IndexModel();
+        $aperturas=$model_index->List_aperturas($this->session->get('configuracion')['ide']);
+        $tabla='
+          <div class="col-md-10 mx-auto"> 
+          
+            <div class="card card-body" >
+              <div class="row">
+                <div class="col-md-4 col-xl-3">
+                  <form class="position-relative">
+                    <input type="text" class="form-control product-search ps-5" id="input-search" placeholder="Buscar..." />
+                  </form>
+                </div>
+                <div class="col-md-8 col-xl-9 text-end d-flex justify-content-md-end justify-content-center mt-3 mt-md-0">
+                  <a href="javascript:void(0)" id="btn-add-contact" class="btn btn-primary d-flex align-items-center">
+                    Nueva Apertura
+                  </a>
+                </div>
+              </div>
+            </div>
+            <!-- Modal -->
+            <div class="modal fade" id="addContactModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" role="dialog" aria-labelledby="addContactModalTitle" aria-hidden="true">
+              <div class="modal-dialog modal-dialog-centered" role="document">
+                <div class="modal-content">
+                  <div class="modal-header d-flex align-items-center">
+                    <h5 class="modal-title">Nueva Apertura '.$this->session->get('configuracion')['ide'].'</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                  </div>
+                  <div class="modal-body">
+                    <div class="add-contact-box">
+                      <div class="add-contact-content">
+                        <form id="addContactModalTitle">
+                          <div class="row">
+                            <div class="col-md-4">
+                              <div class="mb-3">
+                                <input type="text" id="c-name" class="form-control" placeholder="00" />
+                                <span class="validation-text text-danger"></span>
                               </div>
                             </div>
-                          </form>
-                        </div>
+                            <div class="col-md-4">
+                              <div class="mb-3">
+                                <input type="text" id="c-email" class="form-control" value="0000" disabled="true"/>
+                                <span class="validation-text text-danger"></span>
+                              </div>
+                            </div>
+                            <div class="col-md-4">
+                              <div class="mb-3">
+                                <input type="text" id="c-email" class="form-control" value="000" disabled="true"/>
+                                <span class="validation-text text-danger"></span>
+                              </div>
+                            </div>
+                          </div>
+                          <div class="row">
+                            <div class="col-md-12">
+                              <div class="mb-3">
+                                <input type="text" id="c-location" class="form-control" placeholder="Programa" />
+                              </div>
+                            </div>
+                          </div>
+                        </form>
                       </div>
                     </div>
-                 
-                    <div class="col-12">
-                      <div class="d-flex align-items-center justify-content-end gap-6">
-                        <button class="btn btn-primary">Save</button>
-                        <button class="btn bg-danger-subtle text-danger">Cancel</button>
-                      </div>
+                  </div>
+                  <div class="modal-footer">
+                    <div class="d-flex gap-6 m-0">
+                      <button id="btn-add" class="btn btn-success">Guardar</button>
+                      <button class="btn bg-danger-subtle text-danger" data-bs-dismiss="modal">Cancelar
+                      </button>
                     </div>
-                  </div>';
+
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="card card-body">
+              <div class="table-responsive">
+
+                <table class="table search-table align-middle text-nowrap">
+                  <thead class="header-item">
+                    <th style="alig:center">#</th>
+                    <th style="alig:center">CODIGO</th>
+                    <th style="alig:center">DESCRIPCIÓN PROGRAMA</th>
+                    <th style="alig:center"></th>
+                    <th style="alig:center"></th>
+                  </thead>
+                  <tbody>';
+                  $nro=0;
+                    foreach($aperturas as $row){
+                      $nro++;
+                      $tabla.='
+                      <tr class="search-items">
+                      <td>'.$nro.'</td>
+                      <td>
+                        '.$row['aper_programa'].' '.$row['aper_proyecto'].' '.$row['aper_actividad'].'
+                      </td>
+                      <td>
+                        '.$row['aper_descripcion'].'
+                      </td>
+                      <td class="text-center">
+                            <div class="action-btn">
+                              <!-- Botón de Ver/Editar -->
+                              <a href="javascript:void(0)" class="btn btn-outline-primary btn-sm d-flex align-items-center edit shadow-sm">
+                                <i class="ti ti-eye me-1 fs-5"></i> Ver
+                              </a>
+                            </div>
+                        </td>
+                        <td class="text-center">
+                            <div class="action-btn">
+                              <!-- Botón de Eliminar -->
+                              <a href="javascript:void(0)" class="btn btn-outline-danger btn-sm d-flex align-items-center delete shadow-sm">
+                                <i class="ti ti-trash me-1 fs-5"></i> Borrar
+                              </a>
+                            </div>
+                        </td>
+                    </tr>';
+                    }
+                  $tabla.='
+                  </tbody>
+                </table>
+                
+              </div>
+            </div>
+          </div>';
 
 
         return $tabla;

@@ -68,7 +68,7 @@ class CConfiguracion extends BaseController{
               <li class="nav-item" role="presentation">
                 <button class="nav-link position-relative rounded-0 d-flex align-items-center justify-content-center bg-transparent fs-3 py-3" id="pills-bills-tab" data-bs-toggle="pill" data-bs-target="#pills-bills" type="button" role="tab" aria-controls="pills-bills" aria-selected="false">
                   <i class="ti ti-article me-2 fs-6"></i>
-                  <span class="d-none d-md-block">EVALUACION POA</span>
+                  <span class="d-none d-md-block">PROGRAMAS</span>
                 </button>
               </li>
               <li class="nav-item" role="presentation">
@@ -91,7 +91,7 @@ class CConfiguracion extends BaseController{
 
 
                 <div class="tab-pane fade" id="pills-bills" role="tabpanel" aria-labelledby="pills-bills-tab" tabindex="0">
-                  TRES
+                  '.$miLib_conf->conf_form3().'
                 </div>
 
                 <div class="tab-pane fade" id="pills-security" role="tabpanel" aria-labelledby="pills-security-tab" tabindex="0">
@@ -233,6 +233,7 @@ class CConfiguracion extends BaseController{
         // 2. Actualización de Sesión
         $tp_adm = $session->get('funcionario')['tp_adm'];
         $modulos = $model_index->modulos($ide_gestion, $tp_adm);
+        $view_modulos_Sidebar=$miLib_index->Modulos_disponibles_Sidebar($modulos,$session->get('funcionario')['fun_nombre'].' '.$session->get('funcionario')['fun_paterno'].' '.$session->get('funcionario')['fun_materno'],$session->get('funcionario')['fun_cargo'],$this->session->get('configuracion')['conf_abrev_sistema']); /// vista modulos Cabecera Sidebar
         
         // Generamos la vista actualizada del menú
         $view_modulos = $miLib_index->Modulos_disponibles($modulos); 
@@ -240,6 +241,7 @@ class CConfiguracion extends BaseController{
         $session->set([
             'modulos'      => $modulos,
             'view_modulos' => $view_modulos,
+            'view_modulos_sidebar'   => $view_modulos_Sidebar,
         ]);
 
         return $this->response->setJSON([

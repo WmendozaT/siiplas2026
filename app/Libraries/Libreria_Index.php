@@ -418,6 +418,7 @@ class Libreria_Index{
                   <li class="nav-item d-none d-xl-block">
                     <a href="#" class="text-nowrap nav-link" style="color:#ffffff; font-size: 25px;">
                       <img src="'.base_url($img).'" class="dark-logo" width="35" alt="spike-img"/>&nbsp;&nbsp;<b>'.$sistema.'</b>
+                        <input name="base" type="hidden" value="'.base_url().'">
                     </a>
                   </li>
                 </ul>

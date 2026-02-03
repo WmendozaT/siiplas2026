@@ -314,39 +314,32 @@ class Libreria_Configuracion{
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                   </div>
                   <div class="modal-body">
+                  <form id="miFormulario" method="post">
                     <div class="add-contact-box">
                       <div class="add-contact-content">
-                        <form id="addContactModalTitle">
+                        
                           <div class="row">
                             <div class="col-md-4">
-                              <div class="mb-3">
-                                <input type="text" id="c-name" class="form-control" placeholder="00" />
-                                <span class="validation-text text-danger"></span>
-                              </div>
+                                <div class="mb-3">
+                                    <label class="small fw-bold">PROGRAMA</label>
+                                    <input type="number" id="prog" name="prog" class="form-control"/>
+                                    <!-- Mensaje de error dinámico -->
+                                    <div class="invalid-feedback">Ingrese un programa válido.</div>
+                                </div>
                             </div>
-                            <div class="col-md-4">
-                              <div class="mb-3">
-                                <input type="text" id="c-email" class="form-control" value="0000" disabled="true"/>
-                                <span class="validation-text text-danger"></span>
-                              </div>
-                            </div>
-                            <div class="col-md-4">
-                              <div class="mb-3">
-                                <input type="text" id="c-email" class="form-control" value="000" disabled="true"/>
-                                <span class="validation-text text-danger"></span>
-                              </div>
-                            </div>
-                          </div>
-                          <div class="row">
+                         
                             <div class="col-md-12">
-                              <div class="mb-3">
-                                <input type="text" id="c-location" class="form-control" placeholder="Programa" />
-                              </div>
+                                <div class="mb-3">
+                                    <label class="small fw-bold">DETALLE</label>
+                                    <input type="text" id="detalle" name="detalle" class="form-control"/>
+                                    <div class="invalid-feedback">La descripción es obligatoria.</div>
+                                </div>
                             </div>
                           </div>
-                        </form>
+                        
                       </div>
                     </div>
+                    </form>
                   </div>
                   <div class="modal-footer">
                     <div class="d-flex gap-6 m-0">
@@ -354,7 +347,6 @@ class Libreria_Configuracion{
                       <button class="btn bg-danger-subtle text-danger" data-bs-dismiss="modal">Cancelar
                       </button>
                     </div>
-
                   </div>
                 </div>
               </div>

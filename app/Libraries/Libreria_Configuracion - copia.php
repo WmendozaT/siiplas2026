@@ -442,91 +442,93 @@ class Libreria_Configuracion{
         $model_index = new IndexModel();
         $partidas=$model_index->lista_partidas();
         $tabla='
-                  <div class="row">
-                    <div class="col-lg-8 d-flex align-items-stretch">
-                      <div class="card w-100 border position-relative overflow-hidden">
-                        <div class="card-body p-4">
-                          <div class="table-responsive">
-                            <table class="table table-striped w-100 table-bordered datatable-select-inputs" id="mi-tablapartida" style="table-layout: fixed;">
-                              <thead style="background-color: #fcfcfd;">
-                                <tr>
-                                  <!-- Definimos anchos reales en el primer TR del THEAD -->
-                                  <th class="py-3 ps-4 text-muted fw-bold" style="width: 60px; font-size: 11px; letter-spacing: 0.5px;">#</th>
-                                  <th class="py-3 text-muted fw-bold text-center" style="width: 150px; font-size: 11px; letter-spacing: 0.5px;">CÓDIGO</th>
-                                  <th class="py-3 text-muted fw-bold text-center" style="width: 45%; font-size: 11px; letter-spacing: 0.5px;">DESCRIPCIÓN</th>
-                                  <th class="py-3 text-muted fw-bold text-center" style="font-size: 11px; letter-spacing: 0.5px;">DEPENDE</th>
-                                </tr>
-                                <!-- Fila de filtros -->
-                                <tr>
-                                  <td class="ps-4 pb-3 border-0"></td>
-                                  <td class="pb-3 border-0">
-                                    <input type="text" class="form-control form-control-sm minimalist-filter text-center" data-index="1" placeholder="Filtrar...">
-                                  </td>
-                                  <td class="pb-3 border-0">
-                                    <input type="text" class="form-control form-control-sm minimalist-filter" data-index="2" placeholder="Buscar descripción...">
-                                  </td>
-                                  <td class="pb-3 border-0">
-                                    <input type="text" class="form-control form-control-sm minimalist-filter" data-index="3" placeholder="Buscar Dependencia...">
-                                  </td>
-                                </tr>
-                              </thead>
-                              <tbody class="border-top-0">';
-                              $nro=0;
-                                foreach($partidas as $row){
-                                  $nro++;
-                                  $tabla.='
-                                   <tr class="search-items minimalist-row">
-                                    <td class="ps-4 text-muted small">'.$nro.'</td>
-                                    <td class="text-center">
-                                        <button type="button" 
-                                                class="btn btn-link p-0 border-0 btn-activar" 
-                                                data-id="'.$row['par_id'].'" 
-                                                data-codigo="'.$row['par_codigo'].'" 
-                                                title="Click para activar">
-                                            <code class="text-primary-emphasis bg-primary-subtle px-2 py-1 rounded hover-active" style="font-size: 14px; cursor: pointer;">
-                                                <b>'.$row['par_codigo'].'</b>
-                                            </code>
-                                        </button>
-                                    </td>
-                                    <td class="text-wrap">
-                                      <div class="fw-medium text-dark">'.strtoupper($row['par_nombre']).'</div>
-                                    </td>
-                                    <td class="text-wrap">
-                                      <div class="fw-medium text-dark">'.$row['par_depende'].'</div>
-                                    </td>
-                                  </tr>';
-                                }
-                              $tabla.='
-                              </tbody>
-                            </table>
-                          </div>
-                          <div class="d-flex align-items-center justify-content-between px-4 py-3 border-top">
-                              <div class="text-muted small">
-                                  Mostrando <span id="span-inicio">1</span> a <span id="span-fin">10</span> de <span id="span-total">0</span> registros
-                              </div>
-                              <nav>
-                                  <ul class="pagination pagination-sm mb-0">
-                                      <li class="page-item"><a class="page-link border-0 shadow-none text-muted" href="javascript:void(0)" id="btn-prev">
-                                      <img src="'.base_url().'Img/Iconos/resultset_previous.png" alt="Eliminar" style="width:16px; margin-right:5px;"></a></li></a></li>
-                                      <li class="page-item active"><a class="page-link border-0" href="javascript:void(0)" id="page-num">1</a></li>
-                                      <li class="page-item"><a class="page-link border-0 shadow-none text-muted" href="javascript:void(0)" id="btn-next">
-                                      <img src="'.base_url().'Img/Iconos/resultset_next.png" alt="Eliminar" style="width:16px; margin-right:5px;"></a></li>
-                                  </ul>
-                              </nav>
-                          </div>
-                        </div>
-                      </div>
+
+          <div class="row">
+           <div class="card">
+              <div class="card-body p-0">
+                <div class="table-responsive">
+                  <table class="table table-striped w-100 table-bordered datatable-select-inputs text-nowrap" id="mi-tablapartida">
+                    <!-- Cabecera con fondo gris muy tenue -->
+                    <thead style="background-color: #fcfcfd;">
+                      <tr>
+                        <th class="py-3 ps-4 text-muted fw-bold" style="width: 50px; font-size: 11px; letter-spacing: 0.5px;">#</th>
+                        <th class="py-3 text-muted fw-bold" style="font-size: 11px; letter-spacing: 0.5px;">CÓDIGO</th>
+                        <th class="py-3 text-muted fw-bold" style="font-size: 11px; letter-spacing: 0.5px;">DESCRIPCIÓN</th>
+                        <th class="py-3 text-muted fw-bold" style="font-size: 11px; letter-spacing: 0.5px;">DEPENDE</th>
+                        <th class="py-3 pe-4 text-end text-muted fw-bold" style="font-size: 11px; letter-spacing: 0.5px;">OPCIONES</th>
+                      </tr>
+                      <!-- Fila de filtros minimalista -->
+                      <tr>
+                        <td class="ps-4 pb-3 border-0"></td>
+                        <td class="pb-3 border-0">
+                          <input type="text" class="form-control form-control-sm minimalist-filter" data-index="1" placeholder="Filtrar...">
+                        </td>
+                        <td class="pb-3 border-0">
+                          <input type="text" class="form-control form-control-sm minimalist-filter" data-index="2" placeholder="Buscar descripción...">
+                        </td>
+                        <td class="pb-3 border-0">
+                          <input type="text" class="form-control form-control-sm minimalist-filter" data-index="3" placeholder="Buscar Dependencia...">
+                        </td>
+                        <td class="pe-4 pb-3 border-0"></td>
+                      </tr>
+                    </thead>
+                    <tbody class="border-top-0">';
+                      $nro=0;
+                      foreach($partidas as $row){
+                        $nro++;
+                        $tabla.='
+                        <tr class="search-items minimalist-row">
+                          <td class="ps-4 text-muted small">'.$nro.'</td>
+                          <td>
+                            <code class="text-primary-emphasis bg-primary-subtle px-2 py-1 rounded" style="font-size: 12px;">'.$row['par_codigo'].'</code>
+                          </td>
+                          <td>
+                            <div class="fw-medium text-dark">Gestión de Inventarios</div>
+                            <div class="text-muted" style="font-size: 12px;">Última actualización: Hoy</div>
+                          </td>
+                          <td>
+                            <div class="fw-medium text-dark">Gestión de Inventarios</div>
+                            <div class="text-muted" style="font-size: 12px;">Última actualización: Hoy</div>
+                          </td>
+                          <td class="pe-4 text-end">
+                            <button class="btn btn-icon-only border-0 bg-transparent text-muted hover-primary">
+                              <i class="ti ti-pencil fs-5"></i>
+                            </button>
+                            <button class="btn btn-icon-only border-0 bg-transparent text-muted hover-danger">
+                              <i class="ti ti-trash fs-5"></i>
+                            </button>
+                          </td>
+                        </tr>';
+                      }
+                      $tabla.='
+                      <!-- Fila vacía -->
+                      <tr id="no-results-row" style="display: none;">
+                        <td colspan="4" class="py-5 text-center">
+                          <span class="badge rounded-pill bg-light text-dark p-3 border">
+                            <i class="ti ti-info-circle me-1"></i> No hay coincidencias
+                          </span>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+                <div class="d-flex align-items-center justify-content-between px-4 py-3 border-top">
+                    <div class="text-muted small">
+                        Mostrando <span id="span-inicio">1</span> a <span id="span-fin">10</span> de <span id="span-total">0</span> registros
                     </div>
-                    <div class="col-lg-4 d-flex align-items-stretch">
-                      <div class="card w-100 border position-relative overflow-hidden">
-                          <!-- Añadimos max-height y overflow-y -->
-                          <div class="card-body p-4" id="u_medida" style="max-height: 800px; overflow-y: auto;">
-                              <h4 class="card-title">Mis Unidades de Medida</h4>
-                              <!-- Tu lista de unidades o tabla aquí -->
-                          </div>
-                      </div>
-                    </div>
-                  </div>';
+                    <nav>
+                        <ul class="pagination pagination-sm mb-0">
+                            <li class="page-item"><a class="page-link border-0 shadow-none text-muted" href="javascript:void(0)" id="btn-prev">
+                            <img src="'.base_url().'Img/Iconos/resultset_previous.png" alt="Eliminar" style="width:16px; margin-right:5px;"></a></li></a></li>
+                            <li class="page-item active"><a class="page-link border-0" href="javascript:void(0)" id="page-num">1</a></li>
+                            <li class="page-item"><a class="page-link border-0 shadow-none text-muted" href="javascript:void(0)" id="btn-next">
+                            <img src="'.base_url().'Img/Iconos/resultset_next.png" alt="Eliminar" style="width:16px; margin-right:5px;"></a></li>
+                        </ul>
+                    </nav>
+                </div>
+              </div>
+            </div>
+          </div>';
         return $tabla;
     }
 }

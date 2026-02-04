@@ -7,8 +7,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link rel="shortcut icon" type="image/png" href="<?= base_url('Img/plantillaImg/logo_CNS_header.png') ?>" />
   <link rel="stylesheet" href="<?= base_url('Css/plantillaCss/styles.css') ?>"/>
+  
   <title><?= session()->get("configuracion")['conf_abrev_sistema'] ?? 'No encontrado' ?></title>
   <link rel="stylesheet" href="<?= base_url('Css/plantillaCss/jquery-jvectormap.css') ?>">
+
   <meta name="csrf-token-name" content="<?= csrf_token() ?>">
   <meta name="csrf-token-value" content="<?= csrf_hash() ?>">
 </head>
@@ -63,7 +65,6 @@
   <script src=<?= base_url('Js/PlantillaJs/index.global.min.js') ?>></script>
   
   <script src=<?= base_url('Js/Inactividad.js') ?>></script>
-<!--   <script src=<?= base_url('Js/PlantillaJs/contact.js') ?>></script> -->
 </body>
 
 </html>

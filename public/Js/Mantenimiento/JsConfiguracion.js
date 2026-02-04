@@ -1,5 +1,119 @@
  base = $('[name="base"]').val();
 
+document.addEventListener('DOMContentLoaded', function () {
+    const searchInput = document.getElementById('input-search');
+    const tableRows = document.querySelectorAll('.search-items');
+    const noResultsRow = document.getElementById('no-results-row');
+
+    searchInput.addEventListener('keyup', function () {
+        const filter = this.value.toLowerCase();
+        let hasVisibleRows = false;
+
+        tableRows.forEach(row => {
+            const text = row.textContent.toLowerCase();
+            if (text.includes(filter)) {
+                row.style.setProperty('display', '', 'important');
+                hasVisibleRows = true;
+            } else {
+                row.style.setProperty('display', 'none', 'important');
+            }
+        });
+
+        // Mostramos u ocultamos el mensaje según si hay filas visibles
+        noResultsRow.style.display = hasVisibleRows ? 'none' : 'table-row';
+    });
+});
+
+//// para el listado de partidas
+document.addEventListener('DOMContentLoaded', function () {
+    const rowsPerPage = 10;
+    let currentPage = 1;
+    
+    const tableRows = Array.from(document.querySelectorAll('#mi-tablapartida tbody .search-items'));
+    const filters = document.querySelectorAll('.minimalist-filter');
+    const noResultsRow = document.getElementById('no-results-row');
+    
+    function updateTable() {
+        // 1. Obtener solo las filas que pasan el filtro
+        const filteredRows = tableRows.filter(row => {
+            let isVisible = true;
+            filters.forEach(filter => {
+                const colIndex = filter.getAttribute('data-index');
+                const filterValue = filter.value.toLowerCase().trim();
+                const cellValue = row.cells[colIndex].textContent.toLowerCase().trim();
+                if (filterValue && !cellValue.includes(filterValue)) isVisible = false;
+            });
+            return isVisible;
+        });
+
+        // 2. Calcular paginación sobre los resultados filtrados
+        const totalRows = filteredRows.length;
+        const totalPages = Math.ceil(totalRows / rowsPerPage) || 1;
+        
+        if (currentPage > totalPages) currentPage = totalPages;
+        if (currentPage < 1) currentPage = 1;
+
+        const start = (currentPage - 1) * rowsPerPage;
+        const end = start + rowsPerPage;
+
+        // 3. Ocultar todas y mostrar solo las de la página actual
+        tableRows.forEach(row => row.style.display = 'none');
+        
+        filteredRows.slice(start, end).forEach(row => {
+            row.style.display = '';
+        });
+
+        // 4. Actualizar textos e interfaz
+        noResultsRow.style.display = totalRows === 0 ? 'table-row' : 'none';
+        document.getElementById('span-inicio').textContent = totalRows === 0 ? 0 : start + 1;
+        document.getElementById('span-fin').textContent = Math.min(end, totalRows);
+        document.getElementById('span-total').textContent = totalRows;
+        document.getElementById('page-num').textContent = currentPage;
+    }
+
+    // Eventos de Filtros
+    filters.forEach(input => {
+        input.addEventListener('keyup', () => {
+            currentPage = 1; // Reiniciar a pag 1 al buscar
+            updateTable();
+        });
+    });
+
+    // Eventos de Botones
+    document.getElementById('btn-prev').addEventListener('click', () => {
+        if (currentPage > 1) { currentPage--; updateTable(); }
+    });
+
+    document.getElementById('btn-next').addEventListener('click', () => {
+        const totalRows = tableRows.filter(row => {
+            return Array.from(filters).every(f => {
+                const val = f.value.toLowerCase().trim();
+                return !val || row.cells[f.getAttribute('data-index')].textContent.toLowerCase().includes(val);
+            });
+        }).length;
+        
+        if (currentPage < Math.ceil(totalRows / rowsPerPage)) { 
+            currentPage++; 
+            updateTable(); 
+        }
+    });
+
+    // Inicializar
+    updateTable();
+});
+
+
+//// Get Unidades de Medida
+$(document).on('keyup', '#search-um-internal', function() {
+    let valor = $(this).val().toLowerCase();
+    $("#tab_umed tbody tr").filter(function() {
+        $(this).toggle($(this).text().toLowerCase().indexOf(valor) > -1)
+    });
+});
+
+
+
+
 ///// Js Update formulario de configuracion del Sistema
 $(document).ready(function() {
     $("#form_conf").on("submit", function(e) {
@@ -306,4 +420,88 @@ document.addEventListener('DOMContentLoaded', function () {
             });
         }
     }
+});
+
+ ///// GET PARTIDAS
+ document.addEventListener('click', function (e) {
+    // Detectamos si el click fue en el botón o dentro del code
+    const btn = e.target.closest('.btn-activar');
+    
+    if (btn) {
+        const idPartida = btn.getAttribute('data-id');
+        console.log("Activando ID:", idPartida);
+
+        // Referencia a tu div de destino
+        const contenedor = document.getElementById('u_medida');
+        const codigoPartida = btn.getAttribute('data-codigo');
+
+        // Ejemplo de cómo podrías mostrar la información
+        contenedor.innerHTML = `
+            <div class="d-flex align-items-center justify-content-center h-100">
+                <div class="spinner-border text-primary" role="status"></div>
+                <span class="ms-2">Cargando datos del código ${codigoPartida}...</span>
+            </div>`;
+
+            const dataPost = {
+                id: idPartida
+            };
+
+            $.ajax({
+                url: base + "mnt/get_unidades_medida",
+                type: 'POST',
+                data: dataPost,
+                dataType: 'json',
+                success: function(response) {
+                
+                    if (response.status === 'success') {
+                        contenedor.innerHTML = response.datos;
+                        console.log("Módulo actualizado correctamente");
+                    } else {
+                        alert('Error: ' + (response.message || 'No se pudo actualizar'));
+                        // Revertir estado visual si el servidor reporta error
+                        $input.prop('checked', !($input.is(':checked')));
+                    }
+                }
+            });
+                
+    }
+});
+
+
+//// activa el estado de activar la unidades de medida por la Partida
+$(document).on('change', '.btn-switch-update_umedida', function() {
+    alert('hola mundo')
+    const $check = $(this);
+    const data = {
+        um_id: $check.data('um-id'),
+        par_id: $check.data('par-id'),
+        estado: $check.is(':checked') ? 1 : 0
+    };
+
+    // Bloqueo visual temporal
+    $check.addClass('opacity-50').attr('disabled', true);
+
+    $.ajax({
+        url: base + "mnt/update_unidad_estado", // Debes crear este método
+        type: 'POST',
+        data: data,
+        dataType: 'json',
+        success: function(res) {
+            $check.removeClass('opacity-50').attr('disabled', false);
+            
+            if (res.status === 'success') {
+                // Notificación opcional (puedes usar Toastr o SweetAlert)
+                console.log("Actualizado correctamente");
+            } else {
+                // Si falla el servidor, revertimos el check visualmente
+                $check.prop('checked', !data.estado);
+                alert("Error al actualizar: " + res.message);
+            }
+        },
+        error: function() {
+            $check.removeClass('opacity-50').attr('disabled', false);
+            $check.prop('checked', !data.estado);
+            alert("Error de conexión con el servidor");
+        }
+    });
 });

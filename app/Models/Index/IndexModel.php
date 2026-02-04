@@ -117,6 +117,35 @@ class IndexModel extends Model{
     }
 
 
+    /// Listado de Partidas
+    public function lista_partidas(){
+        $sql = 'SELECT *
+                from partidas
+                where par_id!=0 and par_depende!=0
+                order by par_codigo asc';
+
+        $query = $this->query($sql);
+        return $query->getResultArray();
+    }
+
+
+    /// Listado de Unidades de Medida alineados a la partida
+    public function lista_umedidas($par_id){
+        $sql = 'SELECT 
+                    um.*, 
+                    CASE 
+                    WHEN pum.um_id IS NOT NULL THEN 1 
+                    ELSE 0 
+                    END AS incluido
+                FROM insumo_unidadmedida um
+                LEFT JOIN par_umedida pum ON pum.um_id = um.um_id AND pum.par_id = '.$par_id.'
+                ORDER BY um.um_id ASC;';
+
+        $query = $this->query($sql);
+        return $query->getResultArray();
+    }
+
+
     /// Get Buscando funcionario por su Usuario
     public function fun_usuario($usuario){
         // Usando el Query Builder de CI4 para una consulta segura

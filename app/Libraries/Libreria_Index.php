@@ -412,7 +412,9 @@ class Libreria_Index{
     /// Cabecera Sistema
     public function Cabecera_sistema($responsable,$cargo,$sistema,$img){
     $tabla='';
-    $tabla.='<div class="app-header with-horizontal">
+    $tabla.='<link rel="stylesheet" href="https://cdn.jsdelivr.net">
+            <link rel="stylesheet" href="https://cdn.jsdelivr.net">
+            <div class="app-header with-horizontal">
               <nav class="navbar navbar-expand-xl container-fluid p-0">
                 <ul class="navbar-nav">
                   <li class="nav-item d-none d-xl-block">

@@ -74,7 +74,7 @@ class CConfiguracion extends BaseController{
               <li class="nav-item" role="presentation">
                 <button class="nav-link position-relative rounded-0 d-flex align-items-center justify-content-center bg-transparent fs-3 py-3" id="pills-security-tab" data-bs-toggle="pill" data-bs-target="#pills-security" type="button" role="tab" aria-controls="pills-security" aria-selected="false">
                   <i class="ti ti-lock me-2 fs-6"></i>
-                  <span class="d-none d-md-block">Security</span>
+                  <span class="d-none d-md-block">PARTIDAS</span>
                 </button>
               </li>
             </ul>
@@ -95,7 +95,7 @@ class CConfiguracion extends BaseController{
                 </div>
 
                 <div class="tab-pane fade" id="pills-security" role="tabpanel" aria-labelledby="pills-security-tab" tabindex="0">
-                  CUATRO
+                  '.$miLib_conf->conf_form4().'
                 </div>
 
               </div>
@@ -315,7 +315,7 @@ class CConfiguracion extends BaseController{
         return $this->response->setJSON(['success' => false, 'message' => 'No se pudo procesar la información.']);
     }
 
-
+    /// Elimina Apertura Programatica
     public function eliminar_apertura() {
         $id = $this->request->getPost('id');
 
@@ -335,6 +335,75 @@ class CConfiguracion extends BaseController{
 
         return $this->response->setJSON(['success' => false, 'message' => 'No se pudo eliminar.']);
     }
+
+    //// Get Unidades de Medida por Partida
+    public function get_unidades_medida() {
+        // 1. Validación de seguridad avanzada
+        if (!$this->request->isAJAX()) {
+            return $this->response->setStatusCode(403)->setJSON([
+                'status' => 'error', 
+                'message' => 'Acceso no permitido'
+            ]);
+        }
+
+        // 2. Validación de datos de entrada
+        $par_id = $this->request->getPost('id', FILTER_SANITIZE_NUMBER_INT);
+        if (!$par_id) {
+            return $this->response->setJSON(['status' => 'error', 'message' => 'ID de partida no válido']);
+        }
+
+        $model_index = new IndexModel();
+        $listado_umedida = $model_index->lista_umedidas($par_id);
+        //$data['par_id']  = $par_id;
+        $tabla='';
+        $tabla.='
+            <div class="mb-3">
+                <input type="text" class="form-control form-control-sm border-primary-subtle" id="search-um-internal" placeholder="🔍 Buscar unidad...">
+            </div>
+
+            <div class="table-responsive" style="max-height: 400px;">
+                <table class="table table-hover align-middle table-sm" id="tab_umed">
+                    <thead class="table-light sticky-top">
+                        <tr>
+                            <th style="width: 5%">#</th>
+                            <th style="width: 75%">UNIDAD DE MEDIDA</th>
+                            <th style="width: 20%" class="text-center">ESTADO</th>
+                        </tr>
+                    </thead>
+                    <tbody>';
+                    $nro=0;
+                    foreach($listado_umedida as $row){
+                        $nro++;
+                        $tabla.='
+                        <tr class="um-item-row">
+                            <td class="text-muted small">'.$nro.'</td>
+                            <td class="text-uppercase fw-medium" style="font-size: 0.85rem;">
+                                '.$row['um_descripcion'].'
+                            </td>
+                            <td>
+                                <div class="form-check form-switch d-flex justify-content-center">
+                                    <input class="form-check-input btn-switch-update_umedida" type="checkbox" 
+                                           data-um-id="'.$row['um_id'].'" 
+                                           data-par-id="'.$par_id.'"
+                                           '.($row['incluido'] == 1 ? 'checked' : '').'
+                                           style="width: 2.4em; height: 1.2em; cursor:pointer;">
+                                </div>
+                            </td>
+                        </tr>';
+                    }
+                    $tabla.='
+                    </tbody>
+                </table>
+            </div>';
+
+        // 3. Retornar vista procesada (más limpio)
+        return $this->response->setJSON([
+            'status' => 'success', 
+            'datos'  => $tabla 
+        ]);
+    }
+
+
 }
 
 

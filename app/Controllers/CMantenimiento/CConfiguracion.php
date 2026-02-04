@@ -252,134 +252,89 @@ class CConfiguracion extends BaseController{
 
 
     /// Valida form aperturas programaticas
-    public function valida_aperturas(){
+    public function valida_aperturas() {
         $db = \Config\Database::connect();
+        
+        // 1. Capturamos el ID (si viene es edición, si no es nuevo)
+        $id = $this->request->getPost('id_apertura');
+
+        // 2. Ajustamos la regla is_unique para que ignore el ID actual al editar
+        // Sintaxis: is_unique[tabla.columna,id_columna,valor_a_ignorar]
+        $progRule = 'required|numeric|greater_than[0]|min_length[2]|max_length[3]';
+        if (empty($id)) {
+            $progRule .= '|is_unique[aperturaprogramatica.aper_programa]';
+        } else {
+            $progRule .= "|is_unique[aperturaprogramatica.aper_programa,aper_id,{$id}]";
+        }
+
         $rules = [
-            'prog' => 'required|numeric|greater_than[0]',
+            'prog'    => $progRule,
             'detalle' => 'required|min_length[3]|max_length[255]'
         ];
 
-        if (!$this->validate($rules)) {
-            return $this->response->setJSON([
-                'success' => false,
-                'message' => 'Por favor, complete todos los campos correctamente.',
-                'errors' => $this->validator->getErrors()
-            ]);
-        }
-
-        $data = [
-        'aper_programa'    => $this->request->getPost('prog'),
-        'aper_proyecto'    => '0000',
-        'aper_actividad'   => '000',
-        'aper_descripcion' => strtoupper(trim($this->request->getPost('detalle'))),
-        'aper_asignado'    => 1,
-        'fun_id'           => session()->get('fun_id') 
+        $messages = [
+            'prog' => [
+                'is_unique' => 'El código de programa ya existe en la base de datos.'
+            ]
         ];
 
-        if ($db->table('aperturaprogramatica')->insert($data)) {
-            return $this->response->setJSON([
-                'success' => true,
-                'message' => 'Apertura guardada correctamente'
-            ]);
-        } else {
+    /*    if (!$this->validate($rules, $messages)) {
             return $this->response->setJSON([
                 'success' => false,
-                'message' => 'No se pudo guardar la información en la base de datos.'
+                'message' => 'Error de validación.',
+                'errors'  => $this->validator->getErrors()
+            ]);
+        }*/
+
+        // 3. Preparamos los datos
+        $data = [
+            'aper_programa'    => $this->request->getPost('prog'),
+            'aper_gestion'     => session()->get('configuracion')['ide'],
+            'aper_proyecto'    => '0000',
+            'aper_actividad'   => '000',
+            'aper_descripcion' => strtoupper(trim($this->request->getPost('detalle'))),
+            'aper_asignado'    => 1,
+            'fun_id'           => session()->get('fun_id') 
+        ];
+
+        // 4. Decidimos si insertar o actualizar
+        $builder = $db->table('aperturaprogramatica');
+
+        if (!empty($id)) {
+            // ACTUALIZAR
+            if ($builder->where('aper_id', $id)->update($data)) {
+                return $this->response->setJSON(['success' => true, 'message' => 'Apertura actualizada correctamente']);
+            }
+        } else {
+            // INSERTAR
+            if ($builder->insert($data)) {
+                return $this->response->setJSON(['success' => true, 'message' => 'Apertura guardada correctamente']);
+            }
+        }
+
+        return $this->response->setJSON(['success' => false, 'message' => 'No se pudo procesar la información.']);
+    }
+
+
+    public function eliminar_apertura() {
+        $id = $this->request->getPost('id');
+
+        if (empty($id)) {
+            return $this->response->setJSON(['success' => false, 'message' => 'ID no válido.']);
+        }
+
+        $db = \Config\Database::connect();
+        $builder = $db->table('aperturaprogramatica');
+
+        if ($builder->where('aper_id', $id)->delete()) {
+            return $this->response->setJSON([
+                'success' => true, 
+                'message' => 'Registro eliminado correctamente.'
             ]);
         }
+
+        return $this->response->setJSON(['success' => false, 'message' => 'No se pudo eliminar.']);
     }
-
-
-/*public function valida_aperturas() {
-    // 1. Validar datos
-    $rules = [
-        'prog'    => 'required|numeric|min_length[2]|max_length[2]',
-        'detalle' => 'required|min_length[3]'
-    ];
-
-    if (!$this->validate($rules)) {
-        return $this->response->setJSON([
-            'status' => 'error_val',
-            'errors' => $this->validator->getErrors()
-        ]);
-    }
-
-    // 2. Preparar datos para la tabla 'aperturaprogramatica'
-    $data = [
-        'aper_programa'    => $this->request->getPost('prog'),
-        'aper_proyecto'    => '0000',
-        'aper_actividad'   => '000',
-        'aper_descripcion' => strtoupper(trim($this->request->getPost('detalle'))),
-        'aper_asignado'    => 1,
-        'fun_id'           => session()->get('fun_id') 
-    ];
-
-    try {
-        $db = \Config\Database::connect();
-        $builder = $db->table('aperturaprogramatica');
-        
-        if ($builder->insert($data)) {
-            // Respuesta de éxito definitiva
-            return $this->response->setJSON(['status' => 'success']);
-        } else {
-            return $this->response->setJSON(['status' => 'error', 'message' => 'No se pudo insertar.']);
-        }
-    } catch (\Exception $e) {
-        return $this->response->setJSON(['status' => 'error', 'message' => $e->getMessage()]);
-    }
-}*/
-
-public function valida_aperturas2(){
-    $validation = \Config\Services::validation(); // Cargar el servicio manualmente
-
-    $rules = [
-        'prog'    => 'required|numeric|min_length[2]|max_length[2]',
-        'detalle' => 'required|min_length[3]'
-    ];
-
-    // Obtenemos los datos del POST explícitamente
-    $dataInput = $this->request->getPost();
-
-    if (!$this->validateData($dataInput, $rules)) { // Usamos validateData en lugar de validate
-        return $this->response->setJSON([
-            'status' => 'error1',
-            'message' => 'Validación fallida',
-            'errors' => $this->validator->getErrors()
-        ]);
-    }
-
-    // 3. Preparación de datos
-    $data = [
-        'aper_programa'    => $this->request->getPost('prog'),
-        'aper_proyecto'    => '0000',
-        'aper_actividad'   => '000',
-        'aper_descripcion' => strtoupper(trim($this->request->getPost('detalle'))),
-        'aper_asignado'    => 1,
-        'fun_id'           => session()->get('fun_id') // Usando el helper global más seguro
-    ];
-
-    // 4. Inserción
-    try {
-        $db = \Config\Database::connect();
-        $builder = $db->table('aperturaprogramatica');
-        
-        if ($builder->insert($data)) {
-            return $this->response->setJSON(['status' => 'success']);
-        } 
-        
-        return $this->response->setJSON(['status' => 'error', 'message' => 'No se pudo guardar.']);
-        
-    } catch (\Exception $e) {
-        return $this->response->setJSON([
-            'status' => 'error2', 
-            'message' => 'Error de base de datos: ' . $e->getMessage()
-        ]);
-    }
-}
-
-
-
-
 }
 
 

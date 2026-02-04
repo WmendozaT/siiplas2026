@@ -299,58 +299,72 @@ class Libreria_Configuracion{
                   </form>
                 </div>
                 <div class="col-md-8 col-xl-9 text-end d-flex justify-content-md-end justify-content-center mt-3 mt-md-0">
-                  <a href="javascript:void(0)" id="btn-add-contact" class="btn btn-primary d-flex align-items-center">
-                    Nueva Apertura
+                  <a href="javascript:void(0)" 
+                     id="btn-add-contact" 
+                     class="btn btn-primary d-flex align-items-center"
+                     data-bs-toggle="modal" 
+                     data-bs-target="#addContactModal">
+                     Nueva Apertura
                   </a>
                 </div>
               </div>
             </div>
             <!-- Modal -->
+
             <div class="modal fade" id="addContactModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" role="dialog" aria-labelledby="addContactModalTitle" aria-hidden="true">
               <div class="modal-dialog modal-dialog-centered" role="document">
                 <div class="modal-content">
                   <div class="modal-header d-flex align-items-center">
-                    <h5 class="modal-title">Nueva Apertura '.$this->session->get('configuracion')['ide'].'</h5>
+                    <h5 class="modal-title" id="addContactModalTitle">Nueva Apertura Programatica '.$this->session->get('configuracion')['ide'].'</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                   </div>
                   <div class="modal-body">
-                  <form id="miFormulario" method="post">
-                    <div class="add-contact-box">
-                      <div class="add-contact-content">
-                        
-                          <div class="row">
-                            <div class="col-md-4">
-                                <div class="mb-3">
-                                    <label class="small fw-bold">PROGRAMA</label>
-                                    <input type="number" id="prog" name="prog" class="form-control"/>
-                                    <!-- Mensaje de error dinámico -->
-                                    <div class="invalid-feedback">Ingrese un programa válido.</div>
-                                </div>
-                            </div>
-                         
-                            <div class="col-md-12">
-                                <div class="mb-3">
-                                    <label class="small fw-bold">DETALLE</label>
-                                    <input type="text" id="detalle" name="detalle" class="form-control"/>
-                                    <div class="invalid-feedback">La descripción es obligatoria.</div>
-                                </div>
-                            </div>
-                          </div>
-                        
+                    <form id="miFormulario" class="needs-validation" novalidate method="post">
+                      <input type="text" id="id_apertura" name="id_apertura" value="">
+                      <div class="row">
+                        <div class="col-md-12 mb-3">
+                          <label class="form-label">Descripción</label>
+                          <input type="text" class="form-control" id="detalle" name="detalle" required />
+                          <div class="invalid-feedback">Por favor, ingresa una descripción.</div>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                          <label class="form-label">Programa</label>
+                            <input 
+                              type="text" 
+                              class="form-control" 
+                              id="prog" 
+                              name="prog" 
+                              placeholder="000"
+
+                              maxlength="3"
+                              pattern="\d{2,3}"
+                              inputmode="numeric"
+                              required 
+                            />
+                          <div class="invalid-feedback">Debe ingresar exactamente 3 números.</div>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                          <label class="form-label">Proyecto</label>
+                          <input type="text" class="form-control" value="0000" disabled/>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                          <label class="form-label">Actividad</label>
+                          <input type="text" class="form-control" value="000" disabled/>
+                        </div>
                       </div>
-                    </div>
                     </form>
                   </div>
                   <div class="modal-footer">
-                    <div class="d-flex gap-6 m-0">
-                      <button id="btn-add" class="btn btn-success">Guardar</button>
-                      <button class="btn bg-danger-subtle text-danger" data-bs-dismiss="modal">Cancelar
-                      </button>
-                    </div>
+                    <button type="button" class="btn btn-light-danger text-danger font-medium" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" id="btnGuardar" form="miFormulario" class="btn btn-primary">
+                        <span id="btnText">Guardar</span>
+                        <span id="btnLoader" class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
+                    </button>
                   </div>
                 </div>
               </div>
             </div>
+
             <div class="card card-body">
               <div class="table-responsive">
 
@@ -362,7 +376,7 @@ class Libreria_Configuracion{
                     <th style="alig:center"></th>
                     <th style="alig:center"></th>
                   </thead>
-                  <tbody>';
+                  <tbody id="tabla-cuerpo">';
                   $nro=0;
                     foreach($aperturas as $row){
                       $nro++;
@@ -378,16 +392,24 @@ class Libreria_Configuracion{
                       <td class="text-center">
                             <div class="action-btn">
                               <!-- Botón de Ver/Editar -->
-                              <a href="javascript:void(0)" class="btn btn-outline-primary btn-sm d-flex align-items-center edit shadow-sm">
-                                <i class="ti ti-eye me-1 fs-5"></i> Ver
+                              <a href="javascript:void(0)" 
+                                 class="btn btn-outline-primary btn-sm d-flex align-items-center edit shadow-sm btn-edit"
+                                 data-id="'.$row['aper_id'].'" 
+                                 data-prog="'.$row['aper_programa'].'" 
+                                 data-desc="'.$row['aper_descripcion'].'"
+                                 data-bs-toggle="modal" 
+                                 data-bs-target="#addContactModal">
+                                 <i class="ti ti-eye me-1 fs-5"></i> Ver
                               </a>
                             </div>
                         </td>
                         <td class="text-center">
                             <div class="action-btn">
                               <!-- Botón de Eliminar -->
-                              <a href="javascript:void(0)" class="btn btn-outline-danger btn-sm d-flex align-items-center delete shadow-sm">
-                                <i class="ti ti-trash me-1 fs-5"></i> Borrar
+                              <a href="javascript:void(0)" 
+                                 class="btn btn-outline-danger btn-sm d-flex align-items-center delete shadow-sm btn-delete" 
+                                 data-id="'.$row['aper_id'].'">
+                                 <i class="ti ti-trash me-1 fs-5"></i> Borrar
                               </a>
                             </div>
                         </td>

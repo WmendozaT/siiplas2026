@@ -61,4 +61,5 @@ $routes->get('mnt/Pdf_responsables_sfirma', 'CMantenimiento\CResponsables_Pdf::P
 $routes->get('mnt/ConfiguracionSistema', 'CMantenimiento\CConfiguracion::Menu_configuracion'); /// View Configuracion
 $routes->post('mnt/update_conf', 'CMantenimiento\CConfiguracion::Update_configuracion'); /// Valida Update Responsable
 $routes->post('mnt/update_estado_modulos', 'CMantenimiento\CConfiguracion::update_estado_modulos'); /// Estados para modulo disponibles
-$routes->post('mnt/aperturas', 'CMantenimiento\CConfiguracion::valida_aperturas'); /// Valida Aperturas Programaticas
+$routes->post('mnt/aperturas', 'CMantenimiento\CConfiguracion::valida_aperturas'); /// Valida Add - Update Aperturas Programaticas
+$routes->post('mnt/eliminar_apertura', 'CMantenimiento\CConfiguracion::eliminar_apertura'); /// Elimina Apertura Programatica

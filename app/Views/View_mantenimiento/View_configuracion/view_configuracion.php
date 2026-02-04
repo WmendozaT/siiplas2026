@@ -63,7 +63,7 @@
   <script src=<?= base_url('Js/PlantillaJs/index.global.min.js') ?>></script>
   
   <script src=<?= base_url('Js/Inactividad.js') ?>></script>
-  <script src=<?= base_url('Js/PlantillaJs/contact.js') ?>></script>
+<!--   <script src=<?= base_url('Js/PlantillaJs/contact.js') ?>></script> -->
 </body>
 
 </html>

@@ -113,55 +113,197 @@ $(document).on('change', '.btn-switch-updates', function() {
 });
 
 
+//// valida add - Update formulario de Aperturas
+document.addEventListener('DOMContentLoaded', function () {
+    const formulario = document.getElementById('miFormulario');
+    const btnGuardar = document.getElementById('btnGuardar');
+    const btnText = document.getElementById('btnText');
+    const btnLoader = document.getElementById('btnLoader');
+    const modalElement = document.getElementById('addContactModal');
+    const modalBootstrap = bootstrap.Modal.getOrCreateInstance(modalElement);
+    const inputProg = document.getElementById('prog');
 
-$(document).ready(function() {
-    // 1. Obtener el nombre y valor del CSRF (necesario para CI4)
-    // Asegúrate de tener esto en tu vista: <input type="hidden" name="<?= csrf_token() ?>" value="<?= csrf_hash() ?>" id="csrf_token">
-    
-    function enviarFormulario() {
-        $('#btn-add').prop('disabled', true).html('<span class="spinner-border spinner-border-sm"></span> Guardando...');
-        
-        const formData = {
-            prog: $('#prog').val(),
-            detalle: $('#detalle').val(),
-            // Incluye el token CSRF si está activo en tu Config/Filters.php
-            [csrfName]: csrfHash 
-        };
-        
-        $.ajax({
-            url: base + "mnt/aperturas",
-            type: 'POST',
-            data: formData,
-            dataType: 'json',
-            success: function(response) {
-                if (response.success) {
-                    alert('✅ ' + response.message);
-                    $('#addContactModal').modal('hide'); // Cierra el modal
-                    location.reload(); // Opcional: recargar para ver cambios
-                } else {
-                    // Si el controlador manda errores de validación
-                    if(response.errors) {
-                        alert('Error: ' + JSON.stringify(response.errors));
-                    } else {
-                        alert('❌ ' + response.message);
-                    }
-                }
-            },
-            error: function(xhr) {
-                alert('Error crítico en el servidor');
-            },
-            complete: function() {
-                $('#btn-add').prop('disabled', false).text('Guardar');
+    inputProg.addEventListener('input', function() {
+        // Elimina cualquier caracter que no sea número
+        this.value = this.value.replace(/\D/g, '');
+    });
+
+    ///// verifica que tipo de modal sera nuevo - update
+    modalElement.addEventListener('show.bs.modal', function (event) {
+        const button = event.relatedTarget;
+        const inputProg = document.getElementById('prog'); // Asegúrate de obtenerlo aquí
+
+        if (button.hasAttribute('data-id')) {
+            const prog = button.getAttribute('data-prog');
+            
+            // Cargamos los datos
+            document.getElementById('id_apertura').value = button.getAttribute('data-id');
+            document.getElementById('detalle').value = button.getAttribute('data-desc');
+            inputProg.value = prog;
+
+            // IMPORTANTE: Guardamos el original para la comparación posterior
+            inputProg.setAttribute('data-original', prog);
+            
+            document.getElementById('addContactModalTitle').innerText = 'Editar Apertura';
+        } else {
+            // Si es nuevo, limpiamos el atributo para que no tenga basura de una edición previa
+            formulario.reset();
+            inputProg.removeAttribute('data-original');
+            document.getElementById('id_apertura').value = '';
+            document.getElementById('addContactModalTitle').innerText = 'Nueva Apertura';
+        }
+    });
+    //////////////
+
+    formulario.addEventListener('submit', function (event) {
+        event.preventDefault();
+        event.stopPropagation();
+
+        if (!formulario.checkValidity()) {
+            formulario.classList.add('was-validated');
+            return;
+        }
+
+        const inputProg = document.getElementById('prog');
+        const programaNuevo = inputProg.value.trim();
+        const programaOriginal = inputProg.getAttribute('data-original'); // Recuperamos el original
+
+      //  alert(programaNuevo+'----'+programaOriginal)
+        if (programaOriginal === null || programaNuevo !== programaOriginal) {
+            //const programaNuevo = document.getElementById('prog').value.trim();
+            const filas = document.querySelectorAll('#tabla-cuerpo tr'); // Selecciona las filas de la tabla
+            let yaExiste = false;
+
+            filas.forEach(fila => {
+            // Obtenemos el texto de la segunda columna (CÓDIGO)
+            // Usamos split(' ')[0] para extraer solo el código del programa (antes del espacio)
+            const codigoCelda = fila.cells[1].innerText.trim().split(' ')[0];
+            
+            if (codigoCelda === programaNuevo) {
+                yaExiste = true;
             }
-        });
-    }
+            });
 
-    // Corregir el reset del modal
-    $('#addContactModal').on('hidden.bs.modal', function() {
-    // Busca el formulario dentro del modal y resetealo
-    $(this).find('form')[0].reset(); 
-    
-    // Quita las clases de validación de Bootstrap
-    $('#prog, #detalle').removeClass('is-valid is-invalid');
+            if (yaExiste) {
+                alert('⚠️ El código de programa "' + programaNuevo + '" ya se encuentra registrado en el listado.');
+                document.getElementById('prog').focus();
+                return; // Detiene el envío
+            }
+        }
+        
+
+        // --- ACTIVAR LOADING ---
+        btnGuardar.disabled = true;        // Evita múltiples clics
+        btnText.innerText = "Guardando..."; // Cambia el texto
+        btnLoader.classList.remove('d-none'); // Muestra el spinner
+        const formData = new FormData(formulario);
+
+        fetch(base + "mnt/aperturas", { 
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            // CAMBIO CLAVE: Validamos 'data.success' que es lo que envía tu PHP
+            if (data.success === true) {
+               // alert(data.message);
+                
+                // 1. Obtener la referencia de la tabla
+                const tbody = document.getElementById('tabla-cuerpo');
+                
+                // 2. Calcular el siguiente número (opcional, basado en filas actuales)
+                const nro = tbody.rows.length + 1;
+                
+                // 3. Capturar los valores actuales del formulario para la fila
+                const programa = document.getElementById('prog').value;
+                const detalle = document.getElementById('detalle').value.toUpperCase();
+                
+                // 4. Crear el HTML de la nueva fila (idéntico al de tu PHP)
+                const nuevaFila = `
+                  <tr class="search-items">
+                      <td>${nro}</td>
+                      <td>${programa} 0000 000</td>
+                      <td>${detalle}</td>
+                      <td class="text-center">
+                          <div class="action-btn">
+                              <a href="javascript:void(0)" class="btn btn-outline-primary btn-sm d-flex align-items-center edit shadow-sm">
+                                  <i class="ti ti-eye me-1 fs-5"></i> Ver
+                              </a>
+                          </div>
+                      </td>
+                      <td class="text-center">
+                          <div class="action-btn">
+                              <a href="javascript:void(0)" class="btn btn-outline-danger btn-sm d-flex align-items-center delete shadow-sm">
+                                  <i class="ti ti-trash me-1 fs-5"></i> Borrar
+                              </a>
+                          </div>
+                      </td>
+                  </tr>`;
+
+                // 5. Insertar la fila al final de la tabla
+                tbody.insertAdjacentHTML('beforeend', nuevaFila);
+
+                
+                formulario.reset();
+                formulario.classList.remove('was-validated');
+                modalBootstrap.hide();
+                alert(data.message);
+
+            } else {
+                alert('Error: ' + data.message);
+            }
+        })
+        .catch(error => {
+            console.error('Error en la petición:', error);
+            alert('Hubo un problema al conectar con el servidor.');
+        })
+         .finally(() => {
+            // ESTO REACTIVA EL BOTÓN SIEMPRE
+            btnGuardar.disabled = false;
+            btnText.innerText = "Guardar";
+            btnLoader.classList.add('d-none');
+        });;
+
+    }, false);
 });
+
+//// Eliminar Apertura Programatica
+ document.getElementById('tabla-cuerpo').addEventListener('click', function(e) {
+    // Buscamos si el clic fue en el botón de borrar o en su icono
+    const btnDelete = e.target.closest('.btn-delete');
+    
+    if (btnDelete) {
+        const id = btnDelete.getAttribute('data-id');
+        const fila = btnDelete.closest('tr'); // La fila que vamos a eliminar
+
+        if (confirm('¿Estás seguro de eliminar este registro?')) {
+            
+            // Enviamos la petición al controlador
+            fetch(base + "mnt/eliminar_apertura", {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                body: `id=${id}`
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Animación simple de salida y eliminar fila del DOM
+                    fila.style.transition = "0.3s";
+                    fila.style.opacity = "0";
+                    setTimeout(() => fila.remove(), 300);
+                    
+                    alert(data.message);
+                } else {
+                    alert('Error: ' + data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('No se pudo conectar con el servidor.');
+            });
+        }
+    }
 });

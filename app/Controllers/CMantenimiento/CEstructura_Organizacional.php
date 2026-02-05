@@ -72,8 +72,8 @@ class CEstructura_organizacional extends BaseController{
         return view('View_mantenimiento/View_estructuraCns/view_estructuraOrganizacional',$data);
     }
 
-
-    public function obtener_distritales() {
+    /// Obtiene el listado 
+    public function obtener_unidades_organizacionales() {
     if (!$this->request->isAJAX()) {
         return $this->response->setStatusCode(403);
     }
@@ -81,7 +81,7 @@ class CEstructura_organizacional extends BaseController{
     $dep_id = $this->request->getPost('dep_id');
     $model_regional = new Model_regional(); // O el modelo que corresponda
     $unidades_aperturados=$model_regional->lista_unidades_disponibles($dep_id,$this->session->get('funcionario')['ide']);
-    
+
     // Aquí obtienes las distritales filtradas por la regional
 /*    $distritales = $model->getDistritalesByDep($dep_id); 
 

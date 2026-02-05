@@ -354,13 +354,25 @@ class CConfiguracion extends BaseController{
 
         $model_index = new IndexModel();
         $listado_umedida = $model_index->lista_umedidas($par_id);
+        $partida = $model_index->get_partidas($par_id); /// get partida
         //$data['par_id']  = $par_id;
         $tabla='';
         $tabla.='
-            <div class="mb-3">
-                <input type="text" class="form-control form-control-sm border-primary-subtle" id="search-um-internal" placeholder="🔍 Buscar unidad...">
+            
+                <b>PARTIDA: '.$partida['par_codigo'].' - '.strtoupper($partida['par_nombre']).'</b>
+            <hr>
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <div class="flex-grow-1 me-2">
+                    <input type="text" class="form-control form-control-sm border-primary-subtle" id="search-um-internal" placeholder="🔍 Buscar ...">
+                </div>
+                <button type="button" class="btn btn-sm btn-primary d-flex align-items-center gap-2 shadow-sm" id="btn-ver-alineadas" data-par-id="'.$par_id.'">
+                    <img src="'.base_url().'Img/Iconos/page_white_magnify.png" 
+                                    alt="Eliminar" 
+                                    style="width:16px; margin-right:5px;">Ver Alineadas
+                </button>
             </div>
-
+            <hr>
+            
             <div class="table-responsive" style="max-height: 400px;">
                 <table class="table table-hover align-middle table-sm" id="tab_umed">
                     <thead class="table-light sticky-top">
@@ -403,7 +415,62 @@ class CConfiguracion extends BaseController{
         ]);
     }
 
+    /// Update Estado Unidad de Medida
+    public function update_estado_umedida() {
+        // 1. Verificación de seguridad
+        if (!$this->request->isAJAX()) {
+            return $this->response->setStatusCode(403)->setJSON(['status' => 'error', 'message' => 'Acceso no permitido']);
+        }
 
+        $db = \Config\Database::connect(); 
+        $miLib_index = new Libreria_Index();
+        $model_index = new IndexModel();
+
+        $um_id  = $this->request->getPost('um_id', FILTER_SANITIZE_NUMBER_INT);
+        $par_id = $this->request->getPost('par_id', FILTER_SANITIZE_NUMBER_INT);
+        $valor  = $this->request->getPost('estado');
+
+        try {
+
+            if ($model_index->existe_umedia_a_partida($par_id, $um_id)) {
+                if ($valor == 0) {
+                // Si existe y el switch se apagó, eliminamos
+                    $db->table('par_umedida')
+                   ->where('par_id', $par_id)
+                   ->where('um_id', $um_id)
+                   ->delete(); 
+
+                   $msg = "Relación eliminada de la partida";
+                }
+            } else {
+                if ($valor == 1) {
+                    // Si no existe y el switch se encendió, insertamos
+                    $db->table('par_umedida')->insert([
+                        'par_id' => $par_id,
+                        'um_id'    => $um_id
+                    ]);
+
+                    $msg = "Relación alineada a la partida";
+                }
+            }
+
+            return $this->response->setJSON([
+                'status'  => 'success',
+                'message' => $msg,
+                'token'   => csrf_hash() // Imprescindible para el siguiente clic
+            ]);
+
+        } 
+        catch (\Exception $e) {
+            // Enviar error real al JS para debugging o manejo de errores
+            return $this->response->setJSON([
+                'status'  => 'error',
+                'message' => 'Error en la operación: ' . $e->getMessage(),
+                'token'   => csrf_hash()
+            ]);
+        }
+ 
+    }
 }
 
 

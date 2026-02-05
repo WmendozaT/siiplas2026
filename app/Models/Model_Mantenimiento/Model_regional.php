@@ -28,9 +28,6 @@ class Model_regional extends Model{
     }
 
 
-
-
-
     /// lista Unidades Organizacionales
     public function obtenerUnidadesOrganizacionales(){
         $sql = '
@@ -41,6 +38,23 @@ class Model_regional extends Model{
         return $query->getResultArray();
     }
 
+    /// lista de unidades organizacionales para el poa de la gestion por regional
+    public function lista_unidades_disponibles($dep_id,$gestion){
+        $sql = '
+            SELECT *,
+            CASE 
+            WHEN ug.ug_id IS NOT NULL THEN 1 
+            ELSE 0 
+            END AS incluido
+            from _distritales dist
+            Inner Join unidad_actividad as ua On ua.dist_id=dist.dist_id
+
+            LEFT JOIN uni_gestion ug ON ug.act_id = ua.act_id AND ug.g_id = '.$gestion.'
+            where dist.dep_id='.$dep_id.'
+            order by dist.dist_id, ua.act_id asc';
+        $query = $this->query($sql);
+        return $query->getResultArray();
+    }
 
 
 

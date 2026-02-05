@@ -470,38 +470,94 @@ document.addEventListener('DOMContentLoaded', function () {
 
 //// activa el estado de activar la unidades de medida por la Partida
 $(document).on('change', '.btn-switch-update_umedida', function() {
-    alert('hola mundo')
-    const $check = $(this);
-    const data = {
-        um_id: $check.data('um-id'),
-        par_id: $check.data('par-id'),
-        estado: $check.is(':checked') ? 1 : 0
+    const $input = $(this);
+    const $container = $input.closest('.form-check'); // Para el feedback visual
+
+    const um_id      = $input.data('um-id');      
+    const par_id = $input.data('par-id'); 
+    const estado   = $input.is(':checked') ? 1 : 0;
+
+    // 3. Captura de CSRF (Importante: capturarlos justo antes del envío)
+    const csrfName = $('meta[name="csrf-token-name"]').attr('content');
+    const csrfHash = $('meta[name="csrf-token-value"]').attr('content');
+
+    // 4. Preparación del objeto
+    const dataPost = {
+        um_id: um_id,
+        par_id: par_id,
+        estado: estado
     };
 
-    // Bloqueo visual temporal
-    $check.addClass('opacity-50').attr('disabled', true);
+    // 5. Inyección dinámica del token
+    dataPost[csrfName] = csrfHash;
 
     $.ajax({
-        url: base + "mnt/update_unidad_estado", // Debes crear este método
+        url: base + "mnt/update_estado_umedida",
         type: 'POST',
-        data: data,
+        data: dataPost,
         dataType: 'json',
-        success: function(res) {
-            $check.removeClass('opacity-50').attr('disabled', false);
-            
-            if (res.status === 'success') {
-                // Notificación opcional (puedes usar Toastr o SweetAlert)
-                console.log("Actualizado correctamente");
-            } else {
-                // Si falla el servidor, revertimos el check visualmente
-                $check.prop('checked', !data.estado);
-                alert("Error al actualizar: " + res.message);
+        beforeSend: function() {
+            // Opcional: Bloquear el switch mientras procesa para evitar doble clic
+            $input.prop('disabled', true);
+        },
+        success: function(response) {
+           // alert(response.status)
+            // ACTUALIZACIÓN DEL TOKEN: Vital para que el siguiente clic no de error 403
+            if (response.token) {
+                $('meta[name="csrf-token-value"]').attr('content', response.token);
+            }
+
+            if (response.status == 'success') {
+                alert(response.message);
+            }
+            else{
+                $input.prop('checked', !dataPost.estado);
+                alert(response.message);
             }
         },
         error: function() {
-            $check.removeClass('opacity-50').attr('disabled', false);
-            $check.prop('checked', !data.estado);
-            alert("Error de conexión con el servidor");
+            $input.prop('checked', !dataPost.estado);
+            alert('Error de conexión');
+        },
+        complete: function() {
+            $input.prop('disabled', false);
+            $container.removeClass('opacity-50');
         }
     });
 });
+
+//// Modal que muestra el listado de las unidades de medida alineados a la partida
+    $(document).on('click', '#btn-ver-alineadas', function() {
+        let listadoHtml = '<ul class="list-group list-group-flush">';
+        let contador = 0;
+
+        // Recorremos solo las filas que tienen el checkbox marcado
+        $('.um-item-row').each(function() {
+            const row = $(this);
+            const isChecked = row.find('.btn-switch-update_umedida').is(':checked');
+            
+            if (isChecked) {
+                const nombre = row.find('td:nth-child(2)').text().trim();
+                listadoHtml += `
+                    <li class="list-group-item d-flex align-items-center py-2">
+                        <img src="${base}Img/Iconos/page_white_key.png" 
+                                    alt="Eliminar" 
+                                    style="width:16px; margin-right:5px;">
+                        <span class="small fw-medium text-uppercase"> ${nombre}</span>
+                    </li>`;
+                contador++;
+            }
+        });
+
+        listadoHtml += '</ul>';
+
+        if (contador === 0) {
+            listadoHtml = '<div class="p-4 text-center text-muted small">No hay unidades alineadas todavía.</div>';
+        }
+
+        $('#body-alineadas').html(listadoHtml);
+        
+        // Abrir el modal
+        const modal = new bootstrap.Modal(document.getElementById('modalAlineadas'));
+        modal.show();
+    });

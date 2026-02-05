@@ -65,4 +65,10 @@ $routes->post('mnt/update_estado_modulos', 'CMantenimiento\CConfiguracion::updat
 $routes->post('mnt/aperturas', 'CMantenimiento\CConfiguracion::valida_aperturas'); /// Valida Add - Update Aperturas Programaticas
 $routes->post('mnt/eliminar_apertura', 'CMantenimiento\CConfiguracion::eliminar_apertura'); /// Elimina Apertura Programatica
 
-$routes->post('mnt/get_unidades_medida', 'CMantenimiento\CConfiguracion::get_unidades_medida'); /// Get Unidades de Medida de la Partida Seleccionada
+$routes->post('mnt/get_unidades_medida', 'CMantenimiento\CConfiguracion::get_unidades_medida'); /// Get Lista de Unidades de Medida de la Partida Seleccionada
+$routes->post('mnt/update_estado_umedida', 'CMantenimiento\CConfiguracion::update_estado_umedida'); /// Update Estado Unidad de Medida
+
+
+//// Estructura Organizacional
+$routes->get('mnt/EstructuraCns', 'CMantenimiento\CEstructura_organizacional::menu_estructura'); /// Lista de Estructura Organizacional
+$routes->post('mnt/obtener_uorganizacionales', 'CMantenimiento\CEstructura_organizacional::obtener_unidades_organizacionales'); /// Get lista de Distritales

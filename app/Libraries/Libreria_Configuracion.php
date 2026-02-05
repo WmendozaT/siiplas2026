@@ -443,6 +443,26 @@ class Libreria_Configuracion{
         $partidas=$model_index->lista_partidas();
         $tabla='
                   <div class="row">
+
+                    <div class="modal fade" id="modalAlineadas" tabindex="-1" aria-hidden="true">
+                      <div class="modal-dialog modal-dialog-centered modal-sm">
+                        <div class="modal-content border-0 shadow-lg">
+                          <!-- Cambios: background-color con dos puntos y clase text-white -->
+                          <div class="modal-header text-white" style="background-color: #004640;">
+                            <h6 class="modal-title fw-bold text-white">Unidades Alineadas</h6>
+                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                          </div>
+                          <div class="modal-body p-0" id="body-alineadas" style="max-height: 350px; overflow-y: auto;">
+                            <!-- Aquí se cargará el listado resumido -->
+                          </div>
+                          <div class="modal-footer bg-light py-2">
+                            <button type="button" class="btn btn-outline-secondary btn-sm" data-bs-dismiss="modal">Cerrar</button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+
                     <div class="col-lg-8 d-flex align-items-stretch">
                       <div class="card w-100 border position-relative overflow-hidden">
                         <div class="card-body p-4">
@@ -476,7 +496,7 @@ class Libreria_Configuracion{
                                   $nro++;
                                   $tabla.='
                                    <tr class="search-items minimalist-row">
-                                    <td class="ps-4 text-muted small">'.$nro.'</td>
+                                    <td class="ps-4 text-muted small" title="'.$row['par_id'].'">'.$nro.'</td>
                                     <td class="text-center">
                                         <button type="button" 
                                                 class="btn btn-link p-0 border-0 btn-activar" 

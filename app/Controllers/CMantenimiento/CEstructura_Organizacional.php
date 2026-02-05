@@ -1,0 +1,563 @@
+<?php
+namespace App\Controllers\CMantenimiento;
+use App\Controllers\BaseController; 
+// Importa las clases necesarias para initController
+use CodeIgniter\HTTP\RequestInterface;
+use CodeIgniter\HTTP\ResponseInterface;
+use Psr\Log\LoggerInterface;
+use App\Models\Index\IndexModel;
+use App\Models\Model_Mantenimiento\Model_funcionarios;
+use App\Models\Model_Mantenimiento\Model_regional;
+use App\Models\Model_Mantenimiento\Model_configuracion;
+use App\Libraries\Libreria_EstructuraOrganizacional;
+use App\Libraries\Libreria_Index;
+
+class CEstructura_organizacional extends BaseController{
+    protected $IndexModel;
+    protected $Model_funcionarios;
+    protected $Model_regional;
+    protected $Model_configuracion;
+
+    public function initController(RequestInterface $request, ResponseInterface $response, LoggerInterface $logger){
+        // LLAMADA OBLIGATORIA al initController del padre (DESCOMENTADA)
+        parent::initController($request, $response, $logger); 
+
+        // 1. Inicializar sesión si no existe
+        $this->session = \Config\Services::session();
+
+        // 2. Control de sesión sencilla: Si no existe 'user_name', redirigir
+        if (!$this->session->has('fun_id')) {
+            // Esta es la forma limpia en CI4 de forzar una redirección desde initController
+            response()->redirect(base_url('login'))->send();
+            exit; 
+        }
+        
+        $this->session->get('regional'); 
+        $this->session->get('configuracion'); 
+        $this->session->get('funcionario');
+        $this->session->get('view_modulos'); 
+        $this->session->get('view_modulos_sidebar'); 
+    }
+
+    /// menu Estructura Organizacional
+    public function menu_estructura(){
+        $session = session(); // Necesario para romper la sesión
+        $miLib_Estructura = new Libreria_EstructuraOrganizacional();
+        $model_regional = new Model_regional();
+        $regional=$model_regional->obtenerRegionales();
+
+        $tabla='';
+        $tabla.='
+        <div class="row">
+            <div class="card">
+                <div class="card-body">
+                  <h5 class="fs-4 fw-semibold mb-4">ESTRUCTURA ORGANIZACIONAL</h5>
+                  <div class="mb-4 row align-items-center">
+                    <label for="exampleInputSelect2" class="form-label col-sm-3 col-form-label text-end">Seleccione la Regional</label>
+                    <div class="col-sm-6">
+                      <select class="form-select" id="dep_id" name="dep_id" aria-label="Default select example">
+                      <option value="0">Seleccione ..</option>';
+                      foreach($regional as $row){
+                        $tabla.='<option value='.$row['dep_id'].'>'.$row['dep_id'].'.- '.$row['dep_departamento'].'</option>';
+                      }
+                      $tabla.='
+                      </select>
+                    </div>
+                  </div>
+                </div>
+                <div id="listado"></div>
+            </div>
+        </div>';
+        $data['formulario']=$tabla;
+        return view('View_mantenimiento/View_estructuraCns/view_estructuraOrganizacional',$data);
+    }
+
+
+    public function obtener_distritales() {
+    if (!$this->request->isAJAX()) {
+        return $this->response->setStatusCode(403);
+    }
+
+    $dep_id = $this->request->getPost('dep_id');
+    $model_regional = new Model_regional(); // O el modelo que corresponda
+    $unidades_aperturados=$model_regional->lista_unidades_disponibles($dep_id,$this->session->get('funcionario')['ide']);
+    
+    // Aquí obtienes las distritales filtradas por la regional
+/*    $distritales = $model->getDistritalesByDep($dep_id); 
+
+    // Generamos el HTML (puedes usar una vista parcial para que sea más limpio)
+    $html = '<div class="card-body border-top p-4">';
+    $html .= '<h6 class="fw-semibold mb-3">Distritales Encontradas</h6>';
+    
+    if (empty($distritales)) {
+        $html .= '<p class="text-muted small">No hay distritales registradas para esta regional.</p>';
+    } else {
+        $html .= '<div class="list-group">';
+        foreach ($distritales as $dist) {
+            $html .= '
+            <a href="javascript:void(0)" class="list-group-item list-group-item-action d-flex align-items-center gap-3">
+                <i class="ti ti-building-hospital fs-6 text-primary"></i>
+                <div>
+                    <span class="fw-bold d-block">'.$dist['dist_nombre'].'</span>
+                    <small class="text-muted">Código: '.$dist['dist_id'].'</small>
+                </div>
+            </a>';
+        }
+        $html .= '</div>';
+    }
+    $html .= '</div>';*/
+
+    return $this->response->setJSON([
+        'status' => 'success',
+        'datos'  => $html,
+        'token'  => csrf_hash()
+    ]);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//     /// Vista Configuracion sistema POA
+//     public function Menu_configuracion(){
+//         $miLib_conf = new Libreria_Configuracion();
+//         //$model_funcionario = new Model_funcionarios();
+//         $data['formulario']='    
+//           <!--  Header End -->
+//           <div class="mb-3 overflow-hidden position-relative">
+//             <div class="px-3">
+//               <h4 class="fs-6 mb-0">CONFIGURACIÓN SISTEMA </h4>
+//             </div>
+//           </div>
+//           <div class="card">
+//             <ul class="nav nav-pills user-profile-tab" id="pills-tab" role="tablist">
+//               <li class="nav-item" role="presentation">
+//                 <button class="nav-link position-relative rounded-0 active d-flex align-items-center justify-content-center bg-transparent fs-3 py-3" id="pills-account-tab" data-bs-toggle="pill" data-bs-target="#pills-account" type="button" role="tab" aria-controls="pills-account" aria-selected="true">
+//                   <i class="ti ti-user-circle me-2 fs-6"></i>
+//                   <span class="d-none d-md-block">ENTIDAD</span>
+//                 </button>
+//               </li>
+//               <li class="nav-item" role="presentation">
+//                 <button class="nav-link position-relative rounded-0 d-flex align-items-center justify-content-center bg-transparent fs-3 py-3" id="pills-notifications-tab" data-bs-toggle="pill" data-bs-target="#pills-notifications" type="button" role="tab" aria-controls="pills-notifications" aria-selected="false">
+//                   <i class="ti ti-bell me-2 fs-6"></i>
+//                   <span class="d-none d-md-block">MODULOS</span>
+//                 </button>
+//               </li>
+//               <li class="nav-item" role="presentation">
+//                 <button class="nav-link position-relative rounded-0 d-flex align-items-center justify-content-center bg-transparent fs-3 py-3" id="pills-bills-tab" data-bs-toggle="pill" data-bs-target="#pills-bills" type="button" role="tab" aria-controls="pills-bills" aria-selected="false">
+//                   <i class="ti ti-article me-2 fs-6"></i>
+//                   <span class="d-none d-md-block">PROGRAMAS</span>
+//                 </button>
+//               </li>
+//               <li class="nav-item" role="presentation">
+//                 <button class="nav-link position-relative rounded-0 d-flex align-items-center justify-content-center bg-transparent fs-3 py-3" id="pills-security-tab" data-bs-toggle="pill" data-bs-target="#pills-security" type="button" role="tab" aria-controls="pills-security" aria-selected="false">
+//                   <i class="ti ti-lock me-2 fs-6"></i>
+//                   <span class="d-none d-md-block">PARTIDAS</span>
+//                 </button>
+//               </li>
+//             </ul>
+//             <div class="card-body">
+//               <div class="tab-content" id="pills-tabContent">
+                
+//                 <div class="tab-pane fade show active" id="pills-account" role="tabpanel" aria-labelledby="pills-account-tab" tabindex="0">
+//                   '.$miLib_conf->conf_form1().'
+//                 </div>
+
+//                 <div class="tab-pane fade" id="pills-notifications" role="tabpanel" aria-labelledby="pills-notifications-tab" tabindex="0">
+//                   '.$miLib_conf->conf_form2().'
+//                 </div>
+
+
+//                 <div class="tab-pane fade" id="pills-bills" role="tabpanel" aria-labelledby="pills-bills-tab" tabindex="0">
+//                   '.$miLib_conf->conf_form3().'
+//                 </div>
+
+//                 <div class="tab-pane fade" id="pills-security" role="tabpanel" aria-labelledby="pills-security-tab" tabindex="0">
+//                   '.$miLib_conf->conf_form4().'
+//                 </div>
+
+//               </div>
+//             </div>
+//           </div>';
+
+//         //$data['formulario']=$miLib_resp->responsables_poa(); /// lista de responsables (Libreria Responsable)
+//         return view('View_mantenimiento/View_configuracion/view_configuracion',$data);
+//     }
+
+
+// /// Valida Form Update Configuracion
+//   public function Update_configuracion() {
+//     $db = \Config\Database::connect(); 
+//     $session = session(); // Necesario para romper la sesión
+//     $miLib_index = new Libreria_Index();
+//     $model_index = new IndexModel();
+
+//     try {
+//         $id_actual = $this->request->getPost('ide');
+//         $id_nuevo_seleccionado = $this->request->getPost('g_id');
+//         $eval_inicio = $this->request->getPost('eval_inicio');
+//         $eval_fin    = $this->request->getPost('eval_fin');
+
+//         if (!$id_actual) {
+//             throw new \Exception("ID de configuración actual no proporcionado.");
+//         }
+
+//         // 1. Preparar datos (Asegúrate que los names en el HTML coincidan)
+//         $data = [
+//             'conf_nombre_entidad' => strtoupper(trim($this->request->getPost('NombreEntidad'))),
+//             'conf_sigla_entidad'  => strtoupper(trim($this->request->getPost('SiglaEntidad'))),
+//             'conf_mision'         => strtoupper(trim($this->request->getPost('MisionEntidad'))),
+//             'conf_vision'         => strtoupper(trim($this->request->getPost('VisionEntidad'))),
+//             'conf_mes_otro'       => $this->request->getPost('trm_id'),
+//             'conf_mes'            => $this->request->getPost('conf_mes'),
+//             'conf_gestion_desde'  => $this->request->getPost('conf_gestion_desde'),
+//             'conf_gestion_hasta'  => $this->request->getPost('conf_gestion_hasta'),
+//             'conf_ajuste_poa'     => $this->request->getPost('conf_ajuste_poa'),
+//             'tp_msn'              => $this->request->getPost('tp_msn'),
+//             'conf_mensaje'        => trim($this->request->getPost('conf_mensaje')),
+//             'eval_inicio' => (!empty($eval_inicio)) ? $eval_inicio : null,
+//             'eval_fin'    => (!empty($eval_fin))    ? $eval_fin    : null,
+//             'rd_aprobacion_poa'   => trim($this->request->getPost('rd_aprobacion_poa')),
+//             'conf_abrev_sistema'  => trim($this->request->getPost('conf_abrev_sistema')),
+//             'conf_unidad_resp'    => strtoupper(trim($this->request->getPost('conf_unidad_resp'))),
+//             'conf_sis_pie'        => trim($this->request->getPost('conf_sis_pie')),
+//         ];
+
+//         // 2. Actualizar la configuración actual
+//         $db->table('configuracion')->where('ide', $id_actual)->update($data);
+
+//         $conf = $model_index->get_gestion_activo(); /// configuracion gestion activo
+//         $modulos = $model_index->modulos($conf['ide'],$session->get('funcionario')['tp_adm']); /// modulos
+//         $view_modulos=$miLib_index->Modulos_disponibles($modulos); /// vista modulos Cabecera
+//         $view_modulos_Sidebar=$miLib_index->Modulos_disponibles_Sidebar($modulos,$session->get('funcionario')['fun_nombre'].' '.$session->get('funcionario')['fun_paterno'].' '.$session->get('funcionario')['fun_materno'],$session->get('funcionario')['fun_cargo'],$conf['conf_abrev_sistema']); /// vista modulos Cabecera Sidebar
+//         $view_cabecera=$miLib_index->Cabecera_sistema($session->get('funcionario')['fun_nombre'].' '.$session->get('funcionario')['fun_paterno'].' '.$session->get('funcionario')['fun_materno'],$session->get('funcionario')['fun_cargo'],$conf['conf_abrev_sistema'],$conf['conf_img']);
+//         $view_cabecera_layout=$miLib_index->Cabecera_sistema_layout($session->get('funcionario')['fun_nombre'].' '.$session->get('funcionario')['fun_paterno'].' '.$session->get('funcionario')['fun_materno'],$session->get('funcionario')['fun_cargo'],$conf['conf_abrev_sistema'],$conf['conf_img']);
+
+//         //// Actualizando en la session
+//          $userData = [
+//             'configuracion'   => $conf,
+//             'modulos'   => $modulos,
+//             'view_modulos'   => $view_modulos,
+//             'view_modulos_sidebar'   => $view_modulos_Sidebar,
+//             'view_cabecera'   => $view_cabecera,
+//             'view_cabecera_layout'   => $view_cabecera_layout,
+//             'view_menu_izquierdo'   => $miLib_index->Menu_izquierdo(), /// menu izquierdo
+//             'isLoggedIn' => TRUE, // Bandera clave para tus filtros de acceso
+//             ];
+       
+//             $session->set($userData); // Guarda la sesión
+
+
+//         // 3. Lógica de Cambio de Gestión Activa
+//         if ($id_actual != $id_nuevo_seleccionado) {
+//             // Desactivar la anterior
+//             $db->table('configuracion')->where('ide', $id_actual)->update(['conf_estado' => 0]);
+            
+//             // Activar la nueva
+//             $db->table('configuracion')->where('ide', $id_nuevo_seleccionado)->update(['conf_estado' => 1]);
+
+//             // --- ROMPER SESIÓN Y REDIRIGIR ---
+//             $session->destroy();
+//             return redirect()->to(base_url('login'))
+//                              ->with('error', 'Gestión cambiada. Por favor, inicie sesión nuevamente.');
+//         } 
+        
+//         return redirect()->to(base_url('mnt/ConfiguracionSistema'))
+//                          ->with('success', 'Configuración actualizada correctamente.');
+
+//     } catch (\Exception $e) {
+//         log_message('error', 'Error en Update_configuracion: ' . $e->getMessage());
+//         return redirect()->back()->withInput()->with('error', 'Error: ' . $e->getMessage());
+//     }
+// }
+
+
+// //// Update Estado de los Modulos 
+//     public function update_estado_modulos() {
+//         $db = \Config\Database::connect(); 
+//         $session = session(); // Necesario para romper la sesión
+//         $miLib_index = new Libreria_Index();
+//         $model_index = new IndexModel();
+
+//         if (!$this->request->isAJAX()) {
+//             return $this->response->setStatusCode(403)->setJSON(['status' => 'error', 'message' => 'Acceso no permitido']);
+//         }
+
+//         $id      = $this->request->getPost('id');
+//         $valor   = $this->request->getPost('valor');
+//         $ide_gestion = $session->get('configuracion')['ide'];
+
+
+//             // 1. Lógica de Base de Datos
+//         // CORRECCIÓN: Quitamos el $ extra de $this->$model_index
+//         if ($model_index->existe_modulo_configurado($id, $ide_gestion)) {
+//             if ($valor == 0) {
+//                 // Si existe y el switch se apagó, eliminamos
+//                 $db->table('confi_modulo')
+//                    ->where('mod_id', $id)
+//                    ->where('ide', $ide_gestion)
+//                    ->delete(); 
+//             }
+//         } else {
+//             if ($valor == 1) {
+//                 // Si no existe y el switch se encendió, insertamos
+//                 $db->table('confi_modulo')->insert([
+//                     'mod_id' => $id,
+//                     'ide'    => $ide_gestion
+//                 ]);
+//             }
+//         }
+
+//         // 2. Actualización de Sesión
+//         $tp_adm = $session->get('funcionario')['tp_adm'];
+//         $modulos = $model_index->modulos($ide_gestion, $tp_adm);
+//         $view_modulos_Sidebar=$miLib_index->Modulos_disponibles_Sidebar($modulos,$session->get('funcionario')['fun_nombre'].' '.$session->get('funcionario')['fun_paterno'].' '.$session->get('funcionario')['fun_materno'],$session->get('funcionario')['fun_cargo'],$this->session->get('configuracion')['conf_abrev_sistema']); /// vista modulos Cabecera Sidebar
+        
+//         // Generamos la vista actualizada del menú
+//         $view_modulos = $miLib_index->Modulos_disponibles($modulos); 
+
+//         $session->set([
+//             'modulos'      => $modulos,
+//             'view_modulos' => $view_modulos,
+//             'view_modulos_sidebar'   => $view_modulos_Sidebar,
+//         ]);
+
+//         return $this->response->setJSON([
+//             'status' => 'success',
+//             'token'  => csrf_hash()
+//         ]);
+//     }
+
+
+//     /// Valida form aperturas programaticas
+//     public function valida_aperturas() {
+//         $db = \Config\Database::connect();
+        
+//         // 1. Capturamos el ID (si viene es edición, si no es nuevo)
+//         $id = $this->request->getPost('id_apertura');
+
+//         // 2. Ajustamos la regla is_unique para que ignore el ID actual al editar
+//         // Sintaxis: is_unique[tabla.columna,id_columna,valor_a_ignorar]
+//         $progRule = 'required|numeric|greater_than[0]|min_length[2]|max_length[3]';
+//         if (empty($id)) {
+//             $progRule .= '|is_unique[aperturaprogramatica.aper_programa]';
+//         } else {
+//             $progRule .= "|is_unique[aperturaprogramatica.aper_programa,aper_id,{$id}]";
+//         }
+
+//         $rules = [
+//             'prog'    => $progRule,
+//             'detalle' => 'required|min_length[3]|max_length[255]'
+//         ];
+
+//         $messages = [
+//             'prog' => [
+//                 'is_unique' => 'El código de programa ya existe en la base de datos.'
+//             ]
+//         ];
+
+//     /*    if (!$this->validate($rules, $messages)) {
+//             return $this->response->setJSON([
+//                 'success' => false,
+//                 'message' => 'Error de validación.',
+//                 'errors'  => $this->validator->getErrors()
+//             ]);
+//         }*/
+
+//         // 3. Preparamos los datos
+//         $data = [
+//             'aper_programa'    => $this->request->getPost('prog'),
+//             'aper_gestion'     => session()->get('configuracion')['ide'],
+//             'aper_proyecto'    => '0000',
+//             'aper_actividad'   => '000',
+//             'aper_descripcion' => strtoupper(trim($this->request->getPost('detalle'))),
+//             'aper_asignado'    => 1,
+//             'fun_id'           => session()->get('fun_id') 
+//         ];
+
+//         // 4. Decidimos si insertar o actualizar
+//         $builder = $db->table('aperturaprogramatica');
+
+//         if (!empty($id)) {
+//             // ACTUALIZAR
+//             if ($builder->where('aper_id', $id)->update($data)) {
+//                 return $this->response->setJSON(['success' => true, 'message' => 'Apertura actualizada correctamente']);
+//             }
+//         } else {
+//             // INSERTAR
+//             if ($builder->insert($data)) {
+//                 return $this->response->setJSON(['success' => true, 'message' => 'Apertura guardada correctamente']);
+//             }
+//         }
+
+//         return $this->response->setJSON(['success' => false, 'message' => 'No se pudo procesar la información.']);
+//     }
+
+//     /// Elimina Apertura Programatica
+//     public function eliminar_apertura() {
+//         $id = $this->request->getPost('id');
+
+//         if (empty($id)) {
+//             return $this->response->setJSON(['success' => false, 'message' => 'ID no válido.']);
+//         }
+
+//         $db = \Config\Database::connect();
+//         $builder = $db->table('aperturaprogramatica');
+
+//         if ($builder->where('aper_id', $id)->delete()) {
+//             return $this->response->setJSON([
+//                 'success' => true, 
+//                 'message' => 'Registro eliminado correctamente.'
+//             ]);
+//         }
+
+//         return $this->response->setJSON(['success' => false, 'message' => 'No se pudo eliminar.']);
+//     }
+
+//     //// Get Unidades de Medida por Partida
+//     public function get_unidades_medida() {
+//         // 1. Validación de seguridad avanzada
+//         if (!$this->request->isAJAX()) {
+//             return $this->response->setStatusCode(403)->setJSON([
+//                 'status' => 'error', 
+//                 'message' => 'Acceso no permitido'
+//             ]);
+//         }
+
+//         // 2. Validación de datos de entrada
+//         $par_id = $this->request->getPost('id', FILTER_SANITIZE_NUMBER_INT);
+//         if (!$par_id) {
+//             return $this->response->setJSON(['status' => 'error', 'message' => 'ID de partida no válido']);
+//         }
+
+//         $model_index = new IndexModel();
+//         $listado_umedida = $model_index->lista_umedidas($par_id);
+//         $partida = $model_index->get_partidas($par_id); /// get partida
+//         //$data['par_id']  = $par_id;
+//         $tabla='';
+//         $tabla.='
+            
+//                 <b>PARTIDA: '.$partida['par_codigo'].' - '.strtoupper($partida['par_nombre']).'</b>
+//             <hr>
+//             <div class="d-flex justify-content-between align-items-center mb-3">
+//                 <div class="flex-grow-1 me-2">
+//                     <input type="text" class="form-control form-control-sm border-primary-subtle" id="search-um-internal" placeholder="🔍 Buscar ...">
+//                 </div>
+//                 <button type="button" class="btn btn-sm btn-primary d-flex align-items-center gap-2 shadow-sm" id="btn-ver-alineadas" data-par-id="'.$par_id.'">
+//                     <img src="'.base_url().'Img/Iconos/page_white_magnify.png" 
+//                                     alt="Eliminar" 
+//                                     style="width:16px; margin-right:5px;">Ver Alineadas
+//                 </button>
+//             </div>
+//             <hr>
+            
+//             <div class="table-responsive" style="max-height: 400px;">
+//                 <table class="table table-hover align-middle table-sm" id="tab_umed">
+//                     <thead class="table-light sticky-top">
+//                         <tr>
+//                             <th style="width: 5%">#</th>
+//                             <th style="width: 75%">UNIDAD DE MEDIDA</th>
+//                             <th style="width: 20%" class="text-center">ESTADO</th>
+//                         </tr>
+//                     </thead>
+//                     <tbody>';
+//                     $nro=0;
+//                     foreach($listado_umedida as $row){
+//                         $nro++;
+//                         $tabla.='
+//                         <tr class="um-item-row">
+//                             <td class="text-muted small">'.$nro.'</td>
+//                             <td class="text-uppercase fw-medium" style="font-size: 0.85rem;">
+//                                 '.$row['um_descripcion'].'
+//                             </td>
+//                             <td>
+//                                 <div class="form-check form-switch d-flex justify-content-center">
+//                                     <input class="form-check-input btn-switch-update_umedida" type="checkbox" 
+//                                            data-um-id="'.$row['um_id'].'" 
+//                                            data-par-id="'.$par_id.'"
+//                                            '.($row['incluido'] == 1 ? 'checked' : '').'
+//                                            style="width: 2.4em; height: 1.2em; cursor:pointer;">
+//                                 </div>
+//                             </td>
+//                         </tr>';
+//                     }
+//                     $tabla.='
+//                     </tbody>
+//                 </table>
+//             </div>';
+
+//         // 3. Retornar vista procesada (más limpio)
+//         return $this->response->setJSON([
+//             'status' => 'success', 
+//             'datos'  => $tabla 
+//         ]);
+//     }
+
+//     /// Update Estado Unidad de Medida
+//     public function update_estado_umedida() {
+//         // 1. Verificación de seguridad
+//         if (!$this->request->isAJAX()) {
+//             return $this->response->setStatusCode(403)->setJSON(['status' => 'error', 'message' => 'Acceso no permitido']);
+//         }
+
+//         $db = \Config\Database::connect(); 
+//         $miLib_index = new Libreria_Index();
+//         $model_index = new IndexModel();
+
+//         $um_id  = $this->request->getPost('um_id', FILTER_SANITIZE_NUMBER_INT);
+//         $par_id = $this->request->getPost('par_id', FILTER_SANITIZE_NUMBER_INT);
+//         $valor  = $this->request->getPost('estado');
+
+//         try {
+
+//             if ($model_index->existe_umedia_a_partida($par_id, $um_id)) {
+//                 if ($valor == 0) {
+//                 // Si existe y el switch se apagó, eliminamos
+//                     $db->table('par_umedida')
+//                    ->where('par_id', $par_id)
+//                    ->where('um_id', $um_id)
+//                    ->delete(); 
+
+//                    $msg = "Relación eliminada de la partida";
+//                 }
+//             } else {
+//                 if ($valor == 1) {
+//                     // Si no existe y el switch se encendió, insertamos
+//                     $db->table('par_umedida')->insert([
+//                         'par_id' => $par_id,
+//                         'um_id'    => $um_id
+//                     ]);
+
+//                     $msg = "Relación alineada a la partida";
+//                 }
+//             }
+
+//             return $this->response->setJSON([
+//                 'status'  => 'success',
+//                 'message' => $msg,
+//                 'token'   => csrf_hash() // Imprescindible para el siguiente clic
+//             ]);
+
+//         } 
+//         catch (\Exception $e) {
+//             // Enviar error real al JS para debugging o manejo de errores
+//             return $this->response->setJSON([
+//                 'status'  => 'error',
+//                 'message' => 'Error en la operación: ' . $e->getMessage(),
+//                 'token'   => csrf_hash()
+//             ]);
+//         }
+ 
+//     }
+}
+
+

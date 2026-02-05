@@ -128,6 +128,16 @@ class IndexModel extends Model{
         return $query->getResultArray();
     }
 
+    /// Get Partida
+    public function get_partidas($par_id){
+        $sql = 'SELECT *
+                from partidas
+                where par_id='.$par_id.'';
+
+        $query = $this->db->query($sql);
+        return $query->getRowArray();
+    }
+
 
     /// Listado de Unidades de Medida alineados a la partida
     public function lista_umedidas($par_id){
@@ -145,6 +155,12 @@ class IndexModel extends Model{
         return $query->getResultArray();
     }
 
+    /// get modulo estado en la gestion
+    public function existe_umedia_a_partida($par_id, $um_id) {
+    return $this->db->table('par_umedida')
+                    ->where(['par_id' => $par_id, 'um_id' => $um_id])
+                    ->countAllResults() > 0; // Devuelve true o false
+    }
 
     /// Get Buscando funcionario por su Usuario
     public function fun_usuario($usuario){

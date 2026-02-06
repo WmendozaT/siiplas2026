@@ -16,6 +16,22 @@ class Model_regional extends Model{
         return $query->getResultArray();
     }
 
+    //// get datos Regional
+/*    public function get_regional2($dep_id){
+        return $this->db->get_where('_departamentos', ['dep_id' => $dep_id])
+                        ->getRowArray();
+    }*/
+
+    //// get datos Regional
+    public function get_regional($dep_id){
+        $sql = 'SELECT *
+                from _departamentos
+                where dep_id='.$dep_id.'';
+
+        $query = $this->db->query($sql);
+        return $query->getRowArray();
+    }
+
     /// lista de Distritales por Regional
     public function obtenerDistritales($dep_id){
         $sql = '
@@ -48,14 +64,31 @@ class Model_regional extends Model{
             END AS incluido
             from _distritales dist
             Inner Join unidad_actividad as ua On ua.dist_id=dist.dist_id
+            Inner Join v_tp_establecimiento as te On te.te_id=ua.te_id
 
             LEFT JOIN uni_gestion ug ON ug.act_id = ua.act_id AND ug.g_id = '.$gestion.'
-            where dist.dep_id='.$dep_id.'
+            where dist.dep_id='.$dep_id.' and ua.act_estado!=3
             order by dist.dist_id, ua.act_id asc';
         $query = $this->query($sql);
         return $query->getResultArray();
     }
 
+    /// lista tipo de establecimiento
+    public function lista_tipo_establecimiento(){
+        $sql = '
+            SELECT *
+            from tipo_establecimiento
+            where ta_id=2
+            order by te_id asc';
+        $query = $this->query($sql);
+        return $query->getResultArray();
+    }
 
+    /// get modulo estado de la unidadOrganizacional en la gestion vigente
+    public function existe_uorganizacional_en_la_gestion($act_id, $gestion) {
+    return $this->db->table('uni_gestion')
+                    ->where(['act_id' => $act_id, 'g_id' => $gestion])
+                    ->countAllResults() > 0; // Devuelve true o false
+    }
 
 }

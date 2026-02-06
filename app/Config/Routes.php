@@ -72,3 +72,4 @@ $routes->post('mnt/update_estado_umedida', 'CMantenimiento\CConfiguracion::updat
 //// Estructura Organizacional
 $routes->get('mnt/EstructuraCns', 'CMantenimiento\CEstructura_organizacional::menu_estructura'); /// Lista de Estructura Organizacional
 $routes->post('mnt/obtener_uorganizacionales', 'CMantenimiento\CEstructura_organizacional::obtener_unidades_organizacionales'); /// Get lista de Distritales
+$routes->post('mnt/update_uorganizacional', 'CMantenimiento\CEstructura_organizacional::update_estado_uorganizacional'); /// Update Estado Unidad Organizacional

@@ -54,10 +54,10 @@ class Model_regional extends Model{
         return $query->getResultArray();
     }
 
-    /// lista de unidades organizacionales para el poa de la gestion por regional
+    /// lista de unidades organizacionales (Todos) para el poa de la gestion por regional
     public function lista_unidades_disponibles($dep_id,$gestion){
         $sql = '
-            SELECT *,
+            SELECT dist.*,ua.*,te.*,
             CASE 
             WHEN ug.ug_id IS NOT NULL THEN 1 
             ELSE 0 
@@ -67,6 +67,26 @@ class Model_regional extends Model{
             Inner Join v_tp_establecimiento as te On te.te_id=ua.te_id
 
             LEFT JOIN uni_gestion ug ON ug.act_id = ua.act_id AND ug.g_id = '.$gestion.'
+            where dist.dep_id='.$dep_id.' and ua.act_estado!=3
+            order by dist.dist_id, ua.act_id asc';
+        $query = $this->query($sql);
+        return $query->getResultArray();
+    }
+
+
+    /// lista de unidades organizacionales para el Reporte de la gestion por regional
+    public function lista_unidades_disponibles_rep($dep_id,$gestion){
+        $sql = '
+            SELECT dist.*,ua.*,te.*,
+            CASE 
+            WHEN ug.ug_id IS NOT NULL THEN 1 
+            ELSE 0 
+            END AS incluido
+            from _distritales dist
+            Inner Join unidad_actividad as ua On ua.dist_id=dist.dist_id
+            Inner Join v_tp_establecimiento as te On te.te_id=ua.te_id
+
+            Inner JOIN uni_gestion ug ON ug.act_id = ua.act_id AND ug.g_id = '.$gestion.'
             where dist.dep_id='.$dep_id.' and ua.act_estado!=3
             order by dist.dist_id, ua.act_id asc';
         $query = $this->query($sql);
@@ -83,6 +103,7 @@ class Model_regional extends Model{
         $query = $this->query($sql);
         return $query->getResultArray();
     }
+
 
     /// get modulo estado de la unidadOrganizacional en la gestion vigente
     public function existe_uorganizacional_en_la_gestion($act_id, $gestion) {

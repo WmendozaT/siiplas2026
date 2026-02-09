@@ -23,4 +23,38 @@ class Libreria_EstructuraOrganizacional{
     }
 
     
+   /// Reporte Lista Unidades para firmar Digitalmente
+    public function listado_uorganizacional_rep($lista){
+        $tabla='';
+        $tabla.='<table class="table-report">
+                    <thead>
+                        <tr>
+                          <th width="1%" class="text-center">#</th>
+                          <th width="15%" class="text-center">DISTRITAL</th>
+                          <th width="10%" class="text-center">DA</th>
+                          <th width="10%" class="text-center">UE</th>
+                          <th width="10%" class="text-center">COD.</th>
+                          <th width="30%" class="text-center">UNIDAD ORGANIZACIONAL</th>
+                        </tr>
+                      </thead>
+                      <tbody>';
+                      $nro=0;
+                      foreach($lista as $row){ 
+                        $nro++;
+                        $tabla.='
+                        <tr>
+                          <td style="aling:center;">'.$nro.'</td>
+                          <td>'.strtoupper($row['dist_distrital']).'</td>
+                          <td>'.$row['da'].'</td>
+                          <td>'.$row['ue'].'</td>
+                          <td>'.$row['act_cod'].'</td>
+                          <td>'.$row['tipo'].' '.$row['act_descripcion'].' '.$row['abrev'].'</td>
+                        </tr>';
+                      }
+                      $tabla.='
+                      </tbody>
+                    </table>';
+
+        return $tabla;
+    }
 }

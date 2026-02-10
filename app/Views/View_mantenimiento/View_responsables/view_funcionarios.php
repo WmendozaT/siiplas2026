@@ -48,7 +48,7 @@
 
   <script src=<?= base_url('Js/Index/jquery.min.js') ?>></script>
   <script src="<?= base_url('Js/PlantillaJs/vendor.min.js') ?>"></script>
-  <script src=<?= base_url('Js/Mantenimiento/JsResponsable.js') ?>></script>
+
   <!-- Import Js Files -->
   <script src="<?= base_url('Js/PlantillaJs/bootstrap.bundle.min.js') ?>"></script>
   <script src="<?= base_url('Js/PlantillaJs/simplebar.min.js') ?>"></script>
@@ -69,6 +69,7 @@
 </script>
   <script src="<?= base_url('Js/PlantillaJs/jquery.dataTables.min.js') ?>"></script>
   <script src="<?= base_url('Js/PlantillaJs/datatable.init.js') ?>"></script>
+  <script src=<?= base_url('Js/Mantenimiento/JsResponsable.js') ?>></script>
   <script src=<?= base_url('Js/Inactividad.js') ?>></script>
 </body>
 

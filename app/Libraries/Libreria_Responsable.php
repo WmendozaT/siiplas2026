@@ -89,6 +89,7 @@ class Libreria_Responsable{
                           <th>MOD. PPTO.</th>
                           <th>CERT. POA</th>
                           <th>EVAL. POA.</th>
+                          <th>CERT. DIGITAL</th>
                           <th>PASS.</th>
                           <th></th>
                           <th></th>
@@ -102,7 +103,17 @@ class Libreria_Responsable{
                         
                         $tabla.='
                         <tr>
-                          <td style="aling:center;">'.$nro.'</td>
+                          <td class="text-center">
+                              <div class="icono_perfil mx-auto shadow-sm" style="width: 35px; height: 35px; border-radius: 50%; overflow: hidden; border: 2px solid #ddd; cursor: pointer;">
+                                  <img src="'.base_url($row['imagen_perfil']).'" 
+                                       class="img-fluid rounded-circle img-preview" 
+                                       data-img="'.base_url($row['imagen_perfil']).'" 
+                                       data-name="'.$row['fun_nombre'].' '.$row['fun_paterno'].'  '.$row['fun_materno'].'"
+                                       data-unidad="'.strtoupper($row['dist_distrital']).'"
+                                       alt="Perfil" 
+                                       style="width: 100%; height: 100%; object-fit: cover;"/>
+                              </div>
+                          </td>
                           <td>'.$row['fun_nombre'].' '.$row['fun_paterno'].' '.$row['fun_materno'].'</td>
                           <td>'.$row['uni_unidad'].'</td>
                           <td>'.$row['fun_usuario'].'</td>
@@ -152,6 +163,13 @@ class Libreria_Responsable{
                           <td class="text-center">
                               <div class="form-check form-switch d-flex justify-content-center">
                                   <input class="form-check-input btn-switch-update" type="checkbox" 
+                                         data-id="'.$id.'" data-columna="conf_cert_digital" 
+                                         '.($row['conf_cert_digital'] == 1 ? 'checked' : '').' style="width: 2.5em; height: 1.3em;">
+                              </div>
+                          </td>
+                          <td class="text-center">
+                              <div class="form-check form-switch d-flex justify-content-center">
+                                  <input class="form-check-input btn-switch-update" type="checkbox" 
                                          data-id="'.$id.'" data-columna="sw_pass" 
                                          '.($row['sw_pass'] == 1 ? 'checked' : '').' style="width: 2.5em; height: 1.3em;">
                               </div>
@@ -166,7 +184,7 @@ class Libreria_Responsable{
                                <img src="'.base_url().'Img/Iconos/application_form_edit.png" 
                                     alt="Editar" 
                                     style="width:16px; margin-right:5px;"> 
-                               Ver
+                               Modificar
                             </a>
                           </td>
                           <td>
@@ -179,7 +197,7 @@ class Libreria_Responsable{
                                <img src="'.base_url().'Img/Iconos/delete.png" 
                                     alt="Eliminar" 
                                     style="width:16px; margin-right:5px;"> 
-                               Ver
+                               desactivar
                             </a>
                           </td>
                         </tr>';
@@ -187,6 +205,26 @@ class Libreria_Responsable{
                       $tabla.='
                       </tbody>
                     </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal fade" id="modalVerPerfil" tabindex="-1" aria-hidden="true">
+            <!-- Cambiado modal-sm a modal-md para más ancho -->
+            <div class="modal-dialog modal-md modal-dialog-centered"> 
+                <div class="modal-content shadow-lg">
+                    <div class="modal-header">
+                        <h5 class="modal-title fw-semibold" id="perfilNombre">Información del Responsable</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body text-center py-4">
+                        <!-- Aumentado de 150px a 250px -->
+                        <div class="rounded-circle border border-4 border-light shadow-sm mx-auto mb-3" 
+                             style="width: 250px; height: 250px; overflow: hidden; background-color: #f8f9fa;">
+                            <img src="" id="imgModal" style="width: 100%; height: 100%; object-fit: cover;">
+                        </div>
+                        <p class="text-muted small"><div id="unidad"></div></p>
+                    </div>
                 </div>
             </div>
         </div>';
@@ -545,6 +583,7 @@ class Libreria_Responsable{
       $regionales=$model_reg->obtenerRegionales();
       $distritales=$model_reg->obtenerDistritales($get_rep['dep_id']);
       $unidadOrganizacional=$model_reg->obtenerUnidadesOrganizacionales();
+      $img_perfiles=$model_funcionario->perfiles_img();
       ////
 
       ////
@@ -659,6 +698,31 @@ class Libreria_Responsable{
                                     </div>
                                   </select>
                                 </div>
+
+                                <div class="mb-3">
+                                      <label class="form-label">IMG PERFIL</label>
+                                      <select class="form-select" name="img_id" id="img_id">';
+                                      
+                                      foreach($img_perfiles as $row) {
+                                          $selected = ($row['img_id'] == $get_rep['conf_img']) ? 'selected' : '';
+                                          $rutaImg = base_url($row['imagen_perfil']);
+
+                                          // El atributo data-img es la clave para el JS
+                                          $tabla .= '<option value="'.$row['img_id'].'" '.$selected.' data-img="'.$rutaImg.'">
+                                                        Perfil '.$row['img_id'].'
+                                                     </option>';
+                                      }
+                                      
+                                  $tabla .= '
+                                      </select>
+                                  </div>
+
+                                  <div class="d-flex justify-content-center mb-3">
+                                      <div id="icono_perfil" class="mx-auto shadow-sm" 
+                                           style="width: 130px; height: 130px; border-radius: 50%; overflow: hidden; border: 2px solid #ddd; background-color: #f8f9fa; display: flex; align-items: center; justify-content: center;">
+                                          <!-- La imagen se inyectará aquí -->
+                                      </div>
+                                  </div>
                               </div>
 
                               <div class="col-lg-4">

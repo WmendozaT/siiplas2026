@@ -73,7 +73,7 @@ class User extends BaseController{
             $modulos = $model_index->modulos($conf['ide'],$is_valid['data']['tp_adm']); /// modulos
             
             $view_modulos=$miLib_index->Modulos_disponibles($modulos); /// vista modulos Cabecera
-            $view_modulos_Sidebar=$miLib_index->Modulos_disponibles_Sidebar($modulos,$funcionario['fun_nombre'].' '.$funcionario['fun_paterno'].' '.$funcionario['fun_materno'],$funcionario['fun_cargo'],$conf['conf_abrev_sistema']); /// vista modulos Cabecera Sidebar
+            $view_modulos_Sidebar=$miLib_index->Modulos_disponibles_Sidebar($modulos,$funcionario['fun_nombre'].' '.$funcionario['fun_paterno'].' '.$funcionario['fun_materno'],$funcionario['fun_cargo'],$conf['conf_abrev_sistema'],$funcionario['imagen_perfil']); /// vista modulos Cabecera Sidebar
             $userData = [
             'fun_id'    => $is_valid['data']['fun_id'], // Asegúrate de que tu modelo devuelve 'id'
             'funcionario'   => $funcionario,
@@ -82,8 +82,8 @@ class User extends BaseController{
             'modulos'   => $modulos,
             'view_modulos'   => $view_modulos,
             'view_modulos_sidebar'   => $view_modulos_Sidebar,
-            'view_cabecera'   => $miLib_index->Cabecera_sistema($funcionario['fun_nombre'].' '.$funcionario['fun_paterno'].' '.$funcionario['fun_materno'],$funcionario['fun_cargo'],$conf['conf_abrev_sistema'],$conf['conf_img']),
-            'view_cabecera_layout'   => $miLib_index->Cabecera_sistema_layout($funcionario['fun_nombre'].' '.$funcionario['fun_paterno'].' '.$funcionario['fun_materno'],$funcionario['fun_cargo'],$conf['conf_abrev_sistema'],$conf['conf_img']),
+            'view_cabecera'   => $miLib_index->Cabecera_sistema($funcionario['fun_nombre'].' '.$funcionario['fun_paterno'].' '.$funcionario['fun_materno'],$funcionario['fun_cargo'],$conf['conf_abrev_sistema'],$conf['conf_img'],$funcionario['imagen_perfil']),
+            'view_cabecera_layout'   => $miLib_index->Cabecera_sistema_layout($funcionario['fun_nombre'].' '.$funcionario['fun_paterno'].' '.$funcionario['fun_materno'],$funcionario['fun_cargo'],$conf['conf_abrev_sistema'],$conf['conf_img'],$funcionario['imagen_perfil']),
             'view_menu_izquierdo'   => $miLib_index->Menu_izquierdo(), /// menu izquierdo
             'view_bienvenida'   => $miLib_index->bienvenida($conf['conf_abrev_sistema'],$conf['conf_unidad_resp']), /// bienvenida
             'regional'   => $model_index->datos_regional($funcionario['fun_dist']),
@@ -91,6 +91,7 @@ class User extends BaseController{
             'isLoggedIn' => TRUE, // Bandera clave para tus filtros de acceso
             ];
        
+
             $session->set($userData); // Guarda la sesión
 
             // 2. Redirigir al usuario a una página protegida (ej. dashboard)

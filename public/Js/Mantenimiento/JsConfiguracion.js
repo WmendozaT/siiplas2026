@@ -171,11 +171,13 @@ $(document).ready(function() {
 
 //// Js para actualizar estado de los modulos disponibles
 $(document).on('change', '.btn-switch-updates', function() {
+   // alert('hola mundo')
     const $input = $(this);
     const id      = $input.data('id');      
     const columna = $input.data('columna'); 
     const valor   = $input.is(':checked') ? 1 : 0;
 
+alert(id+'--'+columna+'--'+valor)
     // 3. Captura de CSRF (Importante: capturarlos justo antes del envío)
     const csrfName = $('meta[name="csrf-token-name"]').attr('content');
     const csrfHash = $('meta[name="csrf-token-value"]').attr('content');

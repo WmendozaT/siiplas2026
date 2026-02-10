@@ -151,9 +151,9 @@ class CConfiguracion extends BaseController{
         $conf = $model_index->get_gestion_activo(); /// configuracion gestion activo
         $modulos = $model_index->modulos($conf['ide'],$session->get('funcionario')['tp_adm']); /// modulos
         $view_modulos=$miLib_index->Modulos_disponibles($modulos); /// vista modulos Cabecera
-        $view_modulos_Sidebar=$miLib_index->Modulos_disponibles_Sidebar($modulos,$session->get('funcionario')['fun_nombre'].' '.$session->get('funcionario')['fun_paterno'].' '.$session->get('funcionario')['fun_materno'],$session->get('funcionario')['fun_cargo'],$conf['conf_abrev_sistema']); /// vista modulos Cabecera Sidebar
-        $view_cabecera=$miLib_index->Cabecera_sistema($session->get('funcionario')['fun_nombre'].' '.$session->get('funcionario')['fun_paterno'].' '.$session->get('funcionario')['fun_materno'],$session->get('funcionario')['fun_cargo'],$conf['conf_abrev_sistema'],$conf['conf_img']);
-        $view_cabecera_layout=$miLib_index->Cabecera_sistema_layout($session->get('funcionario')['fun_nombre'].' '.$session->get('funcionario')['fun_paterno'].' '.$session->get('funcionario')['fun_materno'],$session->get('funcionario')['fun_cargo'],$conf['conf_abrev_sistema'],$conf['conf_img']);
+        $view_modulos_Sidebar=$miLib_index->Modulos_disponibles_Sidebar($modulos,$session->get('funcionario')['fun_nombre'].' '.$session->get('funcionario')['fun_paterno'].' '.$session->get('funcionario')['fun_materno'],$session->get('funcionario')['fun_cargo'],$conf['conf_abrev_sistema'],$session->get('funcionario')['imagen_perfil']); /// vista modulos Cabecera Sidebar
+        $view_cabecera=$miLib_index->Cabecera_sistema($session->get('funcionario')['fun_nombre'].' '.$session->get('funcionario')['fun_paterno'].' '.$session->get('funcionario')['fun_materno'],$session->get('funcionario')['fun_cargo'],$conf['conf_abrev_sistema'],$conf['conf_img'],$session->get('funcionario')['imagen_perfil']);
+        $view_cabecera_layout=$miLib_index->Cabecera_sistema_layout($session->get('funcionario')['fun_nombre'].' '.$session->get('funcionario')['fun_paterno'].' '.$session->get('funcionario')['fun_materno'],$session->get('funcionario')['fun_cargo'],$conf['conf_abrev_sistema'],$conf['conf_img'],$session->get('funcionario')['imagen_perfil']);
 
         //// Actualizando en la session
          $userData = [
@@ -194,7 +194,7 @@ class CConfiguracion extends BaseController{
 }
 
 
-//// Update Estado de los Modulos 
+//// Update Estado de los Modulos (tengo que cambiar el forenkey de la nueva tabla modulo_sistema a confi_modulo)
     public function update_estado_modulos() {
         $db = \Config\Database::connect(); 
         $session = session(); // Necesario para romper la sesión
@@ -233,7 +233,7 @@ class CConfiguracion extends BaseController{
         // 2. Actualización de Sesión
         $tp_adm = $session->get('funcionario')['tp_adm'];
         $modulos = $model_index->modulos($ide_gestion, $tp_adm);
-        $view_modulos_Sidebar=$miLib_index->Modulos_disponibles_Sidebar($modulos,$session->get('funcionario')['fun_nombre'].' '.$session->get('funcionario')['fun_paterno'].' '.$session->get('funcionario')['fun_materno'],$session->get('funcionario')['fun_cargo'],$this->session->get('configuracion')['conf_abrev_sistema']); /// vista modulos Cabecera Sidebar
+        $view_modulos_Sidebar=$miLib_index->Modulos_disponibles_Sidebar($modulos,$session->get('funcionario')['fun_nombre'].' '.$session->get('funcionario')['fun_paterno'].' '.$session->get('funcionario')['fun_materno'],$session->get('funcionario')['fun_cargo'],$this->session->get('configuracion')['conf_abrev_sistema'],$session->get('funcionario')['imagen_perfil']); /// vista modulos Cabecera Sidebar
         
         // Generamos la vista actualizada del menú
         $view_modulos = $miLib_index->Modulos_disponibles($modulos); 

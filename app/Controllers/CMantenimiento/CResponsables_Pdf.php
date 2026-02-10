@@ -43,7 +43,11 @@ class CResponsables_Pdf extends BaseController{
     $fecha = date('d/m/Y'); // Definir la variable fecha
     
     $options = new Options();
-    $options->set('isRemoteEnabled', true);
+    $options->set('chroot', FCPATH); 
+$options->set('isRemoteEnabled', true); // Permite cargar imágenes vía base_url
+//$options->set('chroot', realpath('')); // Opcional: define la raíz permitida
+
+   // $options->set('chroot', FCPATH);        // Restringe el acceso de lectura a la carpeta de tu proyecto
     $dompdf = new Dompdf($options);
 
 
@@ -180,6 +184,7 @@ class CResponsables_Pdf extends BaseController{
                     <thead>
                         <tr>
                           <th width="1%" class="text-center">#</th>
+                          <th width="5%" class="text-center"></th>
                           <th width="15%" class="text-center">REPONSABLE POA</th>
                           <th width="5%" class="text-center">CI</th>
                           <th width="10%" class="text-center">CARGO</th>
@@ -193,10 +198,17 @@ class CResponsables_Pdf extends BaseController{
                       <tbody>';
                       $nro=0;
                       foreach($responsables as $row){ 
+//$urlImagen = base_url($row['imagen_perfil']);
+                        $urlImagen = FCPATH . $row['imagen_perfil']; 
+
+
                         $nro++;
                         $tabla.='
                         <tr>
                           <td style="aling:center;">'.$nro.'</td>
+                          <td style="text-align:center;">'.$src.'
+                             <img src="'.$urlImagen.'" width="35" height="35">
+                          </td>
                           <td>'.$row['fun_nombre'].' '.$row['fun_paterno'].' '.$row['fun_materno'].'</td>
                           <td>'.$row['fun_ci'].'</td>
                           <td>'.$row['fun_cargo'].'</td>

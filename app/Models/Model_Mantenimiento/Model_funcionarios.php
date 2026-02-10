@@ -20,7 +20,8 @@ class Model_funcionarios extends Model{
         'fun_adm',  
         'fun_dist', 
         'uni_id', 
-        'fun_usuario', 
+        'fun_usuario',
+        'conf_img', 
         'fun_password' // Asegúrate de que este nombre sea exacto al de tu columna
     ];
 
@@ -49,7 +50,8 @@ class Model_funcionarios extends Model{
     public function obtenerFuncionariosActivos(){
         $sql = 'SELECT * 
                 from vlist_funcionario
-                where cm_id=0';
+                where cm_id=0
+                order by id asc';
         $query = $this->query($sql);
         
         return $query->getResultArray();
@@ -216,9 +218,6 @@ public function get_usuario_responsablePoa($usuario) {
         return $query->getRowArray();
     }
 
-
-
-
     /// Datos Regional Distrital
     public function datos_regional($dist_id){
         $sql = 'select *
@@ -231,7 +230,15 @@ public function get_usuario_responsablePoa($usuario) {
     }
 
    
+    /// Lista de Perfiles
+    public function perfiles_img(){
+        $sql = ' select *
+                 from img_perfiles
+                 order by img_id asc';
 
+        $query = $this->query($sql);
+        return $query->getResultArray();
+    }
 
 
 

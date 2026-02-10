@@ -256,8 +256,8 @@ class Libreria_Index{
     }
 
     /// Modulos Habilitados Sidebar
-    public function Modulos_disponibles_Sidebar($modulos,$responsable,$cargo,$sistema){
-        $model_index = new IndexModel();
+    public function Modulos_disponibles_Sidebar($modulos,$responsable,$cargo,$sistema,$img_perfil){
+    $model_index = new IndexModel();
         $tabla='';
         $tabla.='
         <aside class="left-sidebar with-vertical">
@@ -324,7 +324,7 @@ class Libreria_Index{
           <div class="card-body p-4">
             <div class="d-flex align-items-center justify-content-between gap-3">
               <div class="d-flex align-items-center gap-3">
-                <img src="'.base_url('Img/plantillaImg/user-1.jpg').'" width="45" height="45" class="img-fluid rounded-circle" alt="spike-img" />
+                <img src="'.base_url($img_perfil).'" width="45" height="45" class="img-fluid rounded-circle" alt="spike-img" />
                 <div>
                   <h5 class="mb-1">'.$responsable.'</h5>
                   <p class="mb-0">'.$cargo.'</p>
@@ -410,7 +410,7 @@ class Libreria_Index{
 
 
     /// Cabecera Sistema
-    public function Cabecera_sistema($responsable,$cargo,$sistema,$img){
+    public function Cabecera_sistema($responsable,$cargo,$sistema,$img,$img_perfil){
     $tabla='';
     $tabla.='<link rel="stylesheet" href="https://cdn.jsdelivr.net">
             <link rel="stylesheet" href="https://cdn.jsdelivr.net">
@@ -443,7 +443,7 @@ class Libreria_Index{
                         <a class="nav-link position-relative ms-6" href="javascript:void(0)" id="drop1" aria-expanded="false">
                           <div class="d-flex align-items-center flex-shrink-0">
                             <div class="user-profile me-sm-3 me-2">
-                              <img src="'.base_url('Img/plantillaImg/user-1.jpg').'" width="40" class="rounded-circle" alt="spike-img">
+                              <img src="'.base_url($img_perfil).'" width="40" class="rounded-circle" alt="spike-img">
                             </div>
                             <span class="d-sm-none d-block"><iconify-icon icon="solar:alt-arrow-down-line-duotone"></iconify-icon></span>
 
@@ -466,7 +466,7 @@ class Libreria_Index{
                             </div>
 
                             <div class="d-flex align-items-center mx-7 py-9 border-bottom">
-                              <img src="'.base_url('Img/plantillaImg/user-1.jpg').'" alt="user" width="90" class="rounded-circle" />
+                              <img src="'.base_url($img_perfil).'" alt="user" width="90" class="rounded-circle" />
                               <div class="ms-4">
                                 <h4 class="mb-0 fs-5 fw-normal">'.$responsable.'</h4>
                                 <span class="text-muted">'.$cargo.'</span>
@@ -494,7 +494,7 @@ class Libreria_Index{
 
 
 /// Cabecera Superior Sistema
-    public function Cabecera_sistema_layout($responsable,$cargo,$sistema,$img){
+    public function Cabecera_sistema_layout($responsable,$cargo,$sistema,$img,$img_perfil){
     $tabla='';
     $tabla.='<div class="with-vertical">
               <!-- Start Vertical Layout Header -->
@@ -527,7 +527,7 @@ class Libreria_Index{
                         <a class="nav-link position-relative ms-6" href="javascript:void(0)" id="drop1" aria-expanded="false">
                           <div class="d-flex align-items-center flex-shrink-0">
                             <div class="user-profile me-sm-3 me-2">
-                              <img src="'.base_url('Img/plantillaImg/user-1.jpg').'" width="40" class="rounded-circle" alt="spike-img">
+                              <img src="'.base_url($img_perfil).'" width="40" class="rounded-circle" alt="spike-img">
                             </div>
                             <span class="d-sm-none d-block"><iconify-icon icon="solar:alt-arrow-down-line-duotone"></iconify-icon></span>
 

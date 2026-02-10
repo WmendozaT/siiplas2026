@@ -127,7 +127,7 @@ public function update_permisos_responsable() {
     $columna = $this->request->getPost('columna');
     $valor   = $this->request->getPost('valor');
 
-    $columnasPermitidas = ['tp_adm', 'conf_mod_form4', 'conf_mod_form5', 'conf_mod_ppto', 'conf_cert_poa', 'conf_eval_poa', 'sw_pass'];
+    $columnasPermitidas = ['tp_adm', 'conf_mod_form4', 'conf_mod_form5', 'conf_mod_ppto', 'conf_cert_poa', 'conf_eval_poa', 'conf_cert_digital', 'sw_pass'];
 
     if (!in_array($columna, $columnasPermitidas)) {
         return $this->response->setJSON([
@@ -420,6 +420,7 @@ public function exportar_responsables(){
             'fun_adm'      => $this->request->getPost('tp_adm'),
             'fun_dist'      => $this->request->getPost('dist_id'),
             'uni_id'       => $this->request->getPost('uni_id'),
+            'conf_img'       => $this->request->getPost('img_id'),
             'fun_usuario'  => strtoupper($this->request->getPost('fn_usu')),
         ];
 
@@ -428,13 +429,14 @@ public function exportar_responsables(){
           $data['fun_password'] = $pass;
 
           $pass_ini=$model_funcionario->get_pwd($id);
-          if(!empty($pass_ini)){
-            if($pass_ini[0]['fun_apassword']!=$pass){
+
+          if(count($pass_ini)==0){
+           // if($pass_ini[0]['fun_apassword']!=$pass){
                 $db->table('historial_psw')->insert([
                 'fun_id'        => $id,
                 'fun_apassword' => $pass
                 ]);
-            }
+            //}
           }
       }
 

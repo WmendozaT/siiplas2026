@@ -1,4 +1,70 @@
- base = $('[name="base"]').val();
+base = $('[name="base"]').val();
+
+//// muestra el icono del perfil en el formulario de edicion
+$(document).ready(function() {
+    const $select = $('#img_id');
+    const $contenedor = $('#icono_perfil');
+
+    // Función para actualizar la imagen
+    function cambiarImagenPerfil() {
+        // Obtenemos la ruta del atributo data-img de la opción seleccionada
+        const ruta = $select.find('option:selected').attr('data-img');
+        
+        if (ruta) {
+            $contenedor.html(`
+                <img src="${ruta}" 
+                     style="width: 100%; height: 100%; object-fit: cover;" 
+                     class="rounded-circle animate__animated animate__fadeIn">
+            `);
+        }
+    }
+
+    // Escuchar el cambio en el select nativo
+    $select.on('change', cambiarImagenPerfil);
+
+    // Disparar al cargar para que muestre la imagen inicial
+    cambiarImagenPerfil();
+});
+
+/// Muestra en un modal la foto de perfil del listado de responsables
+$(document).ready(function() {
+    // Usamos delegación de eventos por si la tabla se recarga con AJAX
+    $(document).on('click', '.img-preview', function() {
+        const rutaImg = $(this).data('img');
+        const nombre = $(this).data('name');
+        const unidad = $(this).data('unidad');
+
+        // Inyectamos los datos al modal
+        $('#imgModal').attr('src', rutaImg);
+        $('#perfilNombre').text(nombre);
+        $('#unidad').text(unidad);
+
+        // Mostramos el modal
+        $('#modalVerPerfil').modal('show');
+    });
+});
+
+
+
+// Función de formato (Asegúrate que use .attr)
+function formatState (state) {
+    if (!state.id) return state.text;
+    const url = $(state.element).attr('data-img');
+    return $('<span><img src="' + url + '" class="rounded-circle me-2" width="25" height="25" style="object-fit:cover;"/> ' + state.text + '</span>');
+}
+
+// Función de formato para la lista desplegable
+function formatState (state) {
+    if (!state.id) return state.text;
+    const element = state.element;
+    const url = $(element).attr('data-img');
+    
+    return $(
+        '<span><img src="' + url + '" class="rounded-circle me-2" width="25" height="25" style="object-fit:cover; vertical-align:middle;" /> ' + state.text + '</span>'
+    );
+};
+
+
 
 
 $(document).ready(function() {
@@ -401,13 +467,16 @@ $(document).on('change', '.btn-switch-update', function() {
         success: function(response) {
             // IMPORTANTE: Si CI4 regenera el token, debemos actualizar el meta tag
             if (response.token) {
-                //alert(response.token)
+              
                 $('meta[name="csrf-token-value"]').attr('content', response.token);
             }
 
             if (response.status !== 'success') {
                 alert('Error: ' + response.message);
                 $input.prop('checked', !$input.is(':checked'));
+            }
+            else{
+                alert('Permiso Actualizado');
             }
         },
         error: function() {
@@ -620,3 +689,16 @@ $(document).ready(function() {
         }
     });
 });
+
+/*$(document).ready(function() {
+    // Verificamos si la función existe para evitar el error
+    if ($.isFunction($.fn.select2)) {
+        $('.select2-img').select2({
+            templateResult: formatState,
+            templateSelection: formatState,
+            width: '100%'
+        }).trigger('change');
+    } else {
+        console.error("Error: La librería Select2 no se ha cargado correctamente.");
+    }
+});*/

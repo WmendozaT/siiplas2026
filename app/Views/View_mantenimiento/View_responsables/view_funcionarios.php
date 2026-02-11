@@ -44,6 +44,7 @@
     <!--  Fin Menu izquierdo -->
     </div>
     <div class="dark-transparent sidebartoggler"></div>
+
   </div>
 
   <script src=<?= base_url('Js/Index/jquery.min.js') ?>></script>
@@ -69,8 +70,10 @@
 </script>
   <script src="<?= base_url('Js/PlantillaJs/jquery.dataTables.min.js') ?>"></script>
   <script src="<?= base_url('Js/PlantillaJs/datatable.init.js') ?>"></script>
-  <script src=<?= base_url('Js/Mantenimiento/JsResponsable.js') ?>></script>
-  <script src=<?= base_url('Js/Inactividad.js') ?>></script>
+  <script src="<?= base_url('Js/jacobitus-total.browser.js') ?>"></script>
+  <script src="<?= base_url('Js/firma_digital.js') ?>"></script>
+  <script src="<?= base_url('Js/Mantenimiento/JsResponsable.js') ?>"></script>
+  <script src="<?= base_url('Js/Inactividad.js') ?>"></script>
 </body>
 
 </html>

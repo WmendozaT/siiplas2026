@@ -48,6 +48,21 @@ class Libreria_Responsable{
                               <img src="'.base_url().'Img/Iconos/application_form_add.png" alt="Nuevo"> 
                               <span>Nuevo Registro</span>
                           </a>
+
+                          <!-- Para generar reporte de manera clasica -->
+                          <a href="'.base_url('mnt/Pdf_responsables').'" class="btn btn-outline-primary btn-sm ms-2" data-bs-toggle="tooltip" data-bs-placement="top" title="Formulario de Registro">
+                              <img src="'.base_url().'Img/Iconos/application_form_add.png" alt="Nuevo"> 
+                              <span>Reporte Clasico</span>
+                          </a>
+
+                          <button type="button" 
+                                  onclick="verReporteModal()" 
+                                  class="btn btn-outline-primary btn-sm ms-2" 
+                                  data-bs-toggle="tooltip" 
+                                  title="Ver Reporte">
+                              <img src="'.base_url().'Img/Iconos/page_red.png" alt="Nuevo"> 
+                              <span>GENERAR REPORTE PARA FIRMA</span>
+                          </button>
                           <!-- Botón Reporte (Impresión) -->
                           <button type="button" id="btnGenerarReporte" onclick="generarReporteBase64()" class="btn btn-outline-primary btn-sm ms-2">
                               <img src="'.base_url().'Img/Iconos/page_red.png" alt="Nuevo"> 
@@ -227,7 +242,41 @@ class Libreria_Responsable{
                     </div>
                 </div>
             </div>
-        </div>';
+        </div>
+
+    <div class="modal fade" id="modalReporte" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header bg-dark text-white">
+                <h5 class="modal-title">Reporte de Responsables</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <!-- CAMBIO: iframe por embed para que Jacobitus acceda al Base64 -->
+                <embed id="frameReporte" src="" type="application/pdf" width="100%" height="500px">
+                
+                <!-- OBLIGATORIO: Div para que Jacobitus procese logs/errores -->
+                <div id="div-logs-firma" style="display:none;"></div>
+
+                <div class="card mt-3 border-primary">
+                    <div class="card-body bg-light">
+                        <h6 class="text-primary"><i class="fas fa-pen-fancy"></i> Firma Digital (ADSIB)</h6>
+                        <p class="small text-muted">Asegúrese de que <b>Jacobitus Total</b> esté iniciado.</p>
+                        <div class="row g-2">
+                            <div class="col-md-12">
+                                <button type="button" class="btn btn-primary w-100" onclick="ejecutarFirmaDigital()">
+                                    <i class="fas fa-certificate"></i> Firmar Documento
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+</div>';
 
         return $tabla;
     }

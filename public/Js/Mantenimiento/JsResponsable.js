@@ -332,8 +332,124 @@ $(document).ready(function() {
     });
 });
 
+let pdfPendiente = ""; // Variable global para el base64
+let codigoReporte = ""; // Para identificar en la tabla de Postgres
 
+function verReporteModal() {
+    const url = base + "mnt/Pdf_responsables"; 
 
+    $.ajax({
+        url: url,
+        type: 'POST',
+        dataType: 'json',
+        success: function(response) {
+            if (response.status === 'success') {
+                // 1. Guardamos datos en variables globales
+                pdfPendiente = response.pdf; 
+                codigoReporte = response.codigo; // El código aleatorio que genera tu controlador
+
+                // 2. Cargamos el PDF en el iframe
+                $('#frameReporte').attr('src', response.pdf);
+                
+                // 3. Mostramos modal
+                var myModal = new bootstrap.Modal(document.getElementById('modalReporte'));
+                myModal.show();
+            } else {
+                alert("Error: " + response.status);
+            }
+        }
+    });
+}
+
+async function ejecutarFirmaDigital() {
+    const pin = $('#tokenPin').val();
+    if (!pin) return alert("Debe ingresar su PIN");
+
+    try {
+        // A. Verificar Jacobitus
+        const ejecucion = await jacobitusTotal.verificarEjecucion();
+        if (!ejecucion.exito) throw "Abra el software Jacobitus Total en su equipo.";
+
+        // B. Obtener Dispositivo (Token)
+        const tokens = await jacobitusTotal.obtenerDispositivos();
+        if (!tokens.exito || tokens.datos.dispositivos.length === 0) throw "Conecte su Token a la PC.";
+        const slot = tokens.datos.dispositivos[0].slot;
+
+        // C. Obtener Alias del Certificado
+        const certs = await jacobitusTotal.obtenerCertificadosParaFirmaDigital(slot, pin);
+        if (!certs.exito) throw "PIN incorrecto o error al leer certificado.";
+        const alias = certs.datos.certificados[0].alias;
+
+        // D. Firmar el PDF
+        // Recordatorio: firmarPdf limpia automáticamente el prefijo 'data:application/pdf;base64,'
+        const firma = await jacobitusTotal.firmarPdf(slot, pin, alias, pdfPendiente);
+        if (!firma.exito) throw "Firma fallida: " + firma.mensaje;
+
+        // E. Validar Firma para extraer metadatos (Postgres)
+        const validacion = await jacobitusTotal.validarPdf(firma.datos.docFirmado);
+        
+        // F. Enviar al Servidor
+        enviarAlServidor(firma.datos.docFirmado, validacion.datos.firmas[0]);
+
+    } catch (err) {
+        alert("Error en el proceso: " + err);
+    }
+}
+
+function enviarAlServidor(pdfFirmado, datosCertificado) {
+    $.ajax({
+        url: base + "mnt/ActualizarFirmaPostgres",
+        type: 'POST',
+        data: {
+            codigo: codigoReporte,
+            pdf: pdfFirmado,
+            nombre: datosCertificado.nombre_comun,
+            ci: datosCertificado.ci,
+            organizacion: datosCertificado.organizacion,
+            fecha_adsib: datosCertificado.fecha_firma,
+            serial: datosCertificado.serial_number
+        },
+        success: function(res) {
+            alert("Reporte firmado y registrado en Postgres exitosamente.");
+            location.reload();
+        }
+    });
+}
+
+/*function verReporteModal() {
+    // Asegúrate de usar "=" y que "base" termine en "/" o la ruta sea correcta
+
+    const url = base + "mnt/Pdf_responsables"; 
+
+    $.ajax({
+        url: url,
+        type: 'POST',
+        dataType: 'json',
+        beforeSend: function() {
+            // Opcional: mostrar un loader
+            console.log("Enviando petición a:", url);
+        },
+        success: function(response) {
+            if (response.status === 'success') {
+                // Asignar el base64 al src del iframe
+                $('#frameReporte').attr('src', response.pdf);
+                
+                // Mostrar modal
+                var myModal = new bootstrap.Modal(document.getElementById('modalReporte'));
+                myModal.show();
+            } else {
+                alert("Error: " + response.status);
+            }
+        },
+        error: function(xhr, status, error) {
+            // Esto te dirá qué está fallando realmente
+            console.error("Status: " + status);
+            console.error("Error: " + error);
+            console.error("Respuesta del servidor: " + xhr.responseText);
+            alert("Error de conexión con el servidor. Revisa la consola (F12).");
+        }
+    });
+}*/
 
 
 
@@ -702,3 +818,90 @@ $(document).ready(function() {
         console.error("Error: La librería Select2 no se ha cargado correctamente.");
     }
 });*/
+
+
+
+///////////////////// PARA FIRMAR DIGITALMENTE
+//let pdfPendiente = ""; // Variable global para el base64
+//let codigoReporte = ""; // Para identificar en la tabla de Postgres
+
+/*function verReporteModal() {
+    const url = base + "mnt/Pdf_responsables"; 
+
+    $.ajax({
+        url: url,
+        type: 'POST',
+        dataType: 'json',
+        success: function(response) {
+            if (response.status === 'success') {
+                // 1. Guardamos datos en variables globales
+                pdfPendiente = response.pdf; 
+                codigoReporte = response.codigo; // El código aleatorio que genera tu controlador
+
+                // 2. Cargamos el PDF en el iframe
+                $('#frameReporte').attr('src', response.pdf);
+                
+                // 3. Mostramos modal
+                var myModal = new bootstrap.Modal(document.getElementById('modalReporte'));
+                myModal.show();
+            } else {
+                alert("Error: " + response.status);
+            }
+        }
+    });
+}*/
+
+// async function ejecutarFirmaDigital() {
+//     const pin = $('#tokenPin').val();
+//     if (!pin) return alert("Debe ingresar su PIN");
+
+//     try {
+//         // A. Verificar Jacobitus
+//         const ejecucion = await jacobitusTotal.verificarEjecucion();
+//         if (!ejecucion.exito) throw "Abra el software Jacobitus Total en su equipo.";
+
+//         // B. Obtener Dispositivo (Token)
+//         const tokens = await jacobitusTotal.obtenerDispositivos();
+//         if (!tokens.exito || tokens.datos.dispositivos.length === 0) throw "Conecte su Token a la PC.";
+//         const slot = tokens.datos.dispositivos[0].slot;
+
+//         // C. Obtener Alias del Certificado
+//         const certs = await jacobitusTotal.obtenerCertificadosParaFirmaDigital(slot, pin);
+//         if (!certs.exito) throw "PIN incorrecto o error al leer certificado.";
+//         const alias = certs.datos.certificados[0].alias;
+
+//         // D. Firmar el PDF
+//         // Recordatorio: firmarPdf limpia automáticamente el prefijo 'data:application/pdf;base64,'
+//         const firma = await jacobitusTotal.firmarPdf(slot, pin, alias, pdfPendiente);
+//         if (!firma.exito) throw "Firma fallida: " + firma.mensaje;
+
+//         // E. Validar Firma para extraer metadatos (Postgres)
+//         const validacion = await jacobitusTotal.validarPdf(firma.datos.docFirmado);
+        
+//         // F. Enviar al Servidor
+//         enviarAlServidor(firma.datos.docFirmado, validacion.datos.firmas[0]);
+
+//     } catch (err) {
+//         alert("Error en el proceso: " + err);
+//     }
+// }
+
+// function enviarAlServidor(pdfFirmado, datosCertificado) {
+//     $.ajax({
+//         url: base + "mnt/ActualizarFirmaPostgres",
+//         type: 'POST',
+//         data: {
+//             codigo: codigoReporte,
+//             pdf: pdfFirmado,
+//             nombre: datosCertificado.nombre_comun,
+//             ci: datosCertificado.ci,
+//             organizacion: datosCertificado.organizacion,
+//             fecha_adsib: datosCertificado.fecha_firma,
+//             serial: datosCertificado.serial_number
+//         },
+//         success: function(res) {
+//             alert("Reporte firmado y registrado en Postgres exitosamente.");
+//             location.reload();
+//         }
+//     });
+// }

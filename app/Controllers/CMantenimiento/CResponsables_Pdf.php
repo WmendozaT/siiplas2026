@@ -36,19 +36,142 @@ class CResponsables_Pdf extends BaseController{
     }
 
 
-    /// Reporte Lista de Reponsables POA
+/// Reporte Lista de Reponsables POA NORMAL
     public function Pdf_lista_responsables(){
+    $tp_rep = 0; // O recuperar del Post
+    $fecha = date('d/m/Y'); 
+    
+    ini_set('memory_limit', '1024M');
+    $options = new \Dompdf\Options();
+    $options->set('isRemoteEnabled', true);
+    $options->set('chroot', FCPATH);
+    
+    $dompdf = new \Dompdf\Dompdf($options);
+
+    //$path = FCPATH . $this->session->get('configuracion')['conf_img']; 
+   // $path = FCPATH . 'Img/login/logo_CNS_header.png'; 
+    $path = FCPATH . $this->session->get('configuracion')['conf_img']; 
+        $base64 = '';
+
+        if (file_exists($path)) {
+            $type = pathinfo($path, PATHINFO_EXTENSION);
+            $data = file_get_contents($path);
+            $base64 = 'data:image/' . $type . ';base64,' . base64_encode($data);
+        }
+
+$html='';
+$html = '
+<!DOCTYPE html>
+<html>
+<head>
+        <style>
+            @page { margin: 110px 40px 70px 40px; }
+            header {
+                position: fixed; top: -95px; left: 0px; right: 0px; height: 85px;
+                border-bottom: 2px solid #004640; display: block; width: 100%;
+            }
+            .header-table { width: 100%; border-collapse: collapse; }
+            .header-table td { border: none; vertical-align: middle; }
+            .header-title { text-align: center; color: #004640; }
+            .header-title h2 { margin: 0; font-size: 20px; text-transform: uppercase; }
+            .header-title p { margin: 2px 0 0 0; font-size: 12px; color: #000; }
+            
+            footer {
+                position: fixed; bottom: -50px; left: 0px; right: 0px; height: 40px;
+                width: 100%; font-size: 9px; color: #666; border-top: 1px solid #ddd; text-align: center;
+            }
+            .pagenum:before { content: counter(page); }
+
+            .table-report { width: 100%; border-collapse: collapse; margin-top: 10px; font-family: sans-serif; font-size: 8.5px; }
+            .table-report th { background-color: #004640; color: white; padding: 8px; text-align: left; border: 1px solid #ddd; text-transform: uppercase; }
+            .table-report td { padding: 6px; border: 1px solid #ddd; vertical-align: middle; }
+            .table-report tr:nth-child(even) { background-color: #f9f9f9; }
+            .text-center { text-align: center; }
+            .table-report tr { page-break-inside: avoid; } 
+        </style>
+</head>
+<body>
+
+            <header>
+            <table class="header-table">
+                <tr>
+                    <!-- Espacio para el logo izquierdo -->
+                    <td style="width: 20%; text-align: left;">
+                        <img src="' . $base64 . '" style="height: 70px; width: auto;">
+                    </td>
+                    
+                    <!-- Texto central -->
+                    <td style="width: 60%;" class="header-title">
+                        <h2>'.$this->session->get('configuracion')['conf_nombre_entidad'].'</h2>
+                        <p>GESTIÓN '.$this->session->get('configuracion')['conf_gestion'].'</p>
+                        <p><strong>REPORTE OFICIAL DE RESPONSABLES POAssss</strong></p>
+                    </td>
+                    
+                    <!-- Espacio para fecha o código de control (derecha) -->
+                    <td style="width: 20%; text-align: right; font-size: 8px; color: #999;">
+                        Fecha: '.date('d/m/Y').'<br>
+                        Hora: '.date('H:i').'
+                    </td>
+                </tr>
+            </table>
+            </header>
+
+    <footer>
+                <p>'.$this->session->get('configuracion')['conf_version'].'. Página <span class="pagenum"></span></p>
+            </footer>
+
+    <main>
+   
+        '.$this->responsables_poa($tp_rep).'
+    </main>
+</body>
+</html>';
+    // 3. Renderizar PDF
+    $dompdf->loadHtml($html);
+    $dompdf->setPaper('Letter', 'portrait');
+    $dompdf->render();
+
+    // 4. Guardar para Jacobitus
+    $pdf_binario = $dompdf->output();
+    
+    // Recomendación: Usar una carpeta específica en writable para evitar problemas de permisos
+    $carpetaDir = FCPATH . 'uploads/reportes_firmas/';
+    if (!is_dir($carpetaDir)) {
+        mkdir($carpetaDir, 0777, true);
+    }
+    
+    $nombreArchivo = 'reporte_poa.pdf'; // O usar un identificador único
+    $ruta = $carpetaDir . $nombreArchivo;
+    file_put_contents($ruta, $pdf_binario);
+
+if (ob_get_length()) ob_clean();
+
+return $this->response
+            ->setStatusCode(200)
+            ->setContentType('application/json')
+            ->setJSON([
+                'status' => 'success',
+                'pdf'    => 'data:application/pdf;base64,' . base64_encode($pdf_binario),
+                'ruta'   => $ruta 
+            ]);
+    }
+
+
+
+
+
+    /// Reporte Lista de Reponsables POA CON AJAX
+    public function Pdf_lista_responsables2(){
     
     $tp_rep = $this->request->getPost('tp_rep'); /// tipo de Reporte
     $fecha = date('d/m/Y'); // Definir la variable fecha
     
-    $options = new Options();
-    $options->set('chroot', FCPATH); 
-$options->set('isRemoteEnabled', true); // Permite cargar imágenes vía base_url
-//$options->set('chroot', realpath('')); // Opcional: define la raíz permitida
-
-   // $options->set('chroot', FCPATH);        // Restringe el acceso de lectura a la carpeta de tu proyecto
-    $dompdf = new Dompdf($options);
+        ini_set('memory_limit', '1024M'); // Aumenta a 1GB de RAM temporalmente
+        $options = new \Dompdf\Options();
+        $options->set('isRemoteEnabled', true);
+        $options->set('chroot', FCPATH);
+        
+        $dompdf = new \Dompdf\Dompdf($options);
 
 
         $html='';
@@ -206,7 +329,7 @@ $options->set('isRemoteEnabled', true); // Permite cargar imágenes vía base_ur
                         $tabla.='
                         <tr>
                           <td style="aling:center;">'.$nro.'</td>
-                          <td style="text-align:center;">'.$src.'
+                          <td style="text-align:center;">
                              <img src="'.$urlImagen.'" width="35" height="35">
                           </td>
                           <td>'.$row['fun_nombre'].' '.$row['fun_paterno'].' '.$row['fun_materno'].'</td>

@@ -25,6 +25,7 @@ $routes->get('documents', 'User::list_documentos');
 
 /// Dashboard
 $routes->get('dashboard', 'CDashboard\Dashboard::dashboard_admin');
+$routes->get('reporte_prueba', 'CDashboard\Dashboard::reporte_prueba');
 
 
 /// Mantenimiento
@@ -52,7 +53,8 @@ $routes->post('mnt/add_segpoa', 'CMantenimiento\CResponsables::Add_segpoa'); ///
 $routes->get('mnt/form_update_segpoa/(:num)', 'CMantenimiento\CResponsables::form_update_segpoa/$1'); /// Form Update Responsable-Seguimiento POA
 $routes->post('mnt/update_respspoa', 'CMantenimiento\CResponsables::Update_respspoa'); /// Valida Update Responsable
 
-$routes->post('mnt/Pdf_responsables', 'CMantenimiento\CResponsables_Pdf::Pdf_lista_responsables'); /// Pdf Responsables en base64
+$routes->get('mnt/Pdf_responsables', 'CMantenimiento\CResponsables_Pdf::Pdf_lista_responsables'); /// Pdf Responsables en base64
+$routes->post('mnt/Pdf_responsables', 'CMantenimiento\CResponsables_Pdf::Pdf_lista_responsables'); /// Pdf Responsables en base64 Ajax
 
 //// Para firma digital
 $routes->get('mnt/Pdf_responsables_sfirma', 'CMantenimiento\CResponsables_Pdf::Pdf_lista_responsables_para_firmar'); /// Pdf Responsables en base64

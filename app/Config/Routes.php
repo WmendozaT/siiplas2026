@@ -78,3 +78,7 @@ $routes->post('mnt/update_uorganizacional', 'CMantenimiento\CEstructura_organiza
 $routes->post('mnt/add_uorganizacional', 'CMantenimiento\CEstructura_organizacional::add_uorganizacional'); /// Add Unidad Organizacional
 //$routes->get('mnt/rep_uorganizacional/(:num)', 'CMantenimiento\CEstructura_organizacional::reporte_uorganizacional/$1'); /// Reporte Unidad Organizacional por Regional
 $routes->post('mnt/rep_uorganizacional', 'CMantenimiento\CEstructura_organizacional::Pdf_lista_uorganizacional'); /// Pdf Unidad Organizacional por Regional en base64
+
+
+//// Asignar Presupuesto
+$routes->get('mnt/AsigPtto', 'CMantenimiento\Casignar_presupuesto::menu_asignar_ppto'); /// Vista de Asignar Presupuesto

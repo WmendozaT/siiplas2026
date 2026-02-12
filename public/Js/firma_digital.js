@@ -18,40 +18,51 @@ const FirmaDigital = {
         return true;
     },
 
-    async ejecutarFirma(idVisualizador) {
-        try {
-            await this.validarEstado();
+async ejecutarFirma(idVisualizador) {
+    try {
+        await this.validarEstado();
 
-            // 3. Obtener Slot y Alias (Pasos obligatorios en tu nuevo JS)
-            const dispositivos = await jacobitusTotal.obtenerDispositivos();
-            const slot = dispositivos.datos.dispositivos[0].slot;
-            
-            // Aquí podrías pedir el PIN con un prompt de SweetAlert o usar el input del modal
-            const pin = $('#tokenPin').val(); 
-            if(!pin) throw new Error("Debe ingresar el PIN del Token.");
-
-            const certs = await jacobitusTotal.obtenerCertificadosParaFirmaDigital(slot, pin);
-            if(!certs.exito) throw new Error("PIN incorrecto o no se pudieron leer certificados.");
-            
-            // Usamos el primer certificado disponible
-            const alias = certs.datos.certificados[0].alias;
-
-            // 4. Firmar (Tu JS pide: slot, pin, alias, pdfBase64)
-            const pdfBase64 = $('#' + idVisualizador).attr('src');
-            
-            const resultado = await jacobitusTotal.firmarPdf(slot, pin, alias, pdfBase64);
-            
-            if (resultado.exito) {
-                // Tu JS devuelve el PDF en: datos.docFirmado
-                return 'data:application/pdf;base64,' + resultado.datos.docFirmado;
-            } else {
-                throw new Error(resultado.mensaje);
-            }
-        } catch (error) {
-            alert("Error de Firma", error.message, "error");
-            return null;
+        // 1. Obtener Dispositivos
+        const dispositivos = await jacobitusTotal.obtenerDispositivos();
+        
+        if (!dispositivos.exito || dispositivos.datos.dispositivos.length === 0) {
+            throw new Error("No se detectó ningún Token conectado.");
         }
+        
+        const slot = dispositivos.datos.dispositivos[0].slot;
+        
+        // 2. Obtener PIN
+        const pin = $('#tokenPin').val(); 
+        if(!pin) throw new Error("Debe ingresar el PIN del Token.");
+
+        // 3. Obtener Certificados
+        const certs = await jacobitusTotal.obtenerCertificadosParaFirmaDigital(slot, pin);
+        if(!certs.exito) throw new Error("PIN incorrecto o no se pudieron leer certificados.");
+        
+        const alias = certs.datos.certificados[0].alias;
+
+        // 4. Limpiar Base64 del PDF
+        // Jacobitus suele necesitar el Base64 PURO, sin el prefijo "data:application/pdf;base64,"
+        let pdfBase64 = $('#' + idVisualizador).attr('src');
+        if (pdfBase64.includes(',')) {
+            pdfBase64 = pdfBase64.split(',')[1];
+        }
+        
+        // 5. Firmar
+        const resultado = await jacobitusTotal.firmarPdf(slot, pin, alias, pdfBase64);
+        
+        if (resultado.exito) {
+            return 'data:application/pdf;base64,' + resultado.datos.docFirmado;
+        } else {
+            throw new Error(resultado.mensaje || "Error desconocido al firmar.");
+        }
+    } catch (error) {
+        // CORRECCIÓN: alert nativo solo recibe un texto
+        alert("Error de Firma: " + error.message);
+        console.error("Detalle del error:", error);
+        return null;
     }
+}
 };
 
 

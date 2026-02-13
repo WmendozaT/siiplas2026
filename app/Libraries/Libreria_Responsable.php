@@ -49,12 +49,6 @@ class Libreria_Responsable{
                               <span>Nuevo Registro</span>
                           </a>
 
-                          <!-- Para generar reporte de manera clasica -->
-                          <a href="'.base_url('mnt/Pdf_responsables').'" class="btn btn-outline-primary btn-sm ms-2" data-bs-toggle="tooltip" data-bs-placement="top" title="Formulario de Registro">
-                              <img src="'.base_url().'Img/Iconos/application_form_add.png" alt="Nuevo"> 
-                              <span>Reporte Clasico</span>
-                          </a>
-
                           <button type="button" 
                                   onclick="verReporteModal()" 
                                   class="btn btn-outline-primary btn-sm ms-2" 
@@ -63,11 +57,7 @@ class Libreria_Responsable{
                               <img src="'.base_url().'Img/Iconos/page_red.png" alt="Nuevo"> 
                               <span>GENERAR REPORTE PARA FIRMA</span>
                           </button>
-                          <!-- Botón Reporte (Impresión) -->
-                          <button type="button" id="btnGenerarReporte" onclick="generarReporteBase64()" class="btn btn-outline-primary btn-sm ms-2">
-                              <img src="'.base_url().'Img/Iconos/page_red.png" alt="Nuevo"> 
-                              <span>Generar Reporte.Pdf</span>
-                          </button>
+
 
                           <!-- Botón Exportar -->
                           <a href="'.base_url('mnt/exportar_responsablePoa').'" 
@@ -80,10 +70,6 @@ class Libreria_Responsable{
                               </span>
                               <span id="btnText">Exportar Listado.xls</span>
                           </a>
-
-                          <button type="button" onclick="firmarYAbrirReporte()" class="btn btn-info btn-sm ms-2 text-white">
-                              <i class="ti ti-certificate"></i> Firmar Digitalmente
-                          </button>
                       </div>
                   </div>
 

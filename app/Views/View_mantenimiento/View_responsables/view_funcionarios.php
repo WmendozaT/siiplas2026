@@ -60,17 +60,10 @@
   <script src="<?= base_url('Js/PlantillaJs/feather.min.js') ?>"></script>
   <!-- solar icons -->
   <script src="<?= base_url('Js/PlantillaJs/iconify-icon.min.js') ?>"></script>
-  <!-- highlight.js (code view) -->
-  <script src="<?= base_url('Js/PlantillaJs/highlight.min.js') ?>"></script>
-  <script>
-  hljs.initHighlightingOnLoad();
-  document.querySelectorAll("pre.code-view > code").forEach((codeBlock) => {
-    codeBlock.textContent = codeBlock.innerHTML;
-  });
-</script>
+
   <script src="<?= base_url('Js/PlantillaJs/jquery.dataTables.min.js') ?>"></script>
   <script src="<?= base_url('Js/PlantillaJs/datatable.init.js') ?>"></script>
-  <script src="<?= base_url('Js/jacobitus-total.browser.js') ?>"></script>
+  <script src="<?= base_url('Js/jacobitus-total.browser.js') ?>"></script> 
   <script src="<?= base_url('Js/firma_digital.js') ?>"></script>
   <script src="<?= base_url('Js/Mantenimiento/JsResponsable.js') ?>"></script>
   <script src="<?= base_url('Js/Inactividad.js') ?>"></script>

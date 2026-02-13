@@ -36,7 +36,6 @@ class CResponsables_Pdf extends BaseController{
     }
 
 
-/// Reporte Lista de Reponsables POA NORMAL
     public function Pdf_lista_responsables(){
     $tp_rep = 0; // O recuperar del Post
     $fecha = date('d/m/Y'); 
@@ -47,9 +46,6 @@ class CResponsables_Pdf extends BaseController{
     $options->set('chroot', FCPATH);
     
     $dompdf = new \Dompdf\Dompdf($options);
-
-    //$path = FCPATH . $this->session->get('configuracion')['conf_img']; 
-   // $path = FCPATH . 'Img/login/logo_CNS_header.png'; 
     $path = FCPATH . $this->session->get('configuracion')['conf_img']; 
         $base64 = '';
 
@@ -159,143 +155,6 @@ return $this->response
 
 
 
-
-    /// Reporte Lista de Reponsables POA CON AJAX
-    public function Pdf_lista_responsables2(){
-    
-    $tp_rep = $this->request->getPost('tp_rep'); /// tipo de Reporte
-    $fecha = date('d/m/Y'); // Definir la variable fecha
-    
-        ini_set('memory_limit', '1024M'); // Aumenta a 1GB de RAM temporalmente
-        $options = new \Dompdf\Options();
-        $options->set('isRemoteEnabled', true);
-        $options->set('chroot', FCPATH);
-        
-        $dompdf = new \Dompdf\Dompdf($options);
-
-
-        $html='';
-        $html.='
-        <!DOCTYPE html>
-        <html lang="es">
-        <head>
-            <meta charset="UTF-8">
-        <style>
-            /* 1. Definir márgenes de la página */
-            @page {
-                margin: 110px 50px 80px 50px; /* Margen: superior, derecho, inferior, izquierdo */
-            }
-
-            /* 2. Encabezado Fijo */
-            header {
-                position: fixed;
-                top: -90px; /* Se coloca dentro del margen superior */
-                left: 0px;
-                right: 0px;
-                height: 80px;
-                text-align: center;
-                border-bottom: 1px solid #ccc;
-            }
-
-            /* 3. Pie de Página Fijo */
-            footer {
-                position: fixed;
-                bottom: -60px; /* Se coloca dentro del margen inferior */
-                left: 0px;
-                right: 0px;
-                height: 50px;
-                text-align: center;
-                font-size: 10px;
-                color: #777;
-                border-top: 1px solid #ccc;
-            }
-
-            /* 4. Numeración de páginas (Script especial para Dompdf) */
-            .pagenum:before {
-                content: counter(page);
-            }
-
-            /* --- ESTILOS ESPECÍFICOS PARA LA TABLA --- */
-            .table-report {
-                width: 100%;
-                border-collapse: collapse; /* Quita el espacio entre bordes */
-                margin-top: 10px;
-                font-family: sans-serif;
-                font-size: 8.5px;
-            }
-
-            .table-report th {
-                background-color: #004640; /* Color institucional */
-                color: white;
-                padding: 8px;
-                text-align: left;
-                border: 1px solid #ddd;
-                text-transform: uppercase;
-            }
-
-            .table-report td {
-                padding: 6px;
-                border: 1px solid #ddd;
-                vertical-align: middle;
-            }
-
-            /* Cebra: Filas alternas de color gris claro */
-            .table-report tr:nth-child(even) {
-                background-color: #f9f9f9;
-            }
-
-            .text-center { text-align: center; }
-            /* Evita que una fila se corte a la mitad entre dos páginas */
-            .table-report tr { page-break-inside: avoid; } 
-        </style>
-        </head>
-        <body>
-            <!-- Estos elementos se repetirán en cada hoja automáticamente -->
-            <header>
-                <h3>'.$this->session->get('configuracion')['conf_nombre_entidad'].'</h3>';
-                if($tp_rep==0){
-                    $html.='
-                    <p>Reporte Oficial de Responsables POA - Gestión '.$this->session->get('configuracion')['conf_gestion'].'</p>';
-                }
-                else{
-                     $html.='
-                    <p>Reporte Oficial de Responsables para el Seguimiento POA - Gestión '.$this->session->get('configuracion')['conf_gestion'].'</p>';
-                }
-                $html.='
-            </header>
-
-            <footer>
-                <p>'.$this->session->get('configuracion')['conf_version'].'. Página <span class="pagenum"></span></p>
-            </footer>
-
-            <!-- El contenido principal va aquí -->
-            <main>
-                '.$this->responsables_poa($tp_rep).'
-            </main>
-        </body>
-        </html>';
-
-        $dompdf->loadHtml($html);
-        $dompdf->setPaper('Letter', 'portrait');
-        $dompdf->render();
-
-        // 1. Capturamos el contenido binario del PDF generado
-        $pdf_content = $dompdf->output();
-       
-
-        // 2. Convertimos a Base64
-        $base64 = base64_encode($pdf_content);
-
-        // 3. Retornamos como JSON (ideal para recibirlo con AJAX hoy 2026)
-        return $this->response->setJSON([
-            'status' => 'success',
-            'nombre' => 'Responsables_POA.pdf',
-            'pdf'    => 'data:application/pdf;base64,' . $base64
-        ]);
-    }
-
-
-
     /// Reporte Lista de Reponsables POA para firmar Digitalmente
     public function responsables_poa($tp){
         $miLib_resp = new Libreria_Responsable();
@@ -321,10 +180,7 @@ return $this->response
                       <tbody>';
                       $nro=0;
                       foreach($responsables as $row){ 
-//$urlImagen = base_url($row['imagen_perfil']);
                         $urlImagen = FCPATH . $row['imagen_perfil']; 
-
-
                         $nro++;
                         $tabla.='
                         <tr>
@@ -395,96 +251,6 @@ return $this->response
     }
 
 
-
-
-
-     /// Reporte Lista de Reponsables POA para firmar Digitalmente
-    public function Pdf_lista_responsables_para_firmar(){
-    $model_funcionario = new Model_funcionarios();
-    $responsables = $model_funcionario->obtenerFuncionariosActivos();
-    $config = $this->session->get('configuracion');
-    
-    $options = new Options();
-    $options->set('isRemoteEnabled', true); // Cambiar a false si no usas imágenes externas
-    $options->set('defaultFont', 'Helvetica');
-    $dompdf = new Dompdf($options);
-
-    $html = '
-    <!DOCTYPE html>
-    <html lang="es">
-    <head>
-        <meta charset="UTF-8">
-        <style>
-            @page { margin: 110px 50px 80px 50px; }
-            header { position: fixed; top: -90px; left: 0px; right: 0px; height: 80px; text-align: center; border-bottom: 1px solid #000; }
-            footer { position: fixed; bottom: -60px; left: 0px; right: 0px; height: 50px; text-align: center; font-size: 10px; border-top: 1px solid #ccc; }
-            .pagenum:before { content: counter(page); }
-            
-            .table-report { width: 100%; border-collapse: collapse; font-family: sans-serif; font-size: 8.5px; }
-            .table-report th { background-color: #004640; color: white; padding: 8px; border: 1px solid #ddd; }
-            .table-report td { padding: 6px; border: 1px solid #ddd; vertical-align: middle; }
-            .text-center { text-align: center; }
-            tr { page-break-inside: avoid; }
-        </style>
-    </head>
-    <body>
-            <header>
-                <h3>'.$this->session->get('configuracion')['conf_nombre_entidad'].'</h3>
-                <p>Reporte Oficial de Responsables POA - Gestión '.$this->session->get('configuracion')['conf_gestion'].'</p>
-            </header>
-
-        <footer>
-            <span>'.$this->session->get('configuracion')['conf_version'].' - Generado el '.date('d/m/Y H:i').' - Página </span><span class="pagenum"></span>
-        </footer>
-
-        <main>
-            <table class="table-report">
-                <thead>
-                    <tr>
-                      <th width="3%">#</th>
-                      <th>RESPONSABLE POA</th>
-                      <th width="10%">CI</th>
-                      <th width="15%">CARGO</th>
-                      <th width="10%">USUARIO</th>
-                      <th width="10%">DISTRITAL</th>
-                    </tr>
-                </thead>
-                <tbody>';
-                foreach($responsables as $nro => $row){ 
-                    $html.='
-                    <tr>
-                      <td class="text-center">'.($nro + 1).'</td>
-                      <td>'.$row['fun_nombre'].' '.$row['fun_paterno'].' '.$row['fun_materno'].'</td>
-                      <td class="text-center">'.$row['fun_ci'].'</td>
-                      <td>'.$row['fun_cargo'].'</td>
-                      <td class="text-center">'.$row['fun_usuario'].'</td>
-                      <td class="text-center">'.$row['dist_distrital'].'</td>
-                    </tr>';
-                }
-                $html.='</tbody>
-            </table>
-            
-            <!-- Espacio opcional para firma visual si fuera necesario -->
-            <div style="margin-top: 30px; text-align: center;">
-                <p style="font-size: 9px; color: #555;">Documento generado electrónicamente para fines de firma digital.</p>
-            </div>
-        </main>
-    </body>
-    </html>';
-
-    $dompdf->loadHtml($html);
-    $dompdf->setPaper('Letter', 'portrait');
-    $dompdf->render();
-
-    // Importante: El output del PDF para firma debe ser limpio
-    $pdf_output = $dompdf->output();
-
-    return $this->response->setJSON([
-        'status' => 'success',
-        'pdf_sin_firmar' => base64_encode($pdf_output),
-        'nombre_archivo' => 'Reporte_Responsables_'.date('YmdHis').'.pdf'
-    ]);
-    }
 }
 
 

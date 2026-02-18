@@ -81,4 +81,5 @@ $routes->post('mnt/rep_uorganizacional', 'CMantenimiento\CEstructura_organizacio
 
 
 //// Asignar Presupuesto
-$routes->get('mnt/AsigPtto', 'CMantenimiento\Casignar_presupuesto::menu_lista_poa'); /// Vista de Asignar
+$routes->get('mnt/AsigPtto', 'CMantenimiento\Casignar_presupuesto::menu_lista_poa'); /// Vista de Asignar Presupuesto POA
+$routes->post('mnt/valida_ppto', 'CMantenimiento\Casignar_presupuesto::valida_migracion_ppto'); /// Valida migracion 

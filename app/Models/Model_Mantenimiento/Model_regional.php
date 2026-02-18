@@ -112,4 +112,24 @@ class Model_regional extends Model{
                     ->countAllResults() > 0; // Devuelve true o false
     }
 
+
+    //// ASIGNACION DE PRESUPUESTOS
+
+    // lista poa general
+    public function lista_poa_gral() {
+    /// tp_id : 1 Proy inversion
+    /// tp_id : 4 Gasto Corriente
+        $gestion = session()->get('configuracion')['conf_gestion'] ?? null;
+        $sql = "SELECT *,
+                    CASE 
+                        WHEN tp_id = 1 THEN 'INVERSIÓN'
+                        WHEN tp_id = 4 THEN 'GASTO CORRIENTE'
+                        ELSE 'OTRO'
+                    END AS tipo_gasto_nombre
+                FROM lista_poa_nacional(".$gestion.")
+                ORDER BY dep_id, dist_id, prog, proy, act ASC";
+        $query = $this->query($sql);
+        return $query->getResultArray();
+    }
+
 }

@@ -548,7 +548,7 @@ class Libreria_Index{
                             </div>
 
                             <div class="d-flex align-items-center mx-7 py-9 border-bottom">
-                              <img src="'.base_url('Img/plantillaImg/user-1.jpg').'" alt="user" width="90" class="rounded-circle" />
+                              <img src="'.base_url($img_perfil).'" alt="user" width="90" class="rounded-circle" />
                               <div class="ms-4">
                                 <h4 class="mb-0 fs-5 fw-normal" >'.$responsable.'</h4>
                                 <span class="text-muted" style="color:white;">'.$cargo.'</span>

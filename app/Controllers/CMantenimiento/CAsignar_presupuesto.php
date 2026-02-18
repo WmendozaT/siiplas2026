@@ -46,37 +46,29 @@ class Casignar_presupuesto extends BaseController{
     /// menu Estructura Organizacional
     public function menu_lista_poa(){
         $session = session(); // Necesario para romper la sesión
-        $miLib_Estructura = new Libreria_EstructuraOrganizacional();
-        $model_regional = new Model_regional();
-        $regional=$model_regional->obtenerRegionales();
+        $miLib_conf = new Libreria_EstructuraOrganizacional();
+        $data['formulario']=$miLib_conf->Lista_poa_para_asignacion_presupuesto();
 
-        echo "Hola mundo";
+        return view('View_mantenimiento/View_pptoAsignado/view_asignacion_presupuestaria',$data);
+    }
 
 
-/*        $tabla='';
-        $tabla.='
-        <div class="row">
-            <div class="card">
-                <div class="card-body">
-                  <h5 class="fs-4 fw-semibold mb-4">ESTRUCTURA ORGANIZACIONAL - GESTIÓN '.$this->session->get('configuracion')['ide'].'</h5>
-                  <div class="mb-4 row align-items-center">
-                    <label for="exampleInputSelect2" class="form-label col-sm-3 col-form-label text-end">Seleccione la Regional</label>
-                    <div class="col-sm-6">
-                      <select class="form-select" id="dep_id" name="dep_id" aria-label="Default select example">
-                      <option value="0">Seleccione ..</option>';
-                      foreach($regional as $row){
-                        $tabla.='<option value='.$row['dep_id'].'>'.$row['dep_id'].'.- '.$row['dep_departamento'].'</option>';
-                      }
-                      $tabla.='
-                      </select>
-                    </div>
-                  </div>
-                </div>
-                <div id="listado"></div>
-            </div>
-        </div>';
-        $data['formulario']=$tabla;
-        return view('View_mantenimiento/View_estructuraCns/view_estructuraOrganizacional',$data);*/
+    //// Valida migracion del archivo excel
+    public function valida_migracion_ppto() {
+        // 1. Validar si llegó el archivo
+      $file = $this->request->getFile('archivo_excel');
+
+      if (!$file->isValid()) {
+          return redirect()->back()->with('error', 'Archivo no seleccionado o corrupto.');
+      }
+
+
+      return $this->response->setJSON([
+        'status' => 'success',
+        'message' => 'Los datos se migraron correctamente.'
+      ]);
+
+
     }
 
 }

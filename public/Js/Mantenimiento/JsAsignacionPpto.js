@@ -51,11 +51,26 @@ document.addEventListener('DOMContentLoaded', function() {
             contentType: false,
             dataType: 'json',
             success: function(response) {
+
                 if (response.status === 'success') {
                     mensajeUI('success', '<b>✅ ¡Éxito!</b> ' + response.message);
                     setTimeout(() => { location.reload(); }, 2000);
                 } else {
-                    mensajeUI('warning', '<b>⚠️ Atención:</b> ' + response.message);
+                    // --- NUEVA LÓGICA PARA MOSTRAR ERRORES DETALLADOS ---
+                    let htmlErrores = `<b>⚠️ ${response.message}</b>`;
+                    
+                    if (response.detalles && response.detalles.length > 0) {
+                        htmlErrores += `<div class="mt-2" style="max-height: 200px; overflow-y: auto;">
+                            <ul class="list-group list-group-flush small text-start">`;
+                        
+                        response.detalles.forEach(function(error) {
+                            htmlErrores += `<li class="list-group-item list-group-item-warning py-1">${error}</li>`;
+                        });
+                        
+                        htmlErrores += `</ul></div>`;
+                    }
+                    
+                    mensajeUI('warning', htmlErrores);
                     restaurarBoton();
                 }
             },
@@ -79,3 +94,51 @@ document.addEventListener('DOMContentLoaded', function() {
         if(document.getElementById('btnCloseModal')) document.getElementById('btnCloseModal').style.display = 'inline-block';
     }
 });
+
+
+
+function initVaciarTabla() {
+    alert('hola mundo')
+    const btnVaciar = document.getElementById('btnVaciarTodo');
+    
+    // Verificamos que el botón exista en la página actual
+    if (btnVaciar) {
+        btnVaciar.addEventListener('click', function() {
+            
+            // 1. Confirmación Nativa
+            if (confirm('⚠️ ¿ESTÁ SEGURO? \n\nEsta acción eliminará TODOS los registros presupuestarios de la gestión actual. Esta operación no se puede deshacer.')) {
+                
+                // 2. Feedback Visual: Deshabilitar y poner Spinner
+                const contenidoOriginal = btnVaciar.innerHTML;
+                btnVaciar.disabled = true;
+                btnVaciar.innerHTML = `<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Eliminando...`;
+
+                // 3. Llamada AJAX (Ajusta la URL a tu ruta real)
+                $.ajax({
+                    url: '<?= base_url("index.php/presupuesto/eliminar_todo_ppto") ?>',
+                    type: 'POST',
+                    dataType: 'json',
+                    success: function(response) {
+                        if (response.status === 'success') {
+                            alert('✅ Éxito: ' + response.message);
+                            location.reload(); // Recargar para ver la tabla vacía
+                        } else {
+                            alert('❌ Error: ' + response.message);
+                            restaurarBoton(btnVaciar, contenidoOriginal);
+                        }
+                    },
+                    error: function() {
+                        alert('❌ Error crítico: No se pudo comunicar con el servidor.');
+                        restaurarBoton(btnVaciar, contenidoOriginal);
+                    }
+                });
+            }
+        });
+    }
+}
+
+// Función auxiliar para desbloquear el botón si algo falla
+function restaurarBoton(boton, contenido) {
+    boton.disabled = false;
+    boton.innerHTML = contenido;
+}

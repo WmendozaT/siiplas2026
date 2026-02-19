@@ -132,4 +132,18 @@ class Model_regional extends Model{
         return $query->getResultArray();
     }
 
+
+    // get unidad_organizacional
+    public function get_unidad_organizacional($da, $ue, $prog, $act) {
+        $gestion = session()->get('configuracion')['conf_gestion'] ?? date('Y');
+        
+        // Usamos ? para que CI4 maneje las comillas simples de los strings automáticamente
+        $sql = "SELECT * 
+                FROM lista_poa_nacional(?) 
+                WHERE da = ? AND ue = ? AND prog = ? AND act = ?";
+                
+        $query = $this->db->query($sql, [$gestion, $da, $ue, $prog, $act]);
+        return $query->getRowArray(); 
+    }
+
 }

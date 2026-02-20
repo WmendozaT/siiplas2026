@@ -115,19 +115,28 @@ class Model_regional extends Model{
 
     //// ASIGNACION DE PRESUPUESTOS
 
-    // lista poa general
+    // lista poa general con el ppto asignado
     public function lista_poa_gral() {
     /// tp_id : 1 Proy inversion
     /// tp_id : 4 Gasto Corriente
         $gestion = session()->get('configuracion')['conf_gestion'] ?? null;
-        $sql = "SELECT *,
+        $sql = "SELECT 
+                    poa.*,
+                    COALESCE(ppto.ppto_asignado, 0) AS ppto_asignado, 
                     CASE 
-                        WHEN tp_id = 1 THEN 'INVERSIÓN'
-                        WHEN tp_id = 4 THEN 'GASTO CORRIENTE'
+                        WHEN poa.tp_id = 1 THEN 'INVERSIÓN'
+                        WHEN poa.tp_id = 4 THEN 'GASTO CORRIENTE'
                         ELSE 'OTRO'
                     END AS tipo_gasto_nombre
-                FROM lista_poa_nacional(".$gestion.")
-                ORDER BY dep_id, dist_id, prog, proy, act ASC";
+                FROM lista_poa_nacional($gestion) poa
+                LEFT JOIN (
+                    SELECT 
+                        aper_id,
+                        SUM(importe) AS ppto_asignado
+                    FROM ptto_partidas_sigep
+                    GROUP BY aper_id
+                ) ppto ON poa.aper_id = ppto.aper_id
+                ORDER BY poa.dep_id, poa.dist_id, poa.prog, poa.proy, poa.act ASC";
         $query = $this->query($sql);
         return $query->getResultArray();
     }

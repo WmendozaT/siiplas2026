@@ -177,7 +177,7 @@ $(document).on('change', '.btn-switch-updates', function() {
     const columna = $input.data('columna'); 
     const valor   = $input.is(':checked') ? 1 : 0;
 
-alert(id+'--'+columna+'--'+valor)
+//alert(id+'--'+columna+'--'+valor)
     // 3. Captura de CSRF (Importante: capturarlos justo antes del envío)
     const csrfName = $('meta[name="csrf-token-name"]').attr('content');
     const csrfHash = $('meta[name="csrf-token-value"]').attr('content');

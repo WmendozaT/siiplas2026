@@ -83,3 +83,6 @@ $routes->post('mnt/rep_uorganizacional', 'CMantenimiento\CEstructura_organizacio
 //// Asignar Presupuesto
 $routes->get('mnt/AsigPtto', 'CMantenimiento\Casignar_presupuesto::menu_lista_poa'); /// Vista de Asignar Presupuesto POA
 $routes->post('mnt/valida_ppto', 'CMantenimiento\Casignar_presupuesto::valida_migracion_ppto'); /// Valida migracion 
+$routes->post('mnt/eliminar_ppto_asignado', 'CMantenimiento\Casignar_presupuesto::eliminar_ppto_asignado'); /// Eliminar Registro ppto
+$routes->get('mnt/exportar_ppto_asignado', 'CMantenimiento\Casignar_presupuesto::exportar_ppto_asignado'); /// Exportar Registro de ppto asignado en excel
+$routes->post('mnt/get_detalle_poa_ppto', 'CMantenimiento\Casignar_presupuesto::ver_detalle_poa_ppto_x_uo'); /// Ver Dettale del POA-PPto por Unidad Organizacional

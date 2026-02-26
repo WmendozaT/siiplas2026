@@ -1,5 +1,5 @@
 <?php
-namespace App\Models\Model_mantenimiento;
+namespace App\Models\Model_Mantenimiento;
 
 use CodeIgniter\Model;
 

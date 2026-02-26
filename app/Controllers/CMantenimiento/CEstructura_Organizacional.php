@@ -16,7 +16,7 @@ use Dompdf\Dompdf;
 use Dompdf\Options;
 use setasign\Fpdi\TcpdfFpdi; // Importante para la firma
 
-class CEstructura_organizacional extends BaseController{
+class CEstructura_Organizacional extends BaseController{
     protected $IndexModel;
     protected $Model_funcionarios;
     protected $Model_regional;

@@ -21,7 +21,7 @@ use Dompdf\Options;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 
 
-class Casignar_presupuesto extends BaseController{
+class CAsignar_presupuesto extends BaseController{
     protected $IndexModel;
     protected $Model_funcionarios;
     protected $Model_regional;

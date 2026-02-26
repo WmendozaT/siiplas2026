@@ -86,3 +86,7 @@ $routes->post('mnt/valida_ppto', 'CMantenimiento\CAsignar_presupuesto::valida_mi
 $routes->post('mnt/eliminar_ppto_asignado', 'CMantenimiento\CAsignar_presupuesto::eliminar_ppto_asignado'); /// Eliminar Registro ppto
 $routes->get('mnt/exportar_ppto_asignado', 'CMantenimiento\CAsignar_presupuesto::exportar_ppto_asignado'); /// Exportar Registro de ppto asignado en excel
 $routes->post('mnt/get_detalle_poa_ppto', 'CMantenimiento\CAsignar_presupuesto::ver_detalle_poa_ppto_x_uo'); /// Ver Dettale del POA-PPto por Unidad Organizacional
+
+///// PROGRAMACION POA
+$routes->get('m2/Anteproyecto', 'Cprogramacion\CProgramacionPoa::lista_poa_anteproyecto'); /// Vista Lista Poa Anteproyecto 2026
+$routes->get('m2/PoaAprobados', 'Cprogramacion\CProgramacionPoa::lista_poa_aprobado'); /// Vista Lista Poa aprobados 2026

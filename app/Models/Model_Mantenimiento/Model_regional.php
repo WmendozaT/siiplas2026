@@ -113,7 +113,7 @@ class Model_regional extends Model{
     }
 
 
-    //// ASIGNACION DE PRESUPUESTOS
+    //// MANTENIMIENTO -> ASIGNACION DE PRESUPUESTOS
 
     // lista poa general con el ppto asignado
     public function lista_poa_gral() {
@@ -153,6 +153,71 @@ class Model_regional extends Model{
                 
         $query = $this->db->query($sql, [$gestion, $da, $ue, $prog, $act]);
         return $query->getRowArray(); 
+    }
+
+
+    //// PROGRAMACION POA
+
+    // lista POA segun el tipo de Administracion del funcionario
+    public function lista_programacion_poa() {
+
+        $gestion = session()->get('configuracion')['conf_gestion'] ?? null;
+        $tipo_adm = session()->get('funcionario')['tp_adm'] ?? null; /// 1: (nacional), 0:(regional/distrital)
+        $dist_id = session()->get('funcionario')['dist_id'] ?? null; /// id distrital
+
+        if($tipo_adm==1){ //// Nacional
+            $sql = "SELECT 
+                    poa.*,
+                    COALESCE(ppto.ppto_asignado, 0) AS ppto_asignado, 
+                    CASE 
+                        WHEN poa.tp_id = 1 THEN 'INVERSIÓN'
+                        WHEN poa.tp_id = 4 THEN 'GASTO CORRIENTE'
+                        ELSE 'OTRO'
+                    END AS tipo_gasto_nombre,
+                    CASE 
+                        WHEN poa.aper_proy_estado = 1 THEN 'ANTEPROYECTO'
+                        WHEN poa.aper_proy_estado = 4 THEN 'APROBADO'
+                        ELSE 'OBSERVADO'
+                    END AS estado_poa
+                FROM lista_poa_nacional($gestion) poa
+                LEFT JOIN (
+                    SELECT 
+                        aper_id,
+                        SUM(importe) AS ppto_asignado
+                    FROM ptto_partidas_sigep
+                    GROUP BY aper_id
+                ) ppto ON poa.aper_id = ppto.aper_id
+                ORDER BY poa.dep_id, poa.dist_id, poa.prog, poa.proy, poa.act ASC";
+        }
+        else{ /// Distrital-> regional
+            $sql = "SELECT 
+                    poa.*,
+                    COALESCE(ppto.ppto_asignado, 0) AS ppto_asignado, 
+                    CASE 
+                        WHEN poa.tp_id = 1 THEN 'INVERSIÓN'
+                        WHEN poa.tp_id = 4 THEN 'GASTO CORRIENTE'
+                        ELSE 'OTRO'
+                    END AS tipo_gasto_nombre,
+                    CASE 
+                        WHEN poa.aper_proy_estado = 1 THEN 'ANTEPROYECTO'
+                        WHEN poa.aper_proy_estado = 4 THEN 'APROBADO'
+                        ELSE 'OBSERVADO'
+                    END AS estado_poa
+                FROM lista_poa_nacional($gestion) poa
+                LEFT JOIN (
+                    SELECT 
+                        aper_id,
+                        SUM(importe) AS ppto_asignado
+                    FROM ptto_partidas_sigep
+                    GROUP BY aper_id
+                ) ppto ON poa.aper_id = ppto.aper_id
+                WHERE dist_id=$dist_id
+                ORDER BY poa.dep_id, poa.dist_id, poa.prog, poa.proy, poa.act ASC";
+        }
+
+        
+        $query = $this->query($sql);
+        return $query->getResultArray();
     }
 
 }

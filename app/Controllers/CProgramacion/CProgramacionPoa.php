@@ -12,6 +12,7 @@ use App\Models\Model_Mantenimiento\Model_configuracion;
 use App\Models\Model_Poa\Model_formulario5;
 use App\Models\Model_Ppto\Model_PptoAsig;
 use App\Libraries\Libreria_ProgramacionPoa;
+use App\Libraries\Libreria_Responsable;
 use App\Libraries\Libreria_EstructuraOrganizacional;
 use App\Libraries\Libreria_Index;
 
@@ -55,6 +56,11 @@ class CProgramacionPoa extends BaseController{
         $miLib_ProgPoa = new Libreria_ProgramacionPoa();
         $data['formulario']=$miLib_ProgPoa->Lista_ProgramacionPoa();
        
+       //$miLib_resp = new Libreria_Responsable();
+       // $model_funcionario = new Model_funcionarios();
+
+
+       // $data['formulario']=$miLib_resp->responsables_poa(); /// lista de responsables (Libreria Responsable)
         return view('View_programacion/view_programacion_poa',$data);
 
     }

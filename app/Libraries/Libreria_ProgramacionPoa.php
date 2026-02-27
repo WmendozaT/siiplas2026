@@ -23,21 +23,18 @@ class Libreria_ProgramacionPoa{
         $this->db = \Config\Database::connect();
     }
 
-
     ///// LISTA PROGRAMACION POA
     public function Lista_ProgramacionPoa(){
         $model_regional = new Model_regional();
-        $unidades_disponibles=$model_regional->lista_poa_gral();
+        $unidades_disponibles=$model_regional->lista_programacion_poa();
         $tabla='';
         $tabla.='
-        <div class="datatables">
-            <!-- start Zero Configuration -->
+
             <div class="card">
               <div class="card-body">
                 <div class="d-md-flex align-items-center justify-content-between mb-4">
                   <div>
-                    <h4 class="card-title fw-semibold">Programación POA</h4>
-                    <p class="card-subtitle mb-0">Gestión Operativa: <span class="badge bg-light-primary text-primary fw-bold">'.$this->session->get('configuracion')['ide'].'</span></p>
+                    <h4 class="card-title fw-semibold">Programación POA - '.$this->session->get('configuracion')['ide'].'</h4>
                   </div>
                   <div class="d-flex align-items-center gap-2 mt-3 mt-md-0">
                     <!-- Botón Importar con estilo Spike -->
@@ -65,17 +62,26 @@ class Libreria_ProgramacionPoa{
                   </div>
                 </div>
                 <div class="table-responsive pb-4">
+
                     <table id="all-student" class="table table-striped table-bordered border text-nowrap align-middle" style="font-size:10.5px;">
                       <thead>
                         <tr>
-                            <th style="width: 10px;">#</th>
-                            <th style="width: 50px;"></th>
-                            <th style="width: 120px;">TIPO DE GASTO</th>
-                            <th style="width: 100px;">DISTRITAL</th>
-                            <th style="width: 150px;">APERTURA PROGRAMATICA</th>
-                            <th style="width: 100px;">CODIGO SISIN</th>
-                            <th style="width: 250px;">GASTO CORRIENTE / INVERSIÓN</th>
-                            <th style="width: 110px;">PPTO. ASIGNADO '.$this->session->get('configuracion')['ide'].'</th>
+                            <th >#</th>
+                            <th >ESTADO</th>
+                            <th >TIPO DE GASTO</th>
+                            <th ></th>
+                            <th ></th>
+                            <th ></th>
+                            <th >DISTRITAL</th>
+                            <th >APERTURA PROGRAMATICA</th>
+                            <th >CODIGO SISIN</th>
+                            <th >GASTO CORRIENTE / INVERSIÓN</th>
+                            <th >GASTO CORRIENTE / INVERSIÓN</th>
+                            <th >GASTO CORRIENTE / INVERSIÓN</th>
+                            <th >GASTO CORRIENTE / INVERSIÓN</th>
+                            <th >GASTO CORRIENTE / INVERSIÓN</th>
+                            <th >GASTO CORRIENTE / INVERSIÓN</th>
+                            <th >PPTO. ASIGNADO '.$this->session->get('configuracion')['ide'].'</th>
                         </tr>
                       </thead>
                       <tbody>';
@@ -89,6 +95,8 @@ class Libreria_ProgramacionPoa{
                         $tabla.='
                         <tr>
                           <td class="text-center">'.$nro.'</td>
+                          <td>'.$row['estado_poa'].'</td>
+                          <td>'.$row['tipo_gasto_nombre'].'</td>
                           <td class="text-center">';
                           if($row['ppto_asignado']!=0){
                             $tabla.='
@@ -104,11 +112,18 @@ class Libreria_ProgramacionPoa{
                           }
                           $tabla.='
                           </td>
-                          <td>'.$row['tipo_gasto_nombre'].'</td>
+                          <td></td>
+                          <td></td>
                           <td>'.$row['dist_distrital'].'</td>
                           <td>'.$row['prog'].' '.$row['proy'].' '.$row['act'].'</td>
                           <td>'.$row['proy_sisin'].'</td>
                           <td style="white-space: normal; min-width: 200px;">'.$detalle.'</td>
+                          <td style="white-space: normal; min-width: 200px;">'.$detalle.'</td>
+                          <td style="white-space: normal; min-width: 200px;">'.$detalle.'</td>
+                          <td style="white-space: normal; min-width: 200px;">'.$detalle.'</td>
+                          <td style="white-space: normal; min-width: 200px;">'.$detalle.'</td>
+                          <td style="white-space: normal; min-width: 200px;">'.$detalle.'</td>
+
                           <td>'.number_format($row['ppto_asignado'], 2, '.', ',').'</td>
                         </tr>';
                       }
@@ -117,7 +132,7 @@ class Libreria_ProgramacionPoa{
                     </table>
                 </div>
             </div>
-        </div>
+
 
 
         <div class="modal fade" id="modalExcel" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="modalExcelLabel" aria-hidden="true">

@@ -65,7 +65,7 @@
 
   <script src="<?= base_url('Js/PlantillaJs/jquery.dataTables.min.js') ?>"></script>
   <script src="<?= base_url('Js/PlantillaJs/datatable.init.js') ?>"></script>
-  <script src=<?= base_url('Js/Mantenimiento/JsAsignacionPpto.js') ?>></script>
+  <script src=<?= base_url('Js/ProgramacionPoa/JsProgramacionPoa.js') ?>></script>
   <script src="<?= base_url('Js/Inactividad.js') ?>"></script>
 </body>
 

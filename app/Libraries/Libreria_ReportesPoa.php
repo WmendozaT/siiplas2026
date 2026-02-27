@@ -119,6 +119,7 @@ class Libreria_ReportesPoa{
                           <th>#</th>
                           <th>Estado</th>
                           <th>Tipo Gasto</th>
+                          <th>Reg. / Dist.</th>
                           <th>D.A.</th>
                           <th>U.E.</th>
                           <th>Apertura</th>
@@ -137,6 +138,7 @@ class Libreria_ReportesPoa{
                           <td class="text-center">'.$nro.'</td>
                           <td class="text-center">'.$row['estado_poa'].'</td>
                           <td>'.$row['tipo_gasto_nombre'].'</td>
+                          <td>'.strtoupper($row['dist_distrital']).'</td>
                           <td class="text-center">'.$row['da'].'</td>
                           <td class="text-center">'.$row['ue'].'</td>
                           <td class="text-center">'.$row['prog'].' '.$row['proy'].' '.$row['act'].'</td>

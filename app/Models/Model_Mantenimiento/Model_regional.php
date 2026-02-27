@@ -54,7 +54,7 @@ class Model_regional extends Model{
         return $query->getResultArray();
     }
 
-    /// lista de unidades organizacionales (Todos) para el poa de la gestion por regional
+    /// MANTENIMIENTO -> lista de unidades organizacionales (Todos) para el poa de la gestion por regional
     public function lista_unidades_disponibles($dep_id,$gestion){
         $sql = '
             SELECT dist.*,ua.*,te.*,
@@ -67,6 +67,25 @@ class Model_regional extends Model{
             Inner Join v_tp_establecimiento as te On te.te_id=ua.te_id
 
             LEFT JOIN uni_gestion ug ON ug.act_id = ua.act_id AND ug.g_id = '.$gestion.'
+            where dist.dep_id='.$dep_id.' and ua.act_estado!=3
+            order by dist.dist_id, ua.act_id asc';
+        $query = $this->query($sql);
+        return $query->getResultArray();
+    }
+
+    /// PROGRAMACION POA -> lista de unidades organizacionales DISPONIBLES para ADICIONAL AL poa de la gestion por regional
+    public function lista_unidades_disponibles_addpoa($dep_id,$gestion){
+        $sql = '
+            SELECT dist.*,ua.*,te.*,
+            CASE 
+            WHEN ug.ug_id IS NOT NULL THEN 1 
+            ELSE 0 
+            END AS incluido
+            from _distritales dist
+            Inner Join unidad_actividad as ua On ua.dist_id=dist.dist_id
+            Inner Join v_tp_establecimiento as te On te.te_id=ua.te_id
+
+            Inner JOIN uni_gestion ug ON ug.act_id = ua.act_id AND ug.g_id = '.$gestion.'
             where dist.dep_id='.$dep_id.' and ua.act_estado!=3
             order by dist.dist_id, ua.act_id asc';
         $query = $this->query($sql);
@@ -158,7 +177,7 @@ class Model_regional extends Model{
 
     //// PROGRAMACION POA
 
-    // lista POA segun el tipo de Administracion del funcionario
+    // Vista lista POA segun el tipo de Administracion del funcionario
     public function lista_programacion_poa() {
 
         $gestion = session()->get('configuracion')['conf_gestion'] ?? null;
@@ -220,4 +239,61 @@ class Model_regional extends Model{
         return $query->getResultArray();
     }
 
+    // PDF1 lista POA segun el tipo de regional
+    public function lista_programacion_poa_x_regional($dep_id) {
+        $gestion = session()->get('configuracion')['conf_gestion'] ?? null;
+        
+        if($dep_id==0){ /// Institucional
+            $sql = "SELECT 
+                    poa.*,
+                    COALESCE(ppto.ppto_asignado, 0) AS ppto_asignado, 
+                    CASE 
+                        WHEN poa.tp_id = 1 THEN 'INVERSIÓN'
+                        WHEN poa.tp_id = 4 THEN 'GASTO CORRIENTE'
+                        ELSE 'OTRO'
+                    END AS tipo_gasto_nombre,
+                    CASE 
+                        WHEN poa.aper_proy_estado = 1 THEN 'ANTEPROYECTO'
+                        WHEN poa.aper_proy_estado = 4 THEN 'APROBADO'
+                        ELSE 'OBSERVADO'
+                    END AS estado_poa
+                FROM lista_poa_nacional($gestion) poa
+                LEFT JOIN (
+                    SELECT 
+                        aper_id,
+                        SUM(importe) AS ppto_asignado
+                    FROM ptto_partidas_sigep
+                    GROUP BY aper_id
+                ) ppto ON poa.aper_id = ppto.aper_id
+                ORDER BY poa.dep_id, poa.dist_id, poa.prog, poa.proy, poa.act ASC";
+        }
+        else{ //// Regional
+            $sql = "SELECT 
+                    poa.*,
+                    COALESCE(ppto.ppto_asignado, 0) AS ppto_asignado, 
+                    CASE 
+                        WHEN poa.tp_id = 1 THEN 'INVERSIÓN'
+                        WHEN poa.tp_id = 4 THEN 'GASTO CORRIENTE'
+                        ELSE 'OTRO'
+                    END AS tipo_gasto_nombre,
+                    CASE 
+                        WHEN poa.aper_proy_estado = 1 THEN 'ANTEPROYECTO'
+                        WHEN poa.aper_proy_estado = 4 THEN 'APROBADO'
+                        ELSE 'OBSERVADO'
+                    END AS estado_poa
+                FROM lista_poa_nacional($gestion) poa
+                LEFT JOIN (
+                    SELECT 
+                        aper_id,
+                        SUM(importe) AS ppto_asignado
+                    FROM ptto_partidas_sigep
+                    GROUP BY aper_id
+                ) ppto ON poa.aper_id = ppto.aper_id
+                WHERE dep_id=$dep_id
+                ORDER BY poa.dep_id, poa.dist_id, poa.prog, poa.proy, poa.act ASC";
+        }
+
+        $query = $this->query($sql);
+        return $query->getResultArray();
+    }
 }

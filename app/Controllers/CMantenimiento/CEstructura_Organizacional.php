@@ -504,7 +504,6 @@ $html .= '<div class="d-flex justify-content-between align-items-center mb-3">
 
         // 1. Capturamos el contenido binario del PDF generado
         $pdf_content = $dompdf->output();
-       
 
         // 2. Convertimos a Base64
         $base64 = base64_encode($pdf_content);
@@ -512,7 +511,7 @@ $html .= '<div class="d-flex justify-content-between align-items-center mb-3">
         // 3. Retornamos como JSON (ideal para recibirlo con AJAX hoy 2026)
         return $this->response->setJSON([
             'status' => 'success',
-            'nombre' => 'unidad_organizacional.pdf',
+            'nombre' => 'unidad_organizacional-'.$regional['dep_departamento'].'_'.$this->session->get('configuracion')['ide'].'.pdf',
             'pdf'    => 'data:application/pdf;base64,' . $base64
         ]);
     }

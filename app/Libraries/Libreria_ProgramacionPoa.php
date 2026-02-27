@@ -26,6 +26,7 @@ class Libreria_ProgramacionPoa{
     ///// LISTA PROGRAMACION POA
     public function Lista_ProgramacionPoa(){
         $model_regional = new Model_regional();
+        $regionales=$model_regional->obtenerRegionales();
         $unidades_disponibles=$model_regional->lista_programacion_poa();
         $tabla='';
         $tabla.='
@@ -37,50 +38,57 @@ class Libreria_ProgramacionPoa{
                     <h4 class="card-title fw-semibold">Programación POA - '.$this->session->get('configuracion')['ide'].'</h4>
                   </div>
                   <div class="d-flex align-items-center gap-2 mt-3 mt-md-0">
-                    <!-- Botón Importar con estilo Spike -->
-                    <button type="button" class="btn btn-primary btn-sm ms-2"  data-bs-toggle="modal" data-bs-target="#modalExcel">
-                      <span class="d-none d-sm-block">Importar Excel</span>
-                    </button>
 
-                    <!-- Botón Vaciar con estilo Outlined Danger -->
-                    <button type="button" id="btnVaciarTabla" class="btn btn-danger btn-sm ms-2" >
-                      <span class="d-none d-sm-block">Eliminar Registro</span>
-                    </button>
+                      <div class="ms-auto">
+                        <select class="form-select border-primary text-primary fw-semibold" id="dep_id_add" name="dep_id_add" style="border-radius: 7px; background-color: rgba(93, 135, 255, 0.1); font-size:11px;">
+                          <option value="" selected disabled>+ Adicionar POA</option>';
+                          foreach($regionales as $row){
+                            $tabla.='<option value="'.$row['dep_id'].'">'.$row['dep_departamento'].'.pdf</option>';
+                          }
+                          $tabla.='
+                        </select>
+                      </div>
 
-                    <!-- Botón Exportar -->
-                      <a href="'.base_url('mnt/exportar_ppto_asignado').'" 
-                         id="btnExportar"
-                         class="btn btn-outline-primary btn-sm ms-2" 
-                         data-bs-toggle="tooltip" 
-                         title="Exportar Listado">
-                          <span id="btnIcon">
-                              <img src="'.base_url().'Img/Iconos/page_excel.png" alt="Excel">
-                          </span>
-                          <span id="btnText">Exportar.xls</span>
-                      </a>
+                      <div class="ms-auto">
+                        <select class="form-select border-success text-success fw-semibold" id="dep_id_pdf" name="dep_id_pdf" style="border-radius: 7px; background-color: rgba(19, 222, 185, 0.1); font-size:11px;">
+                          <option value="" selected disabled>📄 Generar PDF</option>
+                          <option value="0">INSTITUCIONAL.pdf</option>';
+                          foreach($regionales as $row){
+                            $tabla.='<option value="'.$row['dep_id'].'">'.$row['dep_departamento'].'.Pdf</option>';
+                          }
+                        $tabla.='
+                        </select>
+                      </div>
+
+                      <div class="ms-auto">
+                        <select class="form-select border-success text-success fw-semibold" id="dep_id_xls" name="dep_id_xls" style="border-radius: 7px; background-color: rgba(19, 222, 185, 0.1); font-size:11px;">
+                          <option value="" selected disabled>📊 Exportar Excel</option>
+                          <option value="0">INSTITUCIONAL.xls</option>';
+                          foreach($regionales as $row){
+                            $tabla.='<option value="'.$row['dep_id'].'">'.$row['dep_departamento'].'.Xls</option>';
+                          }
+                        $tabla.='
+                        </select>
+                      </div>
 
                   </div>
+
                 </div>
                 <div class="table-responsive pb-4">
 
                     <table id="all-student" class="table table-striped table-bordered border text-nowrap align-middle" style="font-size:10.5px;">
                       <thead>
                         <tr>
-                            <th >#</th>
-                            <th >ESTADO</th>
-                            <th >TIPO DE GASTO</th>
-                            <th ></th>
-                            <th ></th>
-                            <th ></th>
-                            <th >DISTRITAL</th>
-                            <th >APERTURA PROGRAMATICA</th>
-                            <th >CODIGO SISIN</th>
-                            <th >GASTO CORRIENTE / INVERSIÓN</th>
-                            <th >GASTO CORRIENTE / INVERSIÓN</th>
-                            <th >GASTO CORRIENTE / INVERSIÓN</th>
-                            <th >GASTO CORRIENTE / INVERSIÓN</th>
-                            <th >GASTO CORRIENTE / INVERSIÓN</th>
-                            <th >GASTO CORRIENTE / INVERSIÓN</th>
+                            <th style="white-space: normal; min-width: 5px;">#</th>
+                            <th style="white-space: normal; min-width: 50px;">ESTADO</th>
+                            <th style="white-space: normal; min-width: 50px;">TIPO DE GASTO</th>
+                            <th style="white-space: normal; min-width: 50px;"></th>
+                            <th style="white-space: normal; min-width: 50px;"></th>
+                            <th style="white-space: normal; min-width: 50px;"></th>
+                            <th style="white-space: normal; min-width: 60px;">DISTRITAL</th>
+                            <th style="white-space: normal; min-width: 60px;">APERTURA PROGRAMATICA</th>
+                            <th style="white-space: normal; min-width: 60px;">CODIGO SISIN</th>
+                            <th style="white-space: normal; min-width: 50px;">GASTO CORRIENTE / INVERSIÓN</th>
                             <th >PPTO. ASIGNADO '.$this->session->get('configuracion')['ide'].'</th>
                         </tr>
                       </thead>
@@ -93,7 +101,7 @@ class Libreria_ProgramacionPoa{
                         }
                         $nro++;
                         $tabla.='
-                        <tr>
+                        <tr style="font-size:10px;">
                           <td class="text-center">'.$nro.'</td>
                           <td>'.$row['estado_poa'].'</td>
                           <td>'.$row['tipo_gasto_nombre'].'</td>
@@ -118,11 +126,6 @@ class Libreria_ProgramacionPoa{
                           <td>'.$row['prog'].' '.$row['proy'].' '.$row['act'].'</td>
                           <td>'.$row['proy_sisin'].'</td>
                           <td style="white-space: normal; min-width: 200px;">'.$detalle.'</td>
-                          <td style="white-space: normal; min-width: 200px;">'.$detalle.'</td>
-                          <td style="white-space: normal; min-width: 200px;">'.$detalle.'</td>
-                          <td style="white-space: normal; min-width: 200px;">'.$detalle.'</td>
-                          <td style="white-space: normal; min-width: 200px;">'.$detalle.'</td>
-                          <td style="white-space: normal; min-width: 200px;">'.$detalle.'</td>
 
                           <td>'.number_format($row['ppto_asignado'], 2, '.', ',').'</td>
                         </tr>';
@@ -135,59 +138,78 @@ class Libreria_ProgramacionPoa{
 
 
 
-        <div class="modal fade" id="modalExcel" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="modalExcelLabel" aria-hidden="true">
-            <div class="modal-dialog">
-              <div class="modal-content">
-                <div class="modal-header">
-                  <h6 class="modal-title" id="modalExcelLabel">Importar Asignación de PPTO-POA '.$this->session->get('configuracion')['ide'].' desde Excel</h6>
-                  <!-- Quitar el botón X o deshabilitarlo en el submit es opcional -->
-                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" id="btnCloseModal"></button>
+          <!-- Modal para Formulario POA -->
+          <div class="modal fade" id="modalAdicionarPoa" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
+              <div class="modal-content" style="border-radius: 15px; border: none; min-height: 80vh;">
+                
+                <div class="modal-header border-bottom py-3">
+                  <h5 class="modal-title fw-bold text-primary fs-5">Unidades Organizacionales disponibles</h5>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <form id="formImportarExcel" action="'.base_url().'mnt/valida_ppto" method="POST" enctype="multipart/form-data">
-                  <div class="modal-body">
-                    <div class="mb-3">
-                      <label for="archivo_excel" class="form-label">Seleccione el archivo (.xlsx, .xls)</label>
-                      <input class="form-control" type="file" id="archivo_excel" name="archivo_excel" accept=".xlsx, .xls">
-                      <div id="error-mensaje" class="text-danger mt-2" style="display:none; font-size: 12px;"></div>
-                    </div>
-                    <div class="alert alert-info">
-                      <small>Asegúrese de que el formato coincida con las siguientes columnas: <br>DA|UE|PROG|PROY|ACT|PARTIDA|MONTO</small>
-                    </div>
-                  </div>
-                  <div class="modal-footer">
-                    <button type="button" class="btn btn-light" data-bs-dismiss="modal" id="btnCancelModal">Cancelar</button>
-                    <button type="submit" id="btnImportar" class="btn btn-primary">
-                      <span id="spinnerLoading" class="spinner-border spinner-border-sm me-2" role="status" style="display: none;"></span>
-                      <span id="btnText">Procesar e Importar</span>
-                    </button>
-                  </div>
-                </form>
+
+                <div class="modal-body p-4">
+                  <!-- Formulario estructurado para ocupar el espacio largo -->
+                  <form id="formPoa" class="row g-4">
+                    <div id="listado_uo"></div>
+                  </form>
+                </div>
+
+                <div class="modal-footer border-top-0 p-4">
+                  <button type="button" class="btn btn-light-danger text-danger px-4" data-bs-dismiss="modal">Cancelar Operación</button>
+                  <button type="button" class="btn btn-primary px-4">Finalizar y Guardar</button>
+                </div>
               </div>
             </div>
           </div>
+          <!-- END Modal para Formulario POA -->
 
-
-          <div class="modal fade" id="modalPartidas" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-hidden="true">
-            <div class="modal-dialog modal-lg">
-              <div class="modal-content">
-                <!-- ID añadido: modalHeader -->
-                <div class="modal-header bg-primary text-white" id="modalHeader" style="background-color: #094d48 !important;">
-                  <h5 class="modal-title text-white" id="tituloModal">Partidas Asignadas</h5>
-                  <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                  <!-- ID añadido: modalSubtitulo -->
-                  <h6 id="subtituloUnidad" class="fw-bold mb-3" style="color: #094d4d;"></h6>
-                  <div id="contenidoPartidas">
-                    <div class="text-center p-4">
-                      <div class="spinner-border text-primary" role="status"></div>
-                      <p>Cargando partidas...</p>
-                    </div>
+          <div class="modal fade" id="modalVisorPdf" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-xl modal-dialog-centered">
+              <div class="modal-content border-0 shadow-lg" style="border-radius: 15px; overflow: hidden;">
+                
+                <!-- Cabecera con Degradado y Badge -->
+                <div class="modal-header d-flex align-items-center justify-content-between border-0 py-3" 
+                     style="background: #004640; padding-left: 25px; padding-right: 25px;">
+                  <div class="d-flex align-items-center">
+                      <div>
+                          <h5 class="modal-title fw-bolder text-white mb-0" style="letter-spacing: 0.5px;">POA GESTIÓN '.$this->session->get('configuracion')['ide'].'</h5>
+                          <div class="d-flex align-items-center mt-1">
+                              <span class="badge bg-white fw-bold text-uppercase px-3 py-1 shadow-sm" 
+                                    id="nombre_regional_pdf" style="font-size: 0.75rem; border-radius: 50px; color: #004640;">
+                                  Cargando Regional...
+                              </span>
+                          </div>
+                      </div>
                   </div>
+                  <div class="d-flex align-items-center gap-2">
+                      <!-- BOTÓN REFRESH -->
+                      <button type="button" class="btn btn-sm btn-light-success d-flex align-items-center justify-content-center p-2" 
+                              id="btn_refresh_pdf" title="Actualizar Reporte" style="border-radius: 8px; background: rgba(255,255,255,0.1); border: none; color: white;">
+                          <i class="ti ti-refresh fs-5"> <b>Actualizar Reporte</b></i>
+                      </button>
+                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close" style="opacity: 0.8;"></button>
+                  </div>
+                </div>
+
+                <div class="modal-body p-0" style="background-color: #f8fafd; height: 78vh; position: relative;">
+                  <!-- Pantalla de Loading Mejorada -->
+                  <div id="loading_pdf" class="position-absolute top-50 start-50 translate-middle text-center w-100">
+                      <div class="spinner-grow text-primary" role="status" style="width: 4rem; height: 4rem; opacity: 0.4;"></div>
+                      <h5 class="mt-4 fw-bold text-dark-light">PROCESANDO REPORTE</h5>
+                      <p class="text-muted small px-5">Estamos extrayendo la información del servidor para generar el archivo PDF.</p>
+                  </div>
+
+                  <iframe id="iframe_pdf" src="" width="100%" height="100%" style="border: none; display: none;"></iframe>
+                </div>
+
+                <!-- Pie de página sutil para balancear el diseño -->
+                <div class="modal-footer bg-light border-0 py-2 justify-content-center">
+                    <small class="text-muted fw-medium"><i class="ti ti-info-circle me-1"></i> Use los controles del visor para imprimir o descargar el reporte.</small>
                 </div>
               </div>
             </div>
-          </div>';
+            </div>';
 
         return $tabla;
     }

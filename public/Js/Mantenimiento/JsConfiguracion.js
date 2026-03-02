@@ -432,7 +432,6 @@ document.addEventListener('DOMContentLoaded', function () {
     if (btn) {
         const idPartida = btn.getAttribute('data-id');
         console.log("Activando ID:", idPartida);
-
         // Referencia a tu div de destino
         const contenedor = document.getElementById('u_medida');
         const codigoPartida = btn.getAttribute('data-codigo');

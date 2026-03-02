@@ -88,6 +88,8 @@ $routes->get('mnt/exportar_ppto_asignado', 'CMantenimiento\CAsignar_presupuesto:
 $routes->post('mnt/get_detalle_poa_ppto', 'CMantenimiento\CAsignar_presupuesto::ver_detalle_poa_ppto_x_uo'); /// Ver Dettale del POA-PPto por Unidad Organizacional
 
 ///// PROGRAMACION POA
-$routes->get('m2/Anteproyecto', 'CProgramacion\CProgramacionPoa::lista_poa_anteproyecto'); /// Vista Lista Poa Anteproyecto 2026
+$routes->get('m2/Programacion_poa/(:num)', 'CProgramacion\CProgramacionPoa::lista_poa/$1'); /// Vista Lista Poa Anteproyecto gc inv
 $routes->post('m2/obtener_uorganizacionales_disponibles', 'CProgramacion\CProgramacionPoa::obtener_unidades_organizacionales_disponibles_x_regional'); /// Get Unidades disponibles para su inclusion al poa
-$routes->get('m2/reporte_uorganizacional_gral_poa/(:any)', 'CProgramacion\CProgramacionPoa::pdf_lista_poa_uorganizacional_regional/$1'); /// Reporte Uorganizacional por regional del POA
+$routes->get('m2/reporte_uorganizacional_gral_poa/(:any)', 'CProgramacion\CProgramacionPoa::pdf_lista_poa_uorganizacional_regional/$1/$2'); /// Reporte Uorganizacional por regional del POA Gasto corriente / Inversion
+$routes->get('m2/exportar_excel_poa/(:any)', 'CProgramacion\CProgramacionPoa::exportar_poa_excel/$1/$2'); /// exportar en Uorganizacional por regional del POA Gasto corriente / Inversion
+

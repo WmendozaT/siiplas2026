@@ -25,7 +25,7 @@ class Libreria_ReportesPoa{
 
 
     ///// POA -> Lista Unidades en el POA
-    public function Pdf1_Lista_unidades_disponibles_poa_x_regional($lista,$regional){
+    public function Pdf1_Lista_unidades_disponibles_poa_x_regional($lista,$regional,$tp_id){
       $html='';
       //$logoPath = base_url('Img/login/logo_CNS_header.png'); // Asegúrate que la ruta sea accesible
       $logoPath = FCPATH . 'Img/login/logo_CNS_header.png';
@@ -112,7 +112,6 @@ class Libreria_ReportesPoa{
           </footer>
 
           <main>
-
               <table class="table-report">
                   <thead>
                       <tr>
@@ -122,9 +121,16 @@ class Libreria_ReportesPoa{
                           <th>Reg. / Dist.</th>
                           <th>D.A.</th>
                           <th>U.E.</th>
-                          <th>Apertura</th>
-                          <th>Sisin</th>
-                          <th>Descripción Detallada (Gasto / Inversión)</th>
+                          <th>Apertura</th>';
+                          if($tp_id==1){
+                            $html.='<th>SISIN</th>
+                            <th>PROYECTO</th>';
+                          }
+                          else{
+                            $html.='<th>TIPO</th>
+                            <th>UNIDAD ORGANIZACIONAL</th>';
+                          }
+                          $html .= '
                           <th>Ppto. Asignado</th>
                       </tr>
                   </thead>
@@ -141,8 +147,14 @@ class Libreria_ReportesPoa{
                           <td>'.strtoupper($row['dist_distrital']).'</td>
                           <td class="text-center">'.$row['da'].'</td>
                           <td class="text-center">'.$row['ue'].'</td>
-                          <td class="text-center">'.$row['prog'].' '.$row['proy'].' '.$row['act'].'</td>
-                          <td class="text-center">'.$row['proy_sisin'].'</td>
+                          <td class="text-center">'.$row['prog'].' '.$row['proy'].' '.$row['act'].'</td>';
+                          if($tp_id==1){
+                            $html.='<td >'.$row['proy_sisin'].'</td>';
+                          }
+                          else{
+                            $html.='<td >'.$row['tipo'].'</td>';
+                          }
+                          $html .= '
                           <td style="width: 220px;">'.$detalle.'</td>
                           <td class="text-right bold">'.number_format($row['ppto_asignado'], 2, ".", ",").'</td>
                       </tr>';

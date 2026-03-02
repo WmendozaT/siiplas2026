@@ -178,7 +178,7 @@ class Model_regional extends Model{
     //// PROGRAMACION POA
 
     // Vista lista POA segun el tipo de Administracion del funcionario
-    public function lista_programacion_poa() {
+    public function lista_programacion_poa($tp_id) {
 
         $gestion = session()->get('configuracion')['conf_gestion'] ?? null;
         $tipo_adm = session()->get('funcionario')['tp_adm'] ?? null; /// 1: (nacional), 0:(regional/distrital)
@@ -206,6 +206,7 @@ class Model_regional extends Model{
                     FROM ptto_partidas_sigep
                     GROUP BY aper_id
                 ) ppto ON poa.aper_id = ppto.aper_id
+                WHERE poa.tp_id=$tp_id
                 ORDER BY poa.dep_id, poa.dist_id, poa.prog, poa.proy, poa.act ASC";
         }
         else{ /// Distrital-> regional
@@ -230,7 +231,7 @@ class Model_regional extends Model{
                     FROM ptto_partidas_sigep
                     GROUP BY aper_id
                 ) ppto ON poa.aper_id = ppto.aper_id
-                WHERE dist_id=$dist_id
+                WHERE dist_id=$dist_id and poa.tp_id=$tp_id
                 ORDER BY poa.dep_id, poa.dist_id, poa.prog, poa.proy, poa.act ASC";
         }
 
@@ -240,7 +241,7 @@ class Model_regional extends Model{
     }
 
     // PDF1 lista POA segun el tipo de regional
-    public function lista_programacion_poa_x_regional($dep_id) {
+    public function lista_programacion_poa_x_regional($dep_id,$tp_id) {
         $gestion = session()->get('configuracion')['conf_gestion'] ?? null;
         
         if($dep_id==0){ /// Institucional
@@ -265,6 +266,7 @@ class Model_regional extends Model{
                     FROM ptto_partidas_sigep
                     GROUP BY aper_id
                 ) ppto ON poa.aper_id = ppto.aper_id
+                WHERE poa.tp_id=$tp_id
                 ORDER BY poa.dep_id, poa.dist_id, poa.prog, poa.proy, poa.act ASC";
         }
         else{ //// Regional
@@ -289,7 +291,7 @@ class Model_regional extends Model{
                     FROM ptto_partidas_sigep
                     GROUP BY aper_id
                 ) ppto ON poa.aper_id = ppto.aper_id
-                WHERE dep_id=$dep_id
+                WHERE dep_id=$dep_id and poa.tp_id=$tp_id
                 ORDER BY poa.dep_id, poa.dist_id, poa.prog, poa.proy, poa.act ASC";
         }
 

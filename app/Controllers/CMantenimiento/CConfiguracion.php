@@ -72,6 +72,12 @@ class CConfiguracion extends BaseController{
                 </button>
               </li>
               <li class="nav-item" role="presentation">
+                <button class="nav-link position-relative rounded-0 d-flex align-items-center justify-content-center bg-transparent fs-3 py-3" id="pills-notifications2-tab" data-bs-toggle="pill" data-bs-target="#pills-notifications2" type="button" role="tab" aria-controls="pills-notifications2" aria-selected="false">
+                  <i class="ti ti-bell me-2 fs-6"></i>
+                  <span class="d-none d-md-block">ALINEACIÓN DE SERVICIOS</span>
+                </button>
+              </li>
+              <li class="nav-item" role="presentation">
                 <button class="nav-link position-relative rounded-0 d-flex align-items-center justify-content-center bg-transparent fs-3 py-3" id="pills-security-tab" data-bs-toggle="pill" data-bs-target="#pills-security" type="button" role="tab" aria-controls="pills-security" aria-selected="false">
                   <i class="ti ti-lock me-2 fs-6"></i>
                   <span class="d-none d-md-block">PARTIDAS</span>
@@ -92,6 +98,10 @@ class CConfiguracion extends BaseController{
 
                 <div class="tab-pane fade" id="pills-bills" role="tabpanel" aria-labelledby="pills-bills-tab" tabindex="0">
                   '.$miLib_conf->conf_form3().'
+                </div>
+
+                <div class="tab-pane fade" id="pills-notifications2" role="tabpanel" aria-labelledby="pills-notifications2-tab" tabindex="0">
+                  '.$miLib_conf->conf_form5().'
                 </div>
 
                 <div class="tab-pane fade" id="pills-security" role="tabpanel" aria-labelledby="pills-security-tab" tabindex="0">
@@ -352,9 +362,9 @@ class CConfiguracion extends BaseController{
             return $this->response->setJSON(['status' => 'error', 'message' => 'ID de partida no válido']);
         }
 
-        $model_index = new IndexModel();
-        $listado_umedida = $model_index->lista_umedidas($par_id);
-        $partida = $model_index->get_partidas($par_id); /// get partida
+        $Model_configuracion = new Model_configuracion();
+        $listado_umedida = $Model_configuracion->lista_umedidas($par_id);
+        $partida = $Model_configuracion->get_partidas($par_id); /// get partida
         //$data['par_id']  = $par_id;
         $tabla='';
         $tabla.='

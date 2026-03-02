@@ -117,7 +117,7 @@ class IndexModel extends Model{
     }
 
 
-    /// Listado de Partidas
+/*    /// Listado de Partidas
     public function lista_partidas(){
         $sql = 'SELECT *
                 from partidas
@@ -160,7 +160,7 @@ class IndexModel extends Model{
     return $this->db->table('par_umedida')
                     ->where(['par_id' => $par_id, 'um_id' => $um_id])
                     ->countAllResults() > 0; // Devuelve true o false
-    }
+    }*/
 
     /// Get Buscando funcionario por su Usuario
     public function fun_usuario($usuario){

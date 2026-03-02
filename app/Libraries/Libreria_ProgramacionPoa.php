@@ -24,18 +24,24 @@ class Libreria_ProgramacionPoa{
     }
 
     ///// LISTA PROGRAMACION POA
-    public function Lista_ProgramacionPoa(){
+    public function Lista_ProgramacionPoa($tp_id){
         $model_regional = new Model_regional();
         $regionales=$model_regional->obtenerRegionales();
-        $unidades_disponibles=$model_regional->lista_programacion_poa();
+        $poa_disponibles=$model_regional->lista_programacion_poa($tp_id);
+        
+        $titulo='Programación POA / GASTO CORRIENTE - '.$this->session->get('configuracion')['ide'].'';
+        if($tp_id==1){
+          $titulo='Programación POA / INVERSIÓN - '.$this->session->get('configuracion')['ide'].'';
+        }
+
+
         $tabla='';
         $tabla.='
-
             <div class="card">
               <div class="card-body">
                 <div class="d-md-flex align-items-center justify-content-between mb-4">
                   <div>
-                    <h4 class="card-title fw-semibold">Programación POA - '.$this->session->get('configuracion')['ide'].'</h4>
+                    <h4 class="card-title fw-semibold">'.$titulo.'</h4>
                   </div>
                   <div class="d-flex align-items-center gap-2 mt-3 mt-md-0">
 
@@ -43,7 +49,7 @@ class Libreria_ProgramacionPoa{
                         <select class="form-select border-primary text-primary fw-semibold" id="dep_id_add" name="dep_id_add" style="border-radius: 7px; background-color: rgba(93, 135, 255, 0.1); font-size:11px;">
                           <option value="" selected disabled>+ Adicionar POA</option>';
                           foreach($regionales as $row){
-                            $tabla.='<option value="'.$row['dep_id'].'">'.$row['dep_departamento'].'.pdf</option>';
+                            $tabla.='<option value="'.$row['dep_id'].'" data-tp="'.$tp_id.'">'.$row['dep_departamento'].'</option>';
                           }
                           $tabla.='
                         </select>
@@ -52,9 +58,9 @@ class Libreria_ProgramacionPoa{
                       <div class="ms-auto">
                         <select class="form-select border-success text-success fw-semibold" id="dep_id_pdf" name="dep_id_pdf" style="border-radius: 7px; background-color: rgba(19, 222, 185, 0.1); font-size:11px;">
                           <option value="" selected disabled>📄 Generar PDF</option>
-                          <option value="0">INSTITUCIONAL.pdf</option>';
+                          <option value="0" data-tp="'.$tp_id.'">INSTITUCIONAL.pdf</option>';
                           foreach($regionales as $row){
-                            $tabla.='<option value="'.$row['dep_id'].'">'.$row['dep_departamento'].'.Pdf</option>';
+                            $tabla.='<option value="'.$row['dep_id'].'" data-tp="'.$tp_id.'">'.$row['dep_departamento'].'.Pdf</option>';
                           }
                         $tabla.='
                         </select>
@@ -63,9 +69,9 @@ class Libreria_ProgramacionPoa{
                       <div class="ms-auto">
                         <select class="form-select border-success text-success fw-semibold" id="dep_id_xls" name="dep_id_xls" style="border-radius: 7px; background-color: rgba(19, 222, 185, 0.1); font-size:11px;">
                           <option value="" selected disabled>📊 Exportar Excel</option>
-                          <option value="0">INSTITUCIONAL.xls</option>';
+                          <option value="0" data-tp="'.$tp_id.'">INSTITUCIONAL.xls</option>';
                           foreach($regionales as $row){
-                            $tabla.='<option value="'.$row['dep_id'].'">'.$row['dep_departamento'].'.Xls</option>';
+                            $tabla.='<option value="'.$row['dep_id'].'" data-tp="'.$tp_id.'">'.$row['dep_departamento'].'.Xls</option>';
                           }
                         $tabla.='
                         </select>
@@ -74,65 +80,14 @@ class Libreria_ProgramacionPoa{
                   </div>
 
                 </div>
-                <div class="table-responsive pb-4">
-
-                    <table id="all-student" class="table table-striped table-bordered border text-nowrap align-middle" style="font-size:10.5px;">
-                      <thead>
-                        <tr>
-                            <th style="white-space: normal; min-width: 5px;">#</th>
-                            <th style="white-space: normal; min-width: 50px;">ESTADO</th>
-                            <th style="white-space: normal; min-width: 50px;">TIPO DE GASTO</th>
-                            <th style="white-space: normal; min-width: 50px;"></th>
-                            <th style="white-space: normal; min-width: 50px;"></th>
-                            <th style="white-space: normal; min-width: 50px;"></th>
-                            <th style="white-space: normal; min-width: 60px;">DISTRITAL</th>
-                            <th style="white-space: normal; min-width: 60px;">APERTURA PROGRAMATICA</th>
-                            <th style="white-space: normal; min-width: 60px;">CODIGO SISIN</th>
-                            <th style="white-space: normal; min-width: 50px;">GASTO CORRIENTE / INVERSIÓN</th>
-                            <th >PPTO. ASIGNADO '.$this->session->get('configuracion')['ide'].'</th>
-                        </tr>
-                      </thead>
-                      <tbody>';
-                      $nro=0;
-                      foreach($unidades_disponibles as $row){
-                        $detalle=$row['actividad'].' '.$row['abrev'];
-                        if($row['tp_id']==1){
-                            $detalle=$row['proy_nombre'];
-                        }
-                        $nro++;
-                        $tabla.='
-                        <tr style="font-size:10px;">
-                          <td class="text-center">'.$nro.'</td>
-                          <td>'.$row['estado_poa'].'</td>
-                          <td>'.$row['tipo_gasto_nombre'].'</td>
-                          <td class="text-center">';
-                          if($row['ppto_asignado']!=0){
-                            $tabla.='
-                            <button type="button" 
-                                    class="btn btn-sm btn-success btn-ver-partidas" 
-                                    data-id="'.$row['aper_id'].'" 
-                                    data-nombre="'.$detalle.'"
-                                    title="Ver Partidas">
-                              <span id="btnIcon">
-                              <img src="'.base_url().'Img/Iconos/application_view_detail.png" alt="Partidas">
-                              </span> Ver
-                            </button>';
-                          }
-                          $tabla.='
-                          </td>
-                          <td></td>
-                          <td></td>
-                          <td>'.$row['dist_distrital'].'</td>
-                          <td>'.$row['prog'].' '.$row['proy'].' '.$row['act'].'</td>
-                          <td>'.$row['proy_sisin'].'</td>
-                          <td style="white-space: normal; min-width: 200px;">'.$detalle.'</td>
-
-                          <td>'.number_format($row['ppto_asignado'], 2, '.', ',').'</td>
-                        </tr>';
-                      }
-                      $tabla.='
-                      </tbody>
-                    </table>
+                <div class="table-responsive pb-4">';
+                  if ($tp_id==1) {
+                      $tabla.=$this->poa_inversion($poa_disponibles);
+                  }
+                  else{
+                      $tabla.=$this->poa_gasto_corriente($poa_disponibles);
+                  }
+                $tabla.='
                 </div>
             </div>
 
@@ -209,8 +164,134 @@ class Libreria_ProgramacionPoa{
                 </div>
               </div>
             </div>
-            </div>';
+          </div>
+
+
+          <div id="loading_excel_overlay" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 9999; justify-content: center; align-items: center; flex-direction: column;">
+              <div class="spinner-border text-success" style="width: 3rem; height: 3rem;" role="status"></div>
+              <h5 class="text-white mt-3">Generando Excel...</h5>
+          </div>';
 
         return $tabla;
     }
+
+
+  ///// LISTA PROGRAMACION POA GASTO CORRIENTE
+  public function poa_gasto_corriente($poa_disponibles){
+    $tabla='';
+    $tabla.='
+    <table id="all-student" class="table table-striped table-bordered border text-nowrap align-middle" style="font-size:10.5px;">
+        <thead>
+          <tr>
+              <th style="white-space: normal; min-width: 5px;">#</th>
+              <th style="white-space: normal; min-width: 50px;">ESTADO</th>
+              <th style="white-space: normal; min-width: 50px;"></th>
+              <th style="white-space: normal; min-width: 50px;"></th>
+              <th style="white-space: normal; min-width: 50px;"></th>
+              <th style="white-space: normal; min-width: 60px;">DISTRITAL</th>
+              <th style="white-space: normal; min-width: 60px;">APERTURA PROGRAMATICA</th>
+              <th style="white-space: normal; min-width: 60px;">TIPO </th>
+              <th style="white-space: normal; min-width: 50px;">UNIDAD ORGANIZACIONAL</th>
+              <th >PPTO. ASIGNADO '.$this->session->get('configuracion')['ide'].'</th>
+          </tr>
+        </thead>
+        <tbody>';
+        $nro=0;
+        foreach($poa_disponibles as $row){
+          $nro++;
+          $tabla.='
+          <tr style="font-size:10px;">
+            <td class="text-center">'.$nro.'</td>
+            <td>'.$row['estado_poa'].'</td>
+            <td class="text-center">';
+            if($row['ppto_asignado']!=0){
+              $tabla.='
+              <button type="button" 
+                      class="btn btn-sm btn-success btn-ver-partidas" 
+                      data-id="'.$row['aper_id'].'" 
+                      data-nombre="'.$row['actividad'].' '.$row['abrev'].'"
+                      title="Ver Partidas">
+                <span id="btnIcon">
+                <img src="'.base_url().'Img/Iconos/application_view_detail.png" alt="Partidas">
+                </span> Ver
+              </button>';
+            }
+            $tabla.='
+            </td>
+            <td></td>
+            <td></td>
+            <td>'.$row['dist_distrital'].'</td>
+            <td>'.$row['prog'].' '.$row['proy'].' '.$row['act'].'</td>
+            <td>'.$row['tipo'].'</td>
+            <td style="white-space: normal; min-width: 200px;">'.$row['actividad'].' '.$row['abrev'].'</td>
+
+            <td>'.number_format($row['ppto_asignado'], 2, '.', ',').'</td>
+          </tr>';
+        }
+        $tabla.='
+        </tbody>
+      </table>';
+
+      return $tabla;
+  }
+
+  ///// LISTA PROGRAMACION POA INVERSION
+  public function poa_inversion($poa_disponibles){
+    $tabla='';
+    $tabla.='
+    <table id="all-student" class="table table-striped table-bordered border text-nowrap align-middle" style="font-size:10.5px;">
+        <thead>
+          <tr>
+              <th style="white-space: normal; min-width: 5px;">#</th>
+              <th style="white-space: normal; min-width: 50px;">ESTADO</th>
+              <th style="white-space: normal; min-width: 50px;"></th>
+              <th style="white-space: normal; min-width: 50px;"></th>
+              <th style="white-space: normal; min-width: 50px;"></th>
+              <th style="white-space: normal; min-width: 60px;">DISTRITAL</th>
+              <th style="white-space: normal; min-width: 60px;">APERTURA PROGRAMATICA</th>
+              <th style="white-space: normal; min-width: 60px;">CODIGO SISIN </th>
+              <th style="white-space: normal; min-width: 50px;">PROYECTO</th>
+              <th >PPTO. ASIGNADO '.$this->session->get('configuracion')['ide'].'</th>
+          </tr>
+        </thead>
+        <tbody>';
+        $nro=0;
+        foreach($poa_disponibles as $row){
+          $nro++;
+          $tabla.='
+          <tr style="font-size:10px;">
+            <td class="text-center">'.$nro.'</td>
+            <td>'.$row['estado_poa'].'</td>
+            <td class="text-center">';
+            if($row['ppto_asignado']!=0){
+              $tabla.='
+              <button type="button" 
+                      class="btn btn-sm btn-success btn-ver-partidas" 
+                      data-id="'.$row['aper_id'].'" 
+                      data-nombre="'.$row['proy_nombre'].'"
+                      title="Ver Partidas">
+                <span id="btnIcon">
+                <img src="'.base_url().'Img/Iconos/application_view_detail.png" alt="Partidas">
+                </span> Ver
+              </button>';
+            }
+            $tabla.='
+            </td>
+            <td></td>
+            <td></td>
+            <td>'.$row['dist_distrital'].'</td>
+            <td>'.$row['prog'].' '.$row['proy'].' '.$row['act'].'</td>
+            <td>'.$row['proy_sisin'].'</td>
+            <td style="white-space: normal; min-width: 200px;">'.$row['proy_nombre'].'</td>
+            <td>'.number_format($row['ppto_asignado'], 2, '.', ',').'</td>
+          </tr>';
+        }
+        $tabla.='
+        </tbody>
+      </table>';
+
+      return $tabla;
+
+  }
+
 }

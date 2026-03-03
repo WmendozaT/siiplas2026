@@ -434,7 +434,7 @@ class CConfiguracion extends BaseController{
 
         $db = \Config\Database::connect(); 
         $miLib_index = new Libreria_Index();
-        $model_index = new IndexModel();
+        $model_configuracion = new Model_configuracion ();
 
         $um_id  = $this->request->getPost('um_id', FILTER_SANITIZE_NUMBER_INT);
         $par_id = $this->request->getPost('par_id', FILTER_SANITIZE_NUMBER_INT);
@@ -442,7 +442,7 @@ class CConfiguracion extends BaseController{
 
         try {
 
-            if ($model_index->existe_umedia_a_partida($par_id, $um_id)) {
+            if ($model_configuracion->existe_umedia_a_partida($par_id, $um_id)) {
                 if ($valor == 0) {
                 // Si existe y el switch se apagó, eliminamos
                     $db->table('par_umedida')
@@ -481,6 +481,195 @@ class CConfiguracion extends BaseController{
         }
  
     }
+
+
+    //// Get Unidades Responsables para Alineacion a tipo de establecimiento
+    public function get_uniresp_alineacion_estsalud() {
+        // 1. Validación de seguridad avanzada
+        if (!$this->request->isAJAX()) {
+            return $this->response->setStatusCode(403)->setJSON([
+                'status' => 'error', 
+                'message' => 'Acceso no permitido'
+            ]);
+        }
+
+        // 2. Validación de datos de entrada
+        $te_id = $this->request->getPost('id', FILTER_SANITIZE_NUMBER_INT);
+        $est = $this->request->getPost('est');
+        if (!$te_id) {
+            return $this->response->setJSON(['status' => 'error', 'message' => 'ID de Establecimiento no válido']);
+        }
+        
+        $Model_configuracion = new Model_configuracion();
+        $listado_uresp = $Model_configuracion->list_uresponsables_para_alinear_a_tipoEstablecimiento($te_id);
+
+        $tabla='';
+        $tabla.='<b>'.$est.'</b>
+            <hr>
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <div class="flex-grow-1 me-2">
+                    <input type="text" class="form-control form-control-sm border-primary-subtle" id="search-um-resp" placeholder="🔍 Buscar ...">
+                </div>
+                <button type="button" class="btn btn-sm btn-primary d-flex align-items-center gap-2 shadow-sm" id="btn-ver-alineadasur" data-te-id="'.$te_id.'">
+                    <img src="'.base_url().'Img/Iconos/page_white_magnify.png" 
+                                    alt="Eliminar" 
+                                    style="width:16px; margin-right:5px;">Ver Alineadas
+                </button>
+            </div>
+            <div class="table-responsive" style="max-height: 400px;">
+                <table class="table table-hover align-middle table-sm" id="tab_uresp">
+                    <thead class="table-light sticky-top">
+                        <tr>
+                            <th style="width: 5%">#</th>
+                            <th style="width: 75%">UNIDAD RESPONSABLE</th>
+                            <th style="width: 20%" class="text-center">ALINEADO</th>
+                        </tr>
+                    </thead>
+                    <tbody>';
+                    $nro=0;
+                    foreach($listado_uresp as $row){
+                        $nro++;
+                        $tabla.='
+                        <tr class="ur-item-row">
+                            <td class="text-muted small">'.$nro.'</td>
+                            <td class="text-uppercase fw-medium" style="font-size: 0.85rem;">
+                                '.$row['serv_cod'].' '.$row['serv_descripcion'].'
+                            </td>
+                            <td>
+                                <div class="form-check form-switch d-flex justify-content-center">
+                                    <input class="form-check-input btn-switch-update_uresp" type="checkbox" 
+                                           data-serv-id="'.$row['serv_id'].'" 
+                                           data-te-id="'.$te_id.'"
+                                           '.($row['alineado'] == 1 ? 'checked' : '').'
+                                           style="width: 2.4em; height: 1.2em; cursor:pointer;">
+                                </div>
+                            </td>
+                        </tr>';
+                    }
+                    $tabla.='
+                    </tbody>
+                </table>
+            </div>';
+
+        // 3. Retornar vista procesada (más limpio)
+        return $this->response->setJSON([
+            'status' => 'success', 
+            'datos'  => $tabla 
+        ]);
+    }
+
+    /// Update check Unidad responsable
+    public function update_check_uresponsable() {
+        // 1. Verificación de seguridad
+        if (!$this->request->isAJAX()) {
+            return $this->response->setStatusCode(403)->setJSON(['status' => 'error', 'message' => 'Acceso no permitido']);
+        }
+
+        $db = \Config\Database::connect();
+        $Model = new Model_configuracion();
+
+        $te_id  = $this->request->getPost('te_id', FILTER_SANITIZE_NUMBER_INT);
+        $serv_id = $this->request->getPost('serv_id', FILTER_SANITIZE_NUMBER_INT);
+        $valor  = $this->request->getPost('estado');
+        $msg = "No se realizaron cambios"; // Mensaje por defecto
+
+        try {
+
+            if ($Model->existe_uresponsable_a_establecimiento($te_id, $serv_id)) {
+                if ($valor == 0) {
+                // Si existe y el switch se apagó, eliminamos
+                    $db->table('establecimiento_servicio')
+                   ->where('te_id', $te_id)
+                   ->where('serv_id', $serv_id)
+                   ->delete(); 
+
+                   $msg = "Relación eliminada";
+                }
+            } else {
+                if ($valor == 1) {
+                    // Si no existe y el switch se encendió, insertamos
+                    $db->table('establecimiento_servicio')->insert([
+                        'te_id' => $te_id,
+                        'serv_id'    => $serv_id
+                    ]);
+
+                    $msg = "Relación alineada";
+                }
+            }
+
+            return $this->response->setJSON([
+                'status'  => 'success',
+                'message' => $msg,
+                'token'   => csrf_hash() // Imprescindible para el siguiente clic
+            ]);
+
+        } 
+        catch (\Exception $e) {
+            // Enviar error real al JS para debugging o manejo de errores
+            return $this->response->setJSON([
+                'status'  => 'error',
+                'message' => 'Error en la operación: ' . $e->getMessage(),
+                'token'   => csrf_hash()
+            ]);
+        }
+    }
+
+
+    /// Update SELECT programa a tipo de establecimiento
+    public function update_select_programa() {
+        // 1. Verificación de seguridad
+        if (!$this->request->isAJAX()) {
+            return $this->response->setStatusCode(403)->setJSON(['status' => 'error', 'message' => 'Acceso no permitido']);
+        }
+
+        $db = \Config\Database::connect();
+        $Model = new Model_configuracion();
+
+        $te_id  = $this->request->getPost('te_id', FILTER_SANITIZE_NUMBER_INT);
+        $aper_id = $this->request->getPost('aper_id', FILTER_SANITIZE_NUMBER_INT);
+        $g_id    = $this->session->get('configuracion')['ide']; // ID de gestión/configuración
+        $msg = "No se realizaron cambios"; // Mensaje por defecto
+
+    try {
+        // 1. Siempre eliminamos cualquier vinculación previa de este establecimiento 
+        // para la gestión actual (g_id), así permitimos el cambio de un programa a otro.
+        $db->table('aper_establecimiento')
+           ->where('te_id', $te_id)
+           ->where('g_id', $g_id)
+           ->delete();
+
+        // 2. Si el usuario seleccionó un programa válido (distinto de vacío/cero)
+        if ($aper_id > 0) {
+            $db->table('aper_establecimiento')->insert([
+                'te_id'   => $te_id,
+                'aper_id' => $aper_id,
+                'g_id'    => $g_id
+            ]);
+            $msg = "Programa vinculado correctamente";
+        } else {
+            $msg = "Alineación de programa eliminada";
+        }
+
+        return $this->response->setJSON([
+            'status'  => 'success',
+            'message' => $msg,
+            'token'   => csrf_hash()
+        ]);
+
+    } catch (\Exception $e) {
+        return $this->response->setJSON([
+            'status'  => 'error',
+            'message' => 'Error: ' . $e->getMessage(),
+            'token'   => csrf_hash()
+        ]);
+    }
+ 
+    }
+
+
+
+
+
 }
 
 

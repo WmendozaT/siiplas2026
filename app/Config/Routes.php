@@ -64,12 +64,19 @@ $routes->get('mnt/ConfiguracionSistema', 'CMantenimiento\CConfiguracion::Menu_co
 $routes->post('mnt/update_conf', 'CMantenimiento\CConfiguracion::Update_configuracion'); /// Valida Update Responsable
 $routes->post('mnt/update_estado_modulos', 'CMantenimiento\CConfiguracion::update_estado_modulos'); /// Estados para modulo disponibles
 
+/// Mantenimiento Programas
 $routes->post('mnt/aperturas', 'CMantenimiento\CConfiguracion::valida_aperturas'); /// Valida Add - Update Aperturas Programaticas
 $routes->post('mnt/eliminar_apertura', 'CMantenimiento\CConfiguracion::eliminar_apertura'); /// Elimina Apertura Programatica
 
+/// Mantenimiento Partidas
 $routes->post('mnt/get_unidades_medida', 'CMantenimiento\CConfiguracion::get_unidades_medida'); /// Get Lista de Unidades de Medida de la Partida Seleccionada
 $routes->post('mnt/update_estado_umedida', 'CMantenimiento\CConfiguracion::update_estado_umedida'); /// Update Estado Unidad de Medida
 
+/// Mantenimiento Tipo de Servicios
+
+$routes->post('mnt/get_uniresp_alineacion_estsalud', 'CMantenimiento\CConfiguracion::get_uniresp_alineacion_estsalud'); /// Get Lista de Unidades Responsables a alinear
+$routes->post('mnt/update_check_uresponsable', 'CMantenimiento\CConfiguracion::update_check_uresponsable'); /// Update Check Unidad responsable
+$routes->post('mnt/update_select_programa', 'CMantenimiento\CConfiguracion::update_select_programa'); /// Update Check alineacion programa a tipo de estableciento
 
 //// Estructura Organizacional
 $routes->get('mnt/EstructuraCns', 'CMantenimiento\CEstructura_organizacional::menu_estructura'); /// Lista de Estructura Organizacional

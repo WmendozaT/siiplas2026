@@ -100,7 +100,7 @@ class IndexModel extends Model{
                 from modulo_menu
                 where mod_id=".$id." and sub_menu_estado=1
                 order by sub_id asc";
-        $query = $this->query($sql);
+        $query = $this->db->query($sql);
         return $query->getResultArray();
     }
 
@@ -112,7 +112,8 @@ class IndexModel extends Model{
                 from aperturaprogramatica a
                 where a.aper_estado!=3 and a.aper_gestion=".$gestion." and a.aper_asignado=1
                 order by a.aper_gestion,a.aper_programa,a.aper_proyecto,a.aper_actividad asc";
-        $query = $this->query($sql);
+
+        $query = $this->db->query($sql);
         return $query->getResultArray();
     }
 

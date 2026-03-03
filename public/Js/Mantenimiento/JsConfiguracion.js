@@ -111,6 +111,14 @@ $(document).on('keyup', '#search-um-internal', function() {
     });
 });
 
+//// Buscador Get Unidades Responsables para alinear al establecimiento
+$(document).on('keyup', '#search-um-resp', function() {
+    let valor = $(this).val().toLowerCase();
+    $("#tab_uresp tbody tr").filter(function() {
+        $(this).toggle($(this).text().toLowerCase().indexOf(valor) > -1)
+    });
+});
+
 
 
 
@@ -463,8 +471,48 @@ document.addEventListener('DOMContentLoaded', function () {
                         $input.prop('checked', !($input.is(':checked')));
                     }
                 }
-            });
+            });           
+    }
+
+
+    ///// lista de unidades responsables alineados a tipo de establecimiento
+    const btn2 = e.target.closest('.btn-activar_ur');
+    if (btn2) {
+        const idEstablecimiento = btn2.getAttribute('data-id');
+        console.log("Activando ID:", idEstablecimiento);
+
+        // Referencia a tu div de destino
+        const contenedor = document.getElementById('unidades_responsables');
+        const establecimiento = btn2.getAttribute('data-codigo');
+
+        contenedor.innerHTML = `
+            <div class="d-flex align-items-center justify-content-center h-100">
+                <div class="spinner-border text-primary" role="status"></div>
+                <span class="ms-2">Cargando unidades responsables para alinear a ${establecimiento}...</span>
+            </div>`;
+
+            const dataPost = {
+                id: idEstablecimiento,
+                est: establecimiento
+            };
+
+        $.ajax({
+                url: base + "mnt/get_uniresp_alineacion_estsalud",
+                type: 'POST',
+                data: dataPost,
+                dataType: 'json',
+                success: function(response) {
                 
+                    if (response.status === 'success') {
+                        contenedor.innerHTML = response.datos;
+                        console.log("unidad alineado correctamente");
+                    } else {
+                        alert('Error: ' + (response.message || 'No se pudo actualizar'));
+                        // Revertir estado visual si el servidor reporta error
+                        $input.prop('checked', !($input.is(':checked')));
+                    }
+                }
+            });
     }
 });
 
@@ -527,7 +575,7 @@ $(document).on('change', '.btn-switch-update_umedida', function() {
     });
 });
 
-//// Modal que muestra el listado de las unidades de medida alineados a la partida
+//// Modal que muestra el listado de las unidades de medida alineados a la PARTIDA
     $(document).on('click', '#btn-ver-alineadas', function() {
         let listadoHtml = '<ul class="list-group list-group-flush">';
         let contador = 0;
@@ -562,3 +610,146 @@ $(document).on('change', '.btn-switch-update_umedida', function() {
         const modal = new bootstrap.Modal(document.getElementById('modalAlineadas'));
         modal.show();
     });
+
+
+
+
+
+
+//// activa el estado de alinear la unidades responsables al tipo de establecimiento
+$(document).on('change', '.btn-switch-update_uresp', function() {
+    const $input = $(this);
+    const $container = $input.closest('.form-check'); // Para el feedback visual
+
+    const te_id      = $input.data('data-te-id');      
+    const serv_id = $input.data('data-serv-id'); 
+    const estado   = $input.is(':checked') ? 1 : 0;
+    //console.log("Capturado:", { te_id, serv_id, estado });
+    // 3. Captura de CSRF (Importante: capturarlos justo antes del envío)
+    const csrfName = $('meta[name="csrf-token-name"]').attr('content');
+    const csrfHash = $('meta[name="csrf-token-value"]').attr('content');
+
+    // 4. Preparación del objeto
+    const dataPost = {
+        te_id: te_id,
+        serv_id: serv_id,
+        estado: estado
+    };
+
+
+    // 5. Inyección dinámica del token
+    dataPost[csrfName] = csrfHash;
+
+    $.ajax({
+        url: base + "mnt/update_check_uresponsable",
+        type: 'POST',
+        data: dataPost,
+        dataType: 'json',
+        beforeSend: function() {
+            // Opcional: Bloquear el switch mientras procesa para evitar doble clic
+            $input.prop('disabled', true);
+        },
+        success: function(response) {
+           // alert(response.status)
+            // ACTUALIZACIÓN DEL TOKEN: Vital para que el siguiente clic no de error 403
+            if (response.token) {
+                $('meta[name="csrf-token-value"]').attr('content', response.token);
+            }
+
+            if (response.status == 'success') {
+                alert(response.message);
+            }
+            else{
+                $input.prop('checked', !dataPost.estado);
+                alert(response.message);
+            }
+        },
+        error: function() {
+            $input.prop('checked', !dataPost.estado);
+            alert('Error de conexión');
+        },
+        complete: function() {
+            $input.prop('disabled', false);
+            $container.removeClass('opacity-50');
+        }
+    });
+});
+
+
+//// Modal que muestra el listado de las unidades responsables alineados al Tipo de Establecimiento
+    $(document).on('click', '#btn-ver-alineadasur', function() {
+        let listadoHtml = '<ul class="list-group list-group-flush">';
+        let contador = 0;
+
+        // Recorremos solo las filas que tienen el checkbox marcado
+        $('.ur-item-row').each(function() {
+            const row = $(this);
+            const isChecked = row.find('.btn-switch-update_uresp').is(':checked');
+            
+            if (isChecked) {
+                const nombre = row.find('td:nth-child(2)').text().trim();
+                listadoHtml += `
+                    <li class="list-group-item d-flex align-items-center py-2">
+                        <img src="${base}Img/Iconos/page_white_key.png" 
+                                    alt="Eliminar" 
+                                    style="width:16px; margin-right:5px;">
+                        <span class="small fw-medium text-uppercase"> ${nombre}</span>
+                    </li>`;
+                contador++;
+            }
+        });
+
+        listadoHtml += '</ul>';
+
+        if (contador === 0) {
+            listadoHtml = '<div class="p-4 text-center text-muted small">No hay unidades alineadas todavía.</div>';
+        }
+
+        $('#body-alineadas').html(listadoHtml);
+        
+        // Abrir el modal
+        const modal = new bootstrap.Modal(document.getElementById('modalAlineadas'));
+        modal.show();
+    });
+
+
+    //// activa la alineacion del PROGRAMA al tipo de establecimiento
+    $(document).on('change', '.select-vincula-programa', function() {
+        const $select = $(this);
+        const te_id = $select.data('te-id'); // Captura el ID del establecimiento
+        const aper_id = $select.val();       // Captura el valor seleccionado del programa
+
+        // Captura de CSRF (Reutilizando tu lógica previa)
+        const csrfName = $('meta[name="csrf-token-name"]').attr('content');
+        const csrfHash = $('meta[name="csrf-token-value"]').attr('content');
+
+        const dataPost = {
+            te_id: te_id,
+            aper_id: aper_id
+        };
+        dataPost[csrfName] = csrfHash;
+
+        $.ajax({
+            url: base + "mnt/update_select_programa", // Crea esta ruta en tu controlador
+            type: 'POST',
+            data: dataPost,
+            dataType: 'json',
+            success: function(response) {
+                // Actualizar token CSRF para el siguiente cambio
+                if (response.token) {
+                    $('meta[name="csrf-token-value"]').attr('content', response.token);
+                }
+
+                if (response.status === 'success') {
+                    alert(response.message);
+                    // Podrías añadir un efecto visual de éxito aquí
+                } else {
+                    alert("Error: " + response.message);
+                }
+            },
+            error: function() {
+                alert("Error de conexión al vincular programa");
+            }
+        });
+    });
+

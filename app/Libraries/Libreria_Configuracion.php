@@ -555,85 +555,97 @@ class Libreria_Configuracion{
     public function conf_form5(){
         $Model_configuracion = new Model_configuracion();
         $tp_servicios = $Model_configuracion->list_tp_establecimiento(); /// lista de tipos de servicios
+        $model_index = new IndexModel();
+        $aperturas=$model_index->List_aperturas($this->session->get('configuracion')['ide']);
+        $tabla='
+        <div class="row">
 
+          <div class="modal fade" id="modalAlineadas" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered modal-sm">
+              <div class="modal-content border-0 shadow-lg">
+                <!-- Cambios: background-color con dos puntos y clase text-white -->
+                <div class="modal-header text-white" style="background-color: #004640;">
+                  <h6 class="modal-title fw-bold text-white">Unidades Alineadas</h6>
+                  <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-0" id="body-alineadas" style="max-height: 350px; overflow-y: auto;">
+                  <!-- Aquí se cargará el listado resumido -->
+                </div>
+                <div class="modal-footer bg-light py-2">
+                  <button type="button" class="btn btn-outline-secondary btn-sm" data-bs-dismiss="modal">Cerrar</button>
+                </div>
+              </div>
+            </div>
+          </div>
 
-        /*$tabla='
-                  <div class="row">
-
-                    <div class="modal fade" id="modalAlineadas2" tabindex="-1" aria-hidden="true">
-                      <div class="modal-dialog modal-dialog-centered modal-sm">
-                        <div class="modal-content border-0 shadow-lg">
-                          <!-- Cambios: background-color con dos puntos y clase text-white -->
-                          <div class="modal-header text-white" style="background-color: #004640;">
-                            <h6 class="modal-title fw-bold text-white">Unidades Alineadas</h6>
-                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-                          </div>
-                          <div class="modal-body p-0" id="body-alineadas" style="max-height: 350px; overflow-y: auto;">
-                            <!-- Aquí se cargará el listado resumido -->
-                          </div>
-                          <div class="modal-footer bg-light py-2">
-                            <button type="button" class="btn btn-outline-secondary btn-sm" data-bs-dismiss="modal">Cerrar</button>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-
-
-                    <div class="col-lg-8 d-flex align-items-stretch">
-                      <div class="card w-100 border position-relative overflow-hidden">
-                        <div >
-                          <div class="table-responsive p-4">
-                             <table id="all-student" class="table table-striped table-bordered border text-nowrap align-middle" style="font-size:10.5px;">
-                            <thead>
-                              <tr>
-                                  <th style="white-space: normal; min-width: 2px;">#</th>
-                                  <th style="white-space: normal; min-width: 10px;">ESCALON</th>
-                                  <th style="white-space: normal; min-width: 20px;">ESTABLECIMIENTO</th>
-                                  <th style="white-space: normal; min-width: 20px;">NIVEL</th>
-                                  <th style="white-space: normal; min-width: 20px;"></th>
-                              </tr>
-                            </thead>
-                            <tbody>';
-                            $nro=0;
-                            foreach($tp_servicios as $row){
-                              $nro++;
-                              $tabla.='
-                               <tr class="search-items minimalist-row">
-                                <td class="ps-4 text-muted small" title="'.$row['te_id'].'">'.$nro.'</td>
-                                <td>
-                                    
-                                </td>
-                                <td class="text-wrap">
-                                  <div class="fw-medium text-dark">'.strtoupper($row['establecimiento']).'</div>
-                                </td>
-                                <td class="text-wrap">
-                                  <div class="fw-medium text-dark">'.$row['tipo_adm'].'</div>
-                                </td>
-                                <td class="text-wrap"></td>
-                              </tr>';
+          <div class="col-lg-8 d-flex align-items-stretch">
+            <div class="card w-100 border position-relative overflow-hidden">
+              <div class="table-responsive p-4">
+                <table id="all-student" class="table table-striped table-bordered border text-nowrap align-middle" style="font-size:10.5px;">
+                  <thead>
+                    <tr>
+                      <th style="white-space: normal; min-width: 10px;">#</th>
+                      <th style="white-space: normal; min-width: 40px;">TIPO DE ESTABLECIMIENTO</th>
+                      <th style="white-space: normal; min-width: 50px;">PROGRAMA ALINEADO '.$this->session->get('configuracion')['ide'].'</th>
+                    </tr>
+                  </thead>
+                  <tbody>';
+                  $nro=0;
+                  foreach($tp_servicios as $row){
+                      $nro++;
+                      $tabla.='
+                       <tr class="search-items minimalist-row">
+                        <td class="ps-4 text-muted small" title="'.$row['te_id'].'">'.$nro.'</td>
+                        <td  style="text-align:left;">
+                            <button type="button" 
+                                  class="btn btn-link p-0 border-0 btn-activar_ur" 
+                                  data-id="'.$row['te_id'].'" 
+                                  data-codigo="'.$row['establecimiento'].'" 
+                                  title="Click para alinear Unidades Responsables">
+                              <code class="text-primary-emphasis bg-primary-subtle px-2 py-1 rounded hover-active" style="font-size: 14px; cursor: pointer;">
+                                  <b>'.strtoupper($row['establecimiento']).'</b>
+                              </code>
+                            </button>
+                        </td>
+                        <td class="text-wrap">
+                          <select class="form-select select-vincula-programa" aria-label="Default select example" data-te-id="'.$row['te_id'].'" name="conf_aper" id="conf_aper" style="font-size:10px;">';
+                            $tabla .= '<option value="0">Seleccione alineacion a Programa...</option>';
+                            if($row['incluido_programa']==1){
+                              foreach ($aperturas as $rowa) {
+                                $selected = ($rowa['aper_id'] == $row['aper_id']) ? 'selected' : '';
+                                $tabla .= '<option value="'.$rowa['aper_id'].'" '.$selected.'>'.$rowa['aper_programa'].' - '.$rowa['aper_descripcion'].'</option>';
+                              }
                             }
-                            $tabla.='
-                            </tbody>
-                          </table>
+                            else{
+                              foreach ($aperturas as $rowa) {
+                                $tabla .= '<option value="'.$rowa['aper_id'].'">'.$rowa['aper_programa'].' - '.$rowa['aper_descripcion'].'</option>';
+                              }
+                            }
+                          $tabla.='
+                          </select>
+                        </td>
+                      </tr>';
+                  }
+                  $tabla.='
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+          <div class="col-lg-4 d-flex align-items-stretch">
+            <div class="card w-100 border position-relative overflow-hidden">
+                <!-- Añadimos max-height y overflow-y -->
+                <div class="card-body p-4" id="unidades_responsables" style="max-height: 900px; overflow-y: auto;">
+                    <h4 class="card-title">Mis Unidades Responsables</h4>
+                    <!-- Tu lista de unidades o tabla aquí -->
+                </div>
+            </div>
+          </div>
+        </div>';
 
-                          </div>
-                         
-                        </div>
-                      </div>
-                    </div>
 
-                    <div class="col-lg-4 d-flex align-items-stretch">
-                      <div class="card w-100 border position-relative overflow-hidden">
-                          <!-- Añadimos max-height y overflow-y -->
-                          <div class="card-body p-4" id="u_medida" style="max-height: 800px; overflow-y: auto;">
-                              <h4 class="card-title">Mis Unidades de Medida</h4>
-                              <!-- Tu lista de unidades o tabla aquí -->
-                          </div>
-                      </div>
-                    </div>
-                  </div>';
-        return $tabla;*/
+        return $tabla;
     }
 
-    
+
 }
